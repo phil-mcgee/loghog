@@ -1,0 +1,6 @@
+.gradle/
+build/
+*.code-workspace
+.idea/
+buildSrc/build/
+.DS_Store
