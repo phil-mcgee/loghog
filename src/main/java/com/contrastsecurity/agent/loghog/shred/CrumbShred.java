@@ -7,7 +7,7 @@ import com.contrastsecurity.agent.loghog.sql.SqlTableBase;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class CrumbShred extends Shred {
+public class CrumbShred extends AbstractShred {
 
     public CrumbShred() {
         super(
@@ -44,7 +44,7 @@ public class CrumbShred extends Shred {
         return new Object[] {line};
     }
 
-    // Shred table "crumb"
+    // AbstractShred table "crumb"
     public static final String CRUMB_TBL_NAME = "crumb";
     public static final String CRUMB_TBL_CREATE_SQL =
             """
@@ -156,13 +156,13 @@ create table crumb(
                                             + NO_URL_XTRACT
                                             + NO_STACKFRAME_XTRACT
                                             + "$"));
-                    put(Shred.DEFAULT_TYPE, Pattern.compile("^~NOMATCH~$"));
+                    put(AbstractShred.DEFAULT_TYPE, Pattern.compile("^~NOMATCH~$"));
                 }
             };
     public static final ShredValueExtractor VALUE_EXTRACTOR =
             new ShredValueExtractor(EXTRACTED_VAL_NAMES, VALUE_EXTRACTORS);
 
-    // Shred misfits table "crumb_misfits"
+    // AbstractShred misfits table "crumb_misfits"
     public static final String MISFITS_TBL_NAME = "crumb_misfits";
     public static final String MISFITS_TBL_CREATE_SQL =
             "create table crumb_misfits(" + "line integer primary key references log(line))";

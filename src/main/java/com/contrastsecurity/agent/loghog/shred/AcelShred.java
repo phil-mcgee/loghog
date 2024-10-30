@@ -5,7 +5,7 @@ import com.contrastsecurity.agent.loghog.sql.SqlTableBase;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class AcelShred extends Shred {
+public class AcelShred extends AbstractShred {
 
     public AcelShred() {
         super(
@@ -52,7 +52,7 @@ public class AcelShred extends Shred {
         return new Object[] {line};
     }
 
-    // Shred table "acel" (message queue)
+    // AbstractShred table "acel" (message queue)
     public static final String ACEL_TBL_NAME = "acel";
     public static final String ACEL_TBL_CREATE_SQL =
             "create table acel("
@@ -136,13 +136,13 @@ public class AcelShred extends Shred {
                                     "\\- Adding (?<fqcn>\\S+) to library usage for lib"
                                             + " (?<jarname>\\S+) in app (?<location>~NOLOC~)?\".+\""
                                             + " \\((?<application>.*)\\)$"));
-                    put(Shred.DEFAULT_TYPE, Pattern.compile("^~NOMATCH~$"));
+                    put(AbstractShred.DEFAULT_TYPE, Pattern.compile("^~NOMATCH~$"));
                 }
             };
     public static final ShredValueExtractor VALUE_EXTRACTOR =
             new ShredValueExtractor(EXTRACTED_VAL_NAMES, VALUE_EXTRACTORS);
 
-    // Shred misfits table "acel_misfits"
+    // AbstractShred misfits table "acel_misfits"
     public static final String MISFITS_TBL_NAME = "acel_misfits";
     public static final String MISFITS_TBL_CREATE_SQL =
             "create table acel_misfits(" + "line integer primary key references log(line))";

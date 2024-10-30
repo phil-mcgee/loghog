@@ -24,7 +24,7 @@ class ShredEntryClassifier {
     public ShredEntryClassifier(Map<String, List<String>> patternSignatures) {
         if (patternSignatures == null) {
             this.patternSignatures = new HashMap<>();
-            this.patternSignatures.put(DEFAULT_PATTERN_ID, List.of(""));
+            this.patternSignatures.put(MISFIT_PATTERN_ID, List.of(""));
         } else {
             this.patternSignatures = patternSignatures;
         }
@@ -45,8 +45,8 @@ class ShredEntryClassifier {
                 return patternId;
             }
         }
-        return DEFAULT_PATTERN_ID;
+        return MISFIT_PATTERN_ID;
     }
 
-    public static final String DEFAULT_PATTERN_ID = "default";
+    public static final String MISFIT_PATTERN_ID = "misfit";
 }

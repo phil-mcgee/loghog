@@ -49,6 +49,7 @@ public class ShredEntrySelector {
         this.batchSize = batchSize;
     }
 
+
     // FIXME
     // So this reads the query results into a batch row list and then accumulates all the batch
     // lists

@@ -11,6 +11,7 @@ import java.util.List;
 public class LogDatabaseUtil {
     private static final boolean SHOW_PROGRESS = false;
     private static final int LOG_READ_CHUNK_SIZE = 1000;
+    public static final String LOG_TABLE_NAME = "log";
 
     public static void initializeLogTable(Connection connection, String logFilePath)
             throws IOException, SQLException {

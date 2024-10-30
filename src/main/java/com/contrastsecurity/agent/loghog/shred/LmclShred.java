@@ -5,7 +5,7 @@ import com.contrastsecurity.agent.loghog.sql.SqlTableBase;
 import java.util.*;
 import java.util.regex.Pattern;
 
-public class LmclShred extends Shred {
+public class LmclShred extends AbstractShred {
 
     public LmclShred() {
         super(
@@ -52,7 +52,7 @@ public class LmclShred extends Shred {
         return new Object[] {line};
     }
 
-    // Shred table "lmcl" (class load)
+    // AbstractShred table "lmcl" (class load)
     public static final String LMCL_TBL_NAME = "lmcl";
     public static final String LMCL_TBL_CREATE_SQL =
             "create table lmcl("
@@ -80,7 +80,7 @@ public class LmclShred extends Shred {
             new HashMap<String, Pattern>() {
                 {
                     put(
-                            Shred.DEFAULT_TYPE,
+                            AbstractShred.DEFAULT_TYPE,
                             Pattern.compile(
                                     "!LM!ClassLoad\\|(?<fqcn>[^|]+)\\|result=(?<result>[^&]+)&adapters=(?<adapters>[^&]*)&location=(?<location>.*)$"));
                 }
@@ -88,7 +88,7 @@ public class LmclShred extends Shred {
     public static final ShredValueExtractor VALUE_EXTRACTOR =
             new ShredValueExtractor(EXTRACTED_VAL_NAMES, VALUE_EXTRACTORS);
 
-    // Shred misfits table "lmcl_misfits"
+    // AbstractShred misfits table "lmcl_misfits"
     public static final String MISFITS_TBL_NAME = "lmcl_misfits";
     public static final String MISFITS_TBL_CREATE_SQL =
             "create table lmcl_misfits(" + "line integer primary key references log(line))";

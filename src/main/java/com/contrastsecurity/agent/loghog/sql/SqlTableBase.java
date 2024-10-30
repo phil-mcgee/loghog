@@ -15,8 +15,8 @@ public class SqlTableBase implements SqlTable {
             final String name,
             final String createTableSql,
             final List<String> indexTableSql,
-            final List<String> insertColumnNames) {
-        this(name, createTableSql, indexTableSql, insertSql(name, insertColumnNames));
+            final List<String> columnNames) {
+        this(name, createTableSql, indexTableSql, insertSql(name, columnNames));
     }
 
     public SqlTableBase(

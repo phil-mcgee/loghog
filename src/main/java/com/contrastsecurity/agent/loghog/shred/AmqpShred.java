@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AmqpShred extends Shred {
+public class AmqpShred extends AbstractShred {
 
     public AmqpShred() {
         super(
@@ -51,7 +51,7 @@ public class AmqpShred extends Shred {
         return new Object[] {line};
     }
 
-    // Shred table "amqp" (message queue)
+    // AbstractShred table "amqp" (message queue)
     public static final String AMQP_TBL_NAME = "amqp";
     public static final String AMQP_TBL_CREATE_SQL =
             "create table amqp("
@@ -78,7 +78,7 @@ public class AmqpShred extends Shred {
             new HashMap<String, Pattern>() {
                 {
                     put(
-                            Shred.DEFAULT_TYPE,
+                            AbstractShred.DEFAULT_TYPE,
                             Pattern.compile(
                                     "^.* AMQP Publisher] DEBUG - MQPublisherImpl#publish call:"
                                             + " exchangeName: (?<exchangeName>[^,]*), queueName:"
@@ -91,7 +91,7 @@ public class AmqpShred extends Shred {
 
     public static final Pattern TYPE_EXTRACTOR = Pattern.compile(".*, type=(?<type>[^,]+), ");
 
-    // Shred misfits table "amqp_misfits"
+    // AbstractShred misfits table "amqp_misfits"
     public static final String MISFITS_TBL_NAME = "amqp_misfits";
     public static final String MISFITS_TBL_CREATE_SQL =
             "create table amqp_misfits(" + "line integer primary key references log(line))";

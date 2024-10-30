@@ -5,12 +5,6 @@ import java.util.List;
 
 public interface SqlTable {
     String name();
-
-    String createTableSql();
-
-    List<String> indexTableSql();
-
-    String insertRowSql();
-
-    String dropTblSql();
+    List<String> columnNames();
+// FIXME Do we need it?   List<Class<?>> columnTypes();
 }

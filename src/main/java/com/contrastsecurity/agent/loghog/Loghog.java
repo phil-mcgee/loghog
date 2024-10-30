@@ -14,7 +14,7 @@ public class Loghog {
     public static void createAndPopulateDb(final String logFilepath, final String dbFilepath) {
         try (final Connection connection = EmbeddedDatabaseFactory.create(dbFilepath)) {
             LogDatabaseUtil.initializeLogTable(connection, logFilepath);
-            new MesgShred().createTables(connection);
+            new MesgShred().createAndPopulateShredTables(connection);
             //            new LmclShred().createTables(connection);
             //            new AcelShred().createTables(connection);
             //            new AmqpShred().createTables(connection);
@@ -49,9 +49,14 @@ public class Loghog {
             System.out.println("Using specified database file: " + dbFilepath);
         }
         final File dbFile = new File(dbFilepath);
-        if (dbFile.exists() && !dbFile.canWrite()) {
-            System.out.println("Database file is not writable: " + dbFilepath);
-            System.exit(3);
+        if (dbFile.exists()) {
+            if (!dbFile.canWrite()) {
+                System.out.println("Database file is not writable: " + dbFilepath);
+                System.exit(3);
+            }
+            // delete existing database because dropping tables is a bit complicated
+            // due to foreign key dependency contstraints
+            dbFile.delete();
         }
         createAndPopulateDb(logFilepath, dbFilepath);
     }

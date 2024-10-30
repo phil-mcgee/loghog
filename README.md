@@ -30,6 +30,7 @@ Will produce an H2 embedded database as a sibling file to the parsed log and wit
 total 63024
 -rw-r--r--  1 philmcgee  staff  18870272 Oct 29 15:52 somelog.db.mv.db
 -rw-rw-r--@ 1 philmcgee  staff  12456324 Oct 28 14:36 somelog.err
+```
 
 ### Querying the database
 

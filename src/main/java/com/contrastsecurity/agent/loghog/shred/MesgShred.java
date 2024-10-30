@@ -2,16 +2,35 @@
 package com.contrastsecurity.agent.loghog.shred;
 
 import static com.contrastsecurity.agent.loghog.shred.PatternGroup.*;
-import static com.contrastsecurity.agent.loghog.shred.ShredEntrySelector.ALL_ENTRIES_SIGNATURE;
-import static com.contrastsecurity.agent.loghog.shred.ShredEntrySelector.ALL_ENTRIES_SQL;
+import static com.contrastsecurity.agent.loghog.shred.RowClassifier.ANY_PATTERN;
 
+import com.contrastsecurity.agent.loghog.db.LogDatabaseUtil;
 import com.contrastsecurity.agent.loghog.sql.SqlTableBase;
+
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Pattern;
+
+import org.jooq.CreateTableElementListStep;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
-public class MesgShred extends Shred {
+public class MesgShred extends AbstractShred {
+
+    static final List<ShredRowMetaData> SHRED_METADATA = List.of(
+            new ShredRowMetaData("line",
+                    SQLDataType.INTEGER.notNull(), Integer.class, LOG_TABLE_LINE_COL),
+            new ShredRowMetaData("timestamp",
+                    SQLDataType.LOCALDATETIME(3).notNull(), LocalDateTime.class, TIMESTAMP_VAR),
+            new ShredRowMetaData("thread",
+                    SQLDataType.VARCHAR.notNull(), String.class, THREAD_VAR),
+            new ShredRowMetaData("logger",
+                    SQLDataType.VARCHAR.notNull(), String.class, LOGGER_VAR),
+            new ShredRowMetaData("level",
+                    SQLDataType.VARCHAR.notNull(), String.class, LEVEL_VAR),
+            new ShredRowMetaData("message",
+                    SQLDataType.VARCHAR, String.class, "message")
+    );
 
     public MesgShred() {
         super(
@@ -23,11 +42,25 @@ public class MesgShred extends Shred {
                 new SqlTableBase(
                         misfitsTableName(),
                         misfitsTableCreateSql(),
-                        misfitsTableIndicesCreateSql(),
+                        null,
                         misfitsTableColumns()),
-                ENTRY_SELECTOR,
-                ENTRY_CLASSIFIER,
-                VALUE_EXTRACTOR);
+                new ShredSource() {
+                    @Override
+                    public String sourceTableName() {
+                        return LogDatabaseUtil.LOG_TABLE_NAME;
+                    }
+
+                    @Override
+                    public RowClassifier rowClassifier() {
+                        // classifies all rows as RowClassifier.ANY_PATTERN
+                        return new RowClassifier() {};
+                    }
+
+                    @Override
+                    public RowValuesExtractor rowValuesExtractor() {
+                        return null;
+                    }
+                });
     }
 
     public static String shredTableName() {
@@ -35,24 +68,21 @@ public class MesgShred extends Shred {
     }
 
     public static List<String> shredTableColumns() {
-        return Arrays.asList("line", "timestamp", "thread", "logger", "level", "message");
+        return SHRED_METADATA.stream().map(rowMeta -> rowMeta.columnName()).toList();
     }
 
     public static String shredTableCreateSql() {
-        return DSL.createTable(shredTableName())
-                .column("line", SQLDataType.INTEGER.notNull())
-                .primaryKey("line")
-                .constraint(
-                        DSL.constraint(shredTableName() + "_FK_line")
-                                .foreignKey("line")
-                                .references("log", "line"))
-                .column("timestamp", SQLDataType.LOCALDATETIME(3).notNull())
-                .column("thread", SQLDataType.VARCHAR.notNull())
-                .column("logger", SQLDataType.VARCHAR.notNull())
-                .column("level", SQLDataType.VARCHAR.notNull())
-                .column("message", SQLDataType.VARCHAR)
-                .getSQL();
+        CreateTableElementListStep step = DSL.createTable(shredTableName())
+                .primaryKey("line");
+        for (ShredRowMetaData metaData : SHRED_METADATA) {
+            step = step.column(metaData.columnName(), metaData.jooqDataType());
+        }
+        return step.getSQL();
     }
+//                .constraint(
+//            DSL.constraint(shredTableName() + "_FK_line")
+//            .foreignKey("line")
+//                                .references(LogDatabaseUtil.LOG_TABLE_NAME, "line"))
 
     public static List<String> shredTableIndicesCreateSql() {
         return Arrays.asList(
@@ -61,7 +91,7 @@ public class MesgShred extends Shred {
                         .getSQL());
     }
 
-    // Shred misfits table "cont" identifies "continuation" lines from log file that
+    // AbstractShred misfits table "cont" identifies "continuation" lines from log file that
     // don't include the normal timestamp, thread, class, log level preamble because they
     // are (probably) continuation lines from a preceding multi-line log message.
     // The mesg column indentifies the last properly formatted log message and likely
@@ -82,7 +112,7 @@ public class MesgShred extends Shred {
                 .constraint(
                         DSL.constraint(misfitsTableName() + "_FK_line")
                                 .foreignKey("line")
-                                .references("log", "line"))
+                                .references(LogDatabaseUtil.LOG_TABLE_NAME, "line"))
                 .column("mesg", SQLDataType.INTEGER)
                 .constraint(
                         DSL.constraint(misfitsTableName() + "_FK_mesg")
@@ -96,46 +126,39 @@ public class MesgShred extends Shred {
     }
 
     @Override
-    public Object[] transformValues(
-            int line, String entry, String type, Map<String, Object> extractedVals) {
-        return new Object[] {
-            line,
-            extractedVals.get("timestamp").toString().replace(',', '.'),
-            extractedVals.get("thread"),
-            extractedVals.get("logger"),
-            extractedVals.get("level"),
-            extractedVals.get("message")
-        };
+    public Object[] shredRowValues (final Object[] sourceRow, final String patternId, final Map<String, Object> extractedVals) {
+        Object[] shredRow = new Object[SHRED_METADATA.size()];
+        int idx = 0;
+        for (ShredRowMetaData metaData : SHRED_METADATA) {
+            Object val = null;
+            if (extractedVals.containsKey(metaData.extractName())) {
+                val = extractedVals.get(metaData.extractName());
+            } else if (LOG_TABLE_LINE_COL.equals(metaData.extractName())) {
+                val = sourceRow[LOG_TABLE_LINE_IDX];
+            }
+            if (TIMESTAMP_VAR.equals(metaData.extractName())) {
+                val = String.valueOf(val).replace(',', '.');
+            }
+            shredRow[idx++] = val;
+        }
+        final Object line = sourceRow[0];
+        return shredRow;
     }
 
     @Override
-    public Object[] transformMisfits(int line, int lastGoodLine) {
-        return new Object[] {line, lastGoodLine == -1 ? null : lastGoodLine};
+    public Object[] misfitsRowValues(Object[] sourceRow, Object lastGoodLine) {
+        final Object line = sourceRow[0];
+        return new Object[] {line, lastGoodLine};
     }
 
-    // Selects all lines from log table
-    public static final ShredEntrySelector ENTRY_SELECTOR =
-            new ShredEntrySelector(ALL_ENTRIES_SIGNATURE, ALL_ENTRIES_SQL, 1000);
-
-    // Just one pattern type. Because we just have one pattern we don't really
-    // need the classifier.  Misfit entries (continuation lines) are identified by the failure
-    // of an entry to match our default pattern
-    public static final ShredEntryClassifier ENTRY_CLASSIFIER = new ShredEntryClassifier();
-
-    public static final List<String> EXTRACTED_VAL_NAMES =
+     public static final List<String> EXTRACTED_VAL_NAMES =
             Arrays.asList(TIMESTAMP_VAR, THREAD_VAR, LOGGER_VAR, LEVEL_VAR, "message");
     public static final Map<String, Pattern> VALUE_EXTRACTORS =
             new HashMap<String, Pattern>() {
                 {
-                    put(
-                            Shred.DEFAULT_TYPE,
-                            Pattern.compile(FULL_PREAMBLE_XTRACT + "-( (?<message>.*))?$"));
+                    put(ANY_PATTERN, Pattern.compile(FULL_PREAMBLE_XTRACT + "-( (?<message>.*))?$"));
                 }
             };
-    public static final ShredValueExtractor VALUE_EXTRACTOR =
-            new ShredValueExtractor(EXTRACTED_VAL_NAMES, VALUE_EXTRACTORS);
-
-    public static void main(String[] args) {
-        System.out.println(misfitsTableCreateSql());
-    }
+    public static final RowValuesExtractor VALUE_EXTRACTOR =
+            new PatternRowValuesExtractor(VALUE_EXTRACTORS, EXTRACTED_VAL_NAMES);
 }
