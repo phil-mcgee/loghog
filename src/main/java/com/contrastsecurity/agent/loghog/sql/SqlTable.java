@@ -4,8 +4,8 @@ package com.contrastsecurity.agent.loghog.sql;
 import java.util.List;
 
 public interface SqlTable {
-    String name();
+  String name();
 
-    List<String> columnNames();
-    // FIXME Do we need it?   List<Class<?>> columnTypes();
+  List<String> columnNames();
+  // FIXME Do we need it?   List<Class<?>> columnTypes();
 }

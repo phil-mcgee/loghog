@@ -5,13 +5,13 @@ import java.util.List;
 
 public interface RemovableSqlTable extends CreatableSqlTable {
 
-    String tableDropSql();
+  String tableDropSql();
 
-    String tableTruncateSql();
+  String tableTruncateSql();
 
-    List<String> tableDropContraintsSql();
+  List<String> tableDropContraintsSql();
 
-    List<String> tableDropIndicesSql();
+  List<String> tableDropIndicesSql();
 
-    List<RemovableSqlTable> tablesWithDependentConstraints();
+  List<RemovableSqlTable> tablesWithDependentConstraints();
 }

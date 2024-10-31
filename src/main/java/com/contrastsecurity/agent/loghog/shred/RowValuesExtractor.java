@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 
 public interface RowValuesExtractor {
-    List<String> extractedValueNames();
+  List<String> extractedValueNames();
 
-    Map<String, Object> extractValues(String patternId, Object[] row);
+  Map<String, Object> extractValues(String patternId, Object[] row);
 
-    int expectedCount();
+  int expectedCount();
 
-    Object sourceRowKey(Object[] row);
+  Object sourceRowKey(Object[] row);
 }
