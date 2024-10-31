@@ -1,6 +1,8 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.shred;
 
+import static com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory.jooq;
+
 import com.contrastsecurity.agent.loghog.sql.BatchedSelector;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -21,7 +23,8 @@ public class ShredSource {
         sourceTableName,
         rowValuesExtractor,
         new RowClassifier() {},
-        DSL.select(DSL.asterisk()).from(sourceTableName).getSQL(),
+        // FIXME!
+        jooq().select(DSL.asterisk()).from("\"" + sourceTableName + "\"").getSQL(),
         DEFAULT_BATCH_SIZE);
   }
 
@@ -31,7 +34,8 @@ public class ShredSource {
         sourceTableName,
         rowValuesExtractor,
         rowClassifier,
-        DSL.select(DSL.asterisk()).from(sourceTableName).getSQL(),
+        // FIXME!
+        jooq().select(DSL.asterisk()).from("\"" + sourceTableName + "\"").getSQL(),
         DEFAULT_BATCH_SIZE);
   }
 
@@ -81,5 +85,4 @@ public class ShredSource {
   public BatchedSelector openCandidateRowSelector(Connection connection) throws SQLException {
     return BatchedSelector.open(connection, candidateRowSelectorSql, batchSize);
   }
-  ;
 }

@@ -167,7 +167,7 @@ public class AbstractShred {
             misfitsTable != null
                 ? connection.prepareStatement(misfitsTable.insertRowSql())
                 : null) {
-      connection.setAutoCommit(false);
+        connection.setAutoCommit(false);
 
       for (Object[] row : sourceRows) {
         String patternId = rowClassifier.identifyPattern(row);

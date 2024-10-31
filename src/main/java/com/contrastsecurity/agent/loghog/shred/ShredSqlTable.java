@@ -1,10 +1,11 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.shred;
 
+import static com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory.jooq;
+
 import com.contrastsecurity.agent.loghog.sql.BaseCreatableSqlTable;
 import java.util.List;
 import org.jooq.CreateTableElementListStep;
-import org.jooq.impl.DSL;
 
 public class ShredSqlTable extends BaseCreatableSqlTable {
 
@@ -35,7 +36,7 @@ public class ShredSqlTable extends BaseCreatableSqlTable {
       final String name,
       final String keyColumnName,
       final List<AbstractShred.ShredRowMetaData> shredMetadata) {
-    CreateTableElementListStep step = DSL.createTable(name).primaryKey(keyColumnName);
+    CreateTableElementListStep step = jooq().createTable(name).primaryKey(keyColumnName);
     for (AbstractShred.ShredRowMetaData metaData : shredMetadata) {
       step = step.column(metaData.columnName(), metaData.jooqDataType());
     }

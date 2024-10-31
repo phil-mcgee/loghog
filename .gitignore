@@ -4,3 +4,4 @@ build/
 .idea/
 buildSrc/build/
 .DS_Store
+data/

@@ -1,6 +1,7 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
+import static com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory.jooq;
 import static com.contrastsecurity.agent.loghog.db.LogDatabaseUtil.LOG_TABLE_NAME;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroup.*;
 import static com.contrastsecurity.agent.loghog.shred.RowClassifier.ANY_PATTERN;
@@ -51,7 +52,8 @@ public class MesgShred extends AbstractShred {
           SHRED_KEY_COLUMN,
           List.of(
               // mesg.line references log.line
-              DSL.alterTable(SHRED_TABLE_NAME)
+              jooq()
+                  .alterTable(SHRED_TABLE_NAME)
                   .add(
                       DSL.constraint(SHRED_TABLE_NAME + "_FK_" + SHRED_KEY_COLUMN)
                           .foreignKey(SHRED_KEY_COLUMN)
@@ -59,7 +61,7 @@ public class MesgShred extends AbstractShred {
                   .getSQL()),
           /* is there really any point to index on thread?
              Arrays.asList(
-                     DSL.createIndex("idx_" + SHRED_TABLE_NAME + "_thread")
+                     jooq().createIndex("idx_" + SHRED_TABLE_NAME + "_thread")
                              .on(SHRED_TABLE_NAME, "thread")
                              .getSQL())
           */
@@ -72,14 +74,16 @@ public class MesgShred extends AbstractShred {
           MISFITS_KEY_COLUMN,
           List.of(
               // cont.line references log.line
-              DSL.alterTable(MISFITS_TABLE_NAME)
+              jooq()
+                  .alterTable(MISFITS_TABLE_NAME)
                   .add(
                       DSL.constraint(MISFITS_TABLE_NAME + "_FK_" + MISFITS_KEY_COLUMN)
                           .foreignKey(MISFITS_KEY_COLUMN)
                           .references(LOG_TABLE_NAME, "line"))
                   .getSQL(),
               // cont.mesg references mesg.line
-              DSL.alterTable(MISFITS_TABLE_NAME)
+              jooq()
+                  .alterTable(MISFITS_TABLE_NAME)
                   .add(
                       DSL.constraint(MISFITS_TABLE_NAME + "_FK_" + "mesg")
                           .foreignKey("mesg")

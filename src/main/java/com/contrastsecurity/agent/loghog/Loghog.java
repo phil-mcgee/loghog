@@ -11,8 +11,9 @@ import java.sql.SQLException;
 
 public class Loghog {
 
-  public static void createAndPopulateDb(final String logFilepath, final String dbFilepath) {
-    try (final Connection connection = EmbeddedDatabaseFactory.create(dbFilepath)) {
+  public static void createAndPopulateDb(
+      final String logFilepath, final String dbFilepathNoSuffix) {
+    try (final Connection connection = EmbeddedDatabaseFactory.create(dbFilepathNoSuffix)) {
       LogDatabaseUtil.initializeLogTable(connection, logFilepath);
       new MesgShred().createAndPopulateShredTables(connection);
       //            new LmclShred().createTables(connection);
@@ -40,14 +41,18 @@ public class Loghog {
     }
     System.out.println("Parsing Java Agent log file: " + logFilepath);
 
+    final String dbFilepathNoSuffix;
     final String dbFilepath;
     if (args.length < 2) {
-      dbFilepath = logFilepath.substring(0, logFilepath.lastIndexOf('.')) + ".db";
+      dbFilepathNoSuffix = logFilepath.substring(0, logFilepath.lastIndexOf('.'));
+      dbFilepath = dbFilepathNoSuffix + EmbeddedDatabaseFactory.DB_FILE_EXTENSION;
       System.out.println("Using default database file: " + dbFilepath);
     } else {
-      dbFilepath = args[1];
+      dbFilepathNoSuffix = args[1].substring(0, logFilepath.lastIndexOf('.'));
+      dbFilepath = dbFilepathNoSuffix + EmbeddedDatabaseFactory.DB_FILE_EXTENSION;
       System.out.println("Using specified database file: " + dbFilepath);
     }
+
     final File dbFile = new File(dbFilepath);
     if (dbFile.exists()) {
       if (!dbFile.canWrite()) {
@@ -58,6 +63,6 @@ public class Loghog {
       // due to foreign key dependency contstraints
       dbFile.delete();
     }
-    createAndPopulateDb(logFilepath, dbFilepath);
+    createAndPopulateDb(logFilepath, dbFilepathNoSuffix);
   }
 }
