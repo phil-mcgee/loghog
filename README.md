@@ -24,11 +24,11 @@ Uses `Spotless` for formatting:
 java -jar build/libs/loghog-all.jar ~/logs/somelog.err
 ```
 
-Will produce an H2 embedded database as a sibling file to the parsed log and with the same name but with file type `.db.mv.db`.
+Will produce an H2 embedded database as a sibling file to the parsed log and with the same name but with file type `.mv.db`.
 ```shell
 √ ~/logs % ls -l                                                                                                         15:55:30
 total 63024
--rw-r--r--  1 philmcgee  staff  18870272 Oct 29 15:52 somelog.db.mv.db
+-rw-r--r--  1 philmcgee  staff  18870272 Oct 29 15:52 somelog.mv.db
 -rw-rw-r--@ 1 philmcgee  staff  12456324 Oct 28 14:36 somelog.err
 ```
 

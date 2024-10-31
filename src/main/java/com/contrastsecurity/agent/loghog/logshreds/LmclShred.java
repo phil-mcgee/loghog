@@ -1,7 +1,7 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-public class LmclShred /* extends AbstractShred */ {
+public class LmclShred /* extends BaseShred */ {
 
   //    public LmclShred() {
   //        super(
@@ -49,7 +49,7 @@ public class LmclShred /* extends AbstractShred */ {
   //        return new Object[] {line};
   //    }
   //
-  //    // AbstractShred table "lmcl" (class load)
+  //    // BaseShred table "lmcl" (class load)
   //    public static final String LMCL_TBL_NAME = "lmcl";
   //    public static final String LMCL_TBL_CREATE_SQL =
   //            "create table lmcl("
@@ -78,7 +78,7 @@ public class LmclShred /* extends AbstractShred */ {
   //            new HashMap<String, Pattern>() {
   //                {
   //                    put(
-  //                            AbstractShred.DEFAULT_TYPE,
+  //                            BaseShred.DEFAULT_TYPE,
   //                            Pattern.compile(
   //
   // "!LM!ClassLoad\\|(?<fqcn>[^|]+)\\|result=(?<result>[^&]+)&adapters=(?<adapters>[^&]*)&location=(?<location>.*)$"));
@@ -87,7 +87,7 @@ public class LmclShred /* extends AbstractShred */ {
   //    public static final ShredValueExtractor VALUE_EXTRACTOR =
   //            new ShredValueExtractor(EXTRACTED_VAL_NAMES, VALUE_EXTRACTORS);
   //
-  //    // AbstractShred misfits table "lmcl_misfits"
+  //    // BaseShred misfits table "lmcl_misfits"
   //    public static final String MISFITS_TBL_NAME = "lmcl_misfits";
   //    public static final String MISFITS_TBL_CREATE_SQL =
   //            "create table lmcl_misfits(" + "line integer primary key references log(line))";

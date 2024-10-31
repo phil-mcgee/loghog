@@ -1,7 +1,7 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.shred;
 
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroup.TIMESTAMP_VAR;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TIMESTAMP_VAR;
 
 import com.contrastsecurity.agent.loghog.sql.BatchedSelector;
 import com.contrastsecurity.agent.loghog.sql.CreatableSqlTable;
@@ -13,12 +13,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import org.jooq.DataType;
 
-public class AbstractShred {
-  public static final String LOG_TABLE_LINE_COL = "log.col(line)";
+public class BaseShred {
+  public static final String LOG_TABLE_LINE_COL = "LOG.col(LINE)";
   public static final int LOG_TABLE_LINE_IDX = 0;
+  public static final int LOG_TABLE_ENTRY_IDX = 1;
   public static final String LAST_MATCH_KEY = "LAST_MATCH_KEY";
+  public static final String SHRED_TABLE_PATTERN_COL = "shred.col(PATTERN)";
 
   public static final boolean SHOW_PROGRESS = false;
   public static final boolean SHOW_MISFITS = false;
@@ -30,7 +31,7 @@ public class AbstractShred {
   final List<ShredRowMetaData> shredMetadata;
   final List<ShredRowMetaData> misfitsMetadata;
 
-  public AbstractShred(
+  public BaseShred(
       final List<ShredRowMetaData> shredMetadata,
       final CreatableSqlTable shredTable,
       final List<ShredRowMetaData> misfitsMetadata,
@@ -44,7 +45,7 @@ public class AbstractShred {
   }
 
   public Object[] shredRowValues(
-      final Object[] sourceRow, final Map<String, Object> extractedVals) {
+      final Object[] sourceRow, final String patternId, final Map<String, Object> extractedVals) {
     Object[] shredRow = new Object[shredMetadata.size()];
     int idx = 0;
     for (ShredRowMetaData metaData : shredMetadata) {
@@ -53,6 +54,8 @@ public class AbstractShred {
         val = extractedVals.get(metaData.extractName());
       } else if (LOG_TABLE_LINE_COL.equals(metaData.extractName())) {
         val = sourceRow[LOG_TABLE_LINE_IDX];
+      } else if (SHRED_TABLE_PATTERN_COL.equals(metaData.extractName())) {
+        val = patternId;
       }
       if (TIMESTAMP_VAR.equals(metaData.extractName())) {
         val = String.valueOf(val).replace(',', '.');
@@ -167,13 +170,13 @@ public class AbstractShred {
             misfitsTable != null
                 ? connection.prepareStatement(misfitsTable.insertRowSql())
                 : null) {
-        connection.setAutoCommit(false);
+      connection.setAutoCommit(false);
 
       for (Object[] row : sourceRows) {
         String patternId = rowClassifier.identifyPattern(row);
         Map<String, Object> extractedVals = valuesExtractor.extractValues(patternId, row);
         if (extractedVals != null && extractedVals.size() == valuesExtractor.expectedCount()) {
-          Object[] insertVals = shredRowValues(row, extractedVals);
+          Object[] insertVals = shredRowValues(row, patternId, extractedVals);
           values.add(insertVals);
           lastGoodRowKey = valuesExtractor.sourceRowKey(row);
           nAdded++;
@@ -217,7 +220,4 @@ public class AbstractShred {
   }
 
   record AddRowsResult(int numAddedShredRows, int numMisfitRows, Object lastGoodRowKey) {}
-
-  public record ShredRowMetaData(
-      String columnName, DataType<?> jooqDataType, Class javaType, String extractName) {}
 }

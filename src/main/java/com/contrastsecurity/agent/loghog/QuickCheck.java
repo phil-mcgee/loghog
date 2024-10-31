@@ -1,6 +1,8 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog;
 
+import static com.contrastsecurity.agent.loghog.db.LogDatabaseUtil.LOG_TABLE_NAME;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -23,7 +25,9 @@ public class QuickCheck {
     StringBuilder qrystr =
         new StringBuilder(
             "SELECT entry \n"
-                + "FROM log\n"
+                + "FROM "
+                + LOG_TABLE_NAME
+                + "\n"
                 + "WHERE \n"
                 + "    line in (\n"
                 + "         SELECT line \n"

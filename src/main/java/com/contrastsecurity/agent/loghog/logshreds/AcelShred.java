@@ -1,7 +1,7 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-public class AcelShred /* extends AbstractShred */ {
+public class AcelShred /* extends BaseShred */ {
 
   //    public AcelShred() {
   //        super(
@@ -49,7 +49,7 @@ public class AcelShred /* extends AbstractShred */ {
   //        return new Object[] {line};
   //    }
   //
-  //    // AbstractShred table "acel" (message queue)
+  //    // BaseShred table "acel" (message queue)
   //    public static final String ACEL_TBL_NAME = "acel";
   //    public static final String ACEL_TBL_CREATE_SQL =
   //            "create table acel("
@@ -140,13 +140,13 @@ public class AcelShred /* extends AbstractShred */ {
   //                                            + " (?<jarname>\\S+) in app
   // (?<location>~NOLOC~)?\".+\""
   //                                            + " \\((?<application>.*)\\)$"));
-  //                    put(AbstractShred.DEFAULT_TYPE, Pattern.compile("^~NOMATCH~$"));
+  //                    put(BaseShred.DEFAULT_TYPE, Pattern.compile("^~NOMATCH~$"));
   //                }
   //            };
   //    public static final ShredValueExtractor VALUE_EXTRACTOR =
   //            new ShredValueExtractor(EXTRACTED_VAL_NAMES, VALUE_EXTRACTORS);
   //
-  //    // AbstractShred misfits table "acel_misfits"
+  //    // BaseShred misfits table "acel_misfits"
   //    public static final String MISFITS_TBL_NAME = "acel_misfits";
   //    public static final String MISFITS_TBL_CREATE_SQL =
   //            "create table acel_misfits(" + "line integer primary key references log(line))";

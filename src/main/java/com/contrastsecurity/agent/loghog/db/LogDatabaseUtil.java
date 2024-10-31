@@ -11,11 +11,11 @@ import java.util.List;
 public class LogDatabaseUtil {
   private static final boolean SHOW_PROGRESS = false;
   private static final int LOG_READ_CHUNK_SIZE = 1000;
-  public static final String LOG_TABLE_NAME = "log";
+  public static final String LOG_TABLE_NAME = "LOG";
 
   public static void initializeLogTable(Connection connection, String logFilePath)
       throws IOException, SQLException {
-    System.out.println("Initializing log table from " + logFilePath + " ...");
+    System.out.println("Initializing LOG table from " + logFilePath + " ...");
 
     // create log table (if necessary)
     createLogTable(connection);
@@ -23,7 +23,7 @@ public class LogDatabaseUtil {
     // fill log table
     int total = 0;
     try (Statement stmt = connection.createStatement()) {
-      stmt.execute("DELETE FROM \"log\"");
+      stmt.execute("DELETE FROM " + LOG_TABLE_NAME);
     }
     try (BufferedReader inlog = new BufferedReader(new FileReader(logFilePath))) {
       final List<String[]> chunk = new ArrayList<>(LOG_READ_CHUNK_SIZE);
@@ -46,12 +46,14 @@ public class LogDatabaseUtil {
       System.out.println();
     }
 
-    System.out.println("Added " + total + " rows to table 'log'");
+    System.out.println("Added " + total + " rows to table " + LOG_TABLE_NAME);
   }
 
   public static void createLogTable(Connection connection) throws SQLException {
     String sql =
-        "CREATE TABLE IF NOT EXISTS \"log\" (\"line\" INTEGER PRIMARY KEY, \"entry\"" + " VARCHAR)";
+        "CREATE TABLE IF NOT EXISTS "
+            + LOG_TABLE_NAME
+            + " (LINE INTEGER PRIMARY KEY, ENTRY VARCHAR)";
     try (Statement stmt = connection.createStatement()) {
       stmt.execute(sql);
     }
@@ -59,7 +61,7 @@ public class LogDatabaseUtil {
 
   public static int addChunkOfLogEntries(List<String[]> chunk, Connection connection)
       throws SQLException {
-    String sql = "INSERT INTO \"log\" VALUES (?, ?)";
+    String sql = "INSERT INTO " + LOG_TABLE_NAME + " VALUES (?, ?)";
     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
       connection.setAutoCommit(false);
       for (String[] entry : chunk) {

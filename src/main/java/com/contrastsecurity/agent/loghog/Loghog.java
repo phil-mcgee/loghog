@@ -3,6 +3,7 @@ package com.contrastsecurity.agent.loghog;
 
 import com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory;
 import com.contrastsecurity.agent.loghog.db.LogDatabaseUtil;
+import com.contrastsecurity.agent.loghog.logshreds.CrumbShred;
 import com.contrastsecurity.agent.loghog.logshreds.MesgShred;
 import java.io.File;
 import java.io.IOException;
@@ -16,10 +17,10 @@ public class Loghog {
     try (final Connection connection = EmbeddedDatabaseFactory.create(dbFilepathNoSuffix)) {
       LogDatabaseUtil.initializeLogTable(connection, logFilepath);
       new MesgShred().createAndPopulateShredTables(connection);
+      new CrumbShred().createAndPopulateShredTables(connection);
+      //            new AmqpShred().createTables(connection);
       //            new LmclShred().createTables(connection);
       //            new AcelShred().createTables(connection);
-      //            new AmqpShred().createTables(connection);
-      //            new CrumbShred().createTables(connection);
     } catch (SQLException | IOException e) {
       e.printStackTrace();
     }
@@ -63,6 +64,7 @@ public class Loghog {
       // due to foreign key dependency contstraints
       dbFile.delete();
     }
-    createAndPopulateDb(logFilepath, dbFilepathNoSuffix);
+
+    createAndPopulateDb(logFilepath, new File(dbFilepathNoSuffix).getAbsolutePath());
   }
 }

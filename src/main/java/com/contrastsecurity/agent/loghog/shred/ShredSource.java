@@ -80,7 +80,6 @@ public class ShredSource {
   public int batchSize() {
     return batchSize;
   }
-  ;
 
   public BatchedSelector openCandidateRowSelector(Connection connection) throws SQLException {
     return BatchedSelector.open(connection, candidateRowSelectorSql, batchSize);

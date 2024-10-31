@@ -1,7 +1,7 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-public class AmqpShred /* extends AbstractShred */ {
+public class AmqpShred /* extends BaseShred */ {
 
   //    public AmqpShred() {
   //        super(
@@ -47,7 +47,7 @@ public class AmqpShred /* extends AbstractShred */ {
   //        return new Object[] {line};
   //    }
   //
-  //    // AbstractShred table "amqp" (message queue)
+  //    // BaseShred table "amqp" (message queue)
   //    public static final String AMQP_TBL_NAME = "amqp";
   //    public static final String AMQP_TBL_CREATE_SQL =
   //            "create table amqp("
@@ -75,7 +75,7 @@ public class AmqpShred /* extends AbstractShred */ {
   //            new HashMap<String, Pattern>() {
   //                {
   //                    put(
-  //                            AbstractShred.DEFAULT_TYPE,
+  //                            BaseShred.DEFAULT_TYPE,
   //                            Pattern.compile(
   //                                    "^.* AMQP Publisher] DEBUG - MQPublisherImpl#publish
   // call:"
@@ -91,7 +91,7 @@ public class AmqpShred /* extends AbstractShred */ {
   //
   //    public static final Pattern TYPE_EXTRACTOR = Pattern.compile(".*, type=(?<type>[^,]+), ");
   //
-  //    // AbstractShred misfits table "amqp_misfits"
+  //    // BaseShred misfits table "amqp_misfits"
   //    public static final String MISFITS_TBL_NAME = "amqp_misfits";
   //    public static final String MISFITS_TBL_CREATE_SQL =
   //            "create table amqp_misfits(" + "line integer primary key references log(line))";

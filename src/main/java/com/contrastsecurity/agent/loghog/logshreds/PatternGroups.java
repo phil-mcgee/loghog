@@ -1,7 +1,7 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-public class PatternGroup {
+public class PatternGroups {
 
   public static final String TIMESTAMP_VAR = "timestamp";
   public static final String LOG_TIMESTAMP_XTRACT =
@@ -58,7 +58,7 @@ public class PatternGroup {
   public static final String NO_RESP_XTRACT = "(?<" + RESP_VAR + ">~UNFOUND~)?";
 
   public static final String URL_VAR = "url";
-  public static final String URL_XTRACT = "^(?<" + URL_VAR + ">\\S+)";
+  public static final String URL_XTRACT = "(?<" + URL_VAR + ">\\S+)";
   public static final String NO_URL_XTRACT = "(?<" + URL_VAR + ">~UNFOUND~)?";
 
   public static final String STACKFRAME_VAR = "stackframe";

@@ -11,7 +11,7 @@ public class ShredSqlTable extends BaseCreatableSqlTable {
 
   public ShredSqlTable(
       final String name,
-      final List<AbstractShred.ShredRowMetaData> shredMetadata,
+      final List<ShredRowMetaData> shredMetadata,
       final String keyColumnName,
       final List<String> createContraintsSql,
       final List<String> createIndicesSql) {
@@ -24,20 +24,18 @@ public class ShredSqlTable extends BaseCreatableSqlTable {
         insertRowSql(name, shredMetadata));
   }
 
-  public static List<String> columnNames(final List<AbstractShred.ShredRowMetaData> shredMetadata) {
+  public static List<String> columnNames(final List<ShredRowMetaData> shredMetadata) {
     return shredMetadata.stream().map(colMeta -> colMeta.columnName()).toList();
   }
 
-  public static List<Class> columnTypes(final List<AbstractShred.ShredRowMetaData> shredMetadata) {
+  public static List<Class> columnTypes(final List<ShredRowMetaData> shredMetadata) {
     return shredMetadata.stream().map(colMeta -> colMeta.javaType()).toList();
   }
 
   protected static String createSql(
-      final String name,
-      final String keyColumnName,
-      final List<AbstractShred.ShredRowMetaData> shredMetadata) {
+      final String name, final String keyColumnName, final List<ShredRowMetaData> shredMetadata) {
     CreateTableElementListStep step = jooq().createTable(name).primaryKey(keyColumnName);
-    for (AbstractShred.ShredRowMetaData metaData : shredMetadata) {
+    for (ShredRowMetaData metaData : shredMetadata) {
       step = step.column(metaData.columnName(), metaData.jooqDataType());
     }
     return step.getSQL();
@@ -45,7 +43,7 @@ public class ShredSqlTable extends BaseCreatableSqlTable {
 
   // TODO can we jOOQ this?
   protected static String insertRowSql(
-      final String name, final List<AbstractShred.ShredRowMetaData> shredMetadata) {
+      final String name, final List<ShredRowMetaData> shredMetadata) {
     final List<String> columnNames = columnNames(shredMetadata);
     final StringBuilder sb = new StringBuilder("insert into ");
     sb.append("\"").append(name).append("\"").append(" (");
