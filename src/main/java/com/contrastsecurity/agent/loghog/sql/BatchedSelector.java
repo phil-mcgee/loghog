@@ -35,7 +35,7 @@ public class BatchedSelector implements AutoCloseable {
             return null;
         }
         if (resultSet == null) resultSet = connection.prepareStatement(selectSql).executeQuery();
-        int nColumns = resultSet.getMetaData().getColumnCount()
+        int nColumns = resultSet.getMetaData().getColumnCount();
         List<Object[]> returned = new ArrayList<>(batchSize);
         for (int row = 0; row < batchSize; row++) {
             if (!resultSet.next()) {

@@ -6,4 +6,6 @@ import java.util.Map;
 public interface RowValuesExtractor {
     List<String> extractedValueNames();
     Map<String, Object> extractValues(String patternId, Object[] row);
+    int expectedCount();
+    Object sourceRowKey(Object[] row);
 }

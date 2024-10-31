@@ -14,11 +14,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static com.contrastsecurity.agent.loghog.shred.PatternGroup.TIMESTAMP_VAR;
+
 public abstract class AbstractShred {
     public static final String LOG_TABLE_LINE_COL = "log.col(line)";
     public static final int LOG_TABLE_LINE_IDX = 0;
+    public static final String LAST_MATCH_KEY = "LAST_MATCH_KEY";
 
-//    public static final String DEFAULT_TYPE = "default";
     public static final boolean SHOW_PROGRESS = false;
     public static final boolean SHOW_MISFITS = false;
     public static final boolean VERBOSE = true;
@@ -26,22 +28,52 @@ public abstract class AbstractShred {
     private final CreatableSqlTable shredTable;
     private final CreatableSqlTable misfitsTable;
     private final ShredSource shredSource;
-
+    final List<ShredRowMetaData> shredMetadata;
+    final List<ShredRowMetaData> misfitsMetadata;
 
     public AbstractShred(
-            CreatableSqlTable shredTable,
-            CreatableSqlTable misfitsTable,
-            ShredSource shredSource) {
+             final List<ShredRowMetaData> shredMetadata,
+             final CreatableSqlTable shredTable,
+            final List<ShredRowMetaData> misfitsMetadata,
+             final CreatableSqlTable misfitsTable,
+             final ShredSource shredSource) {
         this.shredTable = shredTable;
         this.misfitsTable = misfitsTable;
         this.shredSource = shredSource;
-
+        this.shredMetadata = shredMetadata;
+        this.misfitsMetadata = misfitsMetadata;
     }
 
-    abstract Object[] shredRowValues(
-            Object[] sourceRow, String patternId, Map<String, Object> extractedVals);
+    public Object[] shredRowValues(final Object[] sourceRow, final Map<String, Object> extractedVals) {
+        Object[] shredRow = new Object[shredMetadata.size()];
+        int idx = 0;
+        for (ShredRowMetaData metaData : shredMetadata) {
+            Object val = null;
+            if (extractedVals.containsKey(metaData.extractName())) {
+                val = extractedVals.get(metaData.extractName());
+            } else if (LOG_TABLE_LINE_COL.equals(metaData.extractName())) {
+                val = sourceRow[LOG_TABLE_LINE_IDX];
+            }
+            if (TIMESTAMP_VAR.equals(metaData.extractName())) {
+                val = String.valueOf(val).replace(',', '.');
+            }
+            shredRow[idx++] = val;
+        }
+        return shredRow;
+    }
 
-    abstract Object[] misfitsRowValues(Object[] sourceRow, Object lastGoodRowKey);
+    public Object[] misfitsRowValues(Object[] sourceRow, Object lastMatchKey) {
+        Object[] misfitsRow = new Object[misfitsMetadata.size()];
+        int idx = 0;
+        for (ShredRowMetaData metaData : misfitsMetadata) {
+            if (LOG_TABLE_LINE_COL.equals(metaData.extractName())) {
+                misfitsRow[idx++] = sourceRow[LOG_TABLE_LINE_IDX];
+            } else if (LAST_MATCH_KEY.equals(metaData.extractName())) {
+                misfitsRow[idx++] = lastMatchKey;
+            }
+        }
+        return misfitsRow;
+    }
 
     public void createAndPopulateShredTables(final Connection connection) throws SQLException {
         createTables(connection);
@@ -136,7 +168,7 @@ public abstract class AbstractShred {
                 Map<String, Object> extractedVals = valuesExtractor.extractValues(patternId, row);
                 if (extractedVals != null
                         && extractedVals.size() == valuesExtractor.expectedCount()) {
-                    Object[] insertVals = shredRow(row, patternId, extractedVals);
+                    Object[] insertVals = shredRowValues(row, extractedVals);
                     values.add(insertVals);
                     lastGoodRowKey = valuesExtractor.sourceRowKey(row);
                     nAdded++;
@@ -146,7 +178,7 @@ public abstract class AbstractShred {
                                 "Extraction/transformation failed in row " + Arrays.asList(row));
                     }
                     if (misfitsTable != null) {
-                        final Object[] misfitVals = this.misfitsRow(row, lastGoodRowKey);
+                        final Object[] misfitVals = misfitsRowValues(row, lastGoodRowKey);
                         misfits.add(misfitVals);
                     }
                     nMisfits++;
@@ -177,10 +209,10 @@ public abstract class AbstractShred {
             connection.setAutoCommit(wasAutoCommit);
         }
 
-        return new AddRowsResult(nAdded, nMisfits, lastGoodLine);
+        return new AddRowsResult(nAdded, nMisfits, lastGoodRowKey);
     }
 
     record AddRowsResult(int numAddedShredRows, int numMisfitRows, Object lastGoodRowKey) {}
 
-    public record ShredRowMetaData(String columnName, DataType<?> jooqDataType, Class<?> javaType, String extractName) {}
+    public record ShredRowMetaData(String columnName, DataType<?> jooqDataType, Class javaType, String extractName) {}
 }

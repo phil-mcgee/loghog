@@ -9,19 +9,22 @@ import java.util.regex.Pattern;
 
 public class PatternRowValuesExtractor implements RowValuesExtractor {
     private static final int LOG_TABLE_ENTRY_IDX = 1;
+    private static final int LOG_TABLE_LINE_IDX = 0;
 
     final Map<String, Pattern> patternMap;
     final List<String> extractedValNames;
     final int sourceValueIdx;
+    final int sourceKeyIdx;
 
     public PatternRowValuesExtractor(Map<String, Pattern> patternMap, List<String> extractedValNames) {
-        this(patternMap, extractedValNames, LOG_TABLE_ENTRY_IDX);
+        this(patternMap, extractedValNames, LOG_TABLE_ENTRY_IDX, LOG_TABLE_LINE_IDX);
     }
 
-    public PatternRowValuesExtractor(Map<String, Pattern> patternMap, List<String> extractedValNames, final int sourceValueIdx) {
+    public PatternRowValuesExtractor(Map<String, Pattern> patternMap, List<String> extractedValNames, final int sourceValueIdx, final int sourceKeyIdx) {
         this.patternMap = Map.copyOf(patternMap);
         this.extractedValNames = List.copyOf(extractedValNames);
         this.sourceValueIdx = sourceValueIdx;
+        this.sourceKeyIdx = sourceKeyIdx;
     }
 
     @Override
@@ -43,6 +46,16 @@ public class PatternRowValuesExtractor implements RowValuesExtractor {
             }
         }
         return null;
+    }
+
+    @Override
+    public int expectedCount() {
+        return extractedValNames.size();
+    }
+
+    @Override
+    public Object sourceRowKey(Object[] row) {
+        return row[sourceKeyIdx];
     }
 
 }

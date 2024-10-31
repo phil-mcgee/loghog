@@ -3,7 +3,7 @@ package com.contrastsecurity.agent.loghog;
 
 import com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory;
 import com.contrastsecurity.agent.loghog.db.LogDatabaseUtil;
-import com.contrastsecurity.agent.loghog.shred.MesgShred;
+import com.contrastsecurity.agent.loghog.logshreds.MesgShred;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
