@@ -110,7 +110,7 @@ public class CrumbShred extends BaseShred {
   static final String CRUMB_REQ_PREFIX =
       DEBUG_PREAMBLE_XTRACT + "- CRUMB " + REQ_XTRACT + " " + URL_XTRACT;
   static final String CRUMB_REQ_SUFFIX = NO_RESP_XTRACT + NO_STACKFRAME_XTRACT + "$";
-  static final String CRUMB_RESP_PREFIX = DEBUG_PREAMBLE_XTRACT + "- CRUMB " + RESP_XTRACT;
+  static final String CRUMB_RESP_PREFIX = DEBUG_PREAMBLE_XTRACT + "- CRUMB " + RESP_XTRACT + " ";
   static final String CRUMB_RESP_SUFFIX =
       NO_REQ_XTRACT + NO_URL_XTRACT + NO_STACKFRAME_XTRACT + "$";
 
@@ -119,26 +119,26 @@ public class CrumbShred extends BaseShred {
           new PatternMetadata(
               "hist_req_begin",
               List.of("request@", "\t\t\tBEGIN "),
-              Pattern.compile(CRUMB_REQ_PREFIX + "\\t\\t\\tBEGIN.+" + CRUMB_REQ_SUFFIX)),
+              Pattern.compile(CRUMB_REQ_PREFIX + "\\t\\t\\tBEGIN .*" + CRUMB_REQ_SUFFIX)),
           new PatternMetadata(
               "req_begin",
               List.of("request@", "\t\tBEGIN "),
-              Pattern.compile(CRUMB_REQ_PREFIX + "\\t\\tBEGIN.+" + CRUMB_REQ_SUFFIX)),
+              Pattern.compile(CRUMB_REQ_PREFIX + "\\t\\tBEGIN .*" + CRUMB_REQ_SUFFIX)),
           new PatternMetadata(
               "hist_resp_begin",
               List.of("response@", "\t\t\tBEGIN "),
-              Pattern.compile(CRUMB_RESP_PREFIX + "\\t\\t\\tBEGIN.+" + CRUMB_RESP_SUFFIX)),
+              Pattern.compile(CRUMB_RESP_PREFIX + "\\t\\t\\tBEGIN .*" + CRUMB_RESP_SUFFIX)),
           new PatternMetadata(
               "resp_begin",
               List.of("response@", "\t\tBEGIN "),
-              Pattern.compile(CRUMB_RESP_PREFIX + "\\t\\t\\tBEGIN.+" + CRUMB_RESP_SUFFIX)),
+              Pattern.compile(CRUMB_RESP_PREFIX + "\\t\\tBEGIN .*" + CRUMB_RESP_SUFFIX)),
           new PatternMetadata(
               "req_end",
               List.of("request@", "END & HISTORY:"),
               Pattern.compile(CRUMB_REQ_PREFIX + " END & HISTORY:" + CRUMB_REQ_SUFFIX)),
           new PatternMetadata(
               "resp_end",
-              List.of("request@", "\t\t\tBEGIN "),
+              List.of("response@", "END & HISTORY:"),
               Pattern.compile(CRUMB_RESP_PREFIX + " END & HISTORY:" + CRUMB_RESP_SUFFIX)));
 
   static final List<String> EXTRACTED_VAL_NAMES =
@@ -174,5 +174,7 @@ public class CrumbShred extends BaseShred {
 
   public CrumbShred() {
     super(SHRED_METADATA, SHRED_SQL_TABLE, MISFITS_METADATA, MISFITS_SQL_TABLE, SHRED_SOURCE);
+
+    PATTERN_METADATA.stream().map(pmd -> pmd.pattern().toString()).forEach(System.out::println);
   }
 }
