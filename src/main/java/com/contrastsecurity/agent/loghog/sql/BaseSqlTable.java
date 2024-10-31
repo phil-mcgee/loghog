@@ -1,7 +1,6 @@
+/* (C)2024 */
 package com.contrastsecurity.agent.loghog.sql;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class BaseSqlTable implements SqlTable {

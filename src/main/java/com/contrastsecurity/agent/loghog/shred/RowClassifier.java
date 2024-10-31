@@ -1,3 +1,4 @@
+/* (C)2024 */
 package com.contrastsecurity.agent.loghog.shred;
 
 public interface RowClassifier {
@@ -6,5 +7,6 @@ public interface RowClassifier {
 
     default String identifyPattern(Object[] sourceRow) {
         return ANY_PATTERN;
-    };
+    }
+    ;
 }

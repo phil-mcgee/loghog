@@ -5,6 +5,7 @@ import java.util.List;
 
 public interface SqlTable {
     String name();
+
     List<String> columnNames();
-// FIXME Do we need it?   List<Class<?>> columnTypes();
+    // FIXME Do we need it?   List<Class<?>> columnTypes();
 }

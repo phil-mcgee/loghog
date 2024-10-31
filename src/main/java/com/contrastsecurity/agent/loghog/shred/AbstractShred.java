@@ -1,10 +1,10 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.shred;
 
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroup.TIMESTAMP_VAR;
+
 import com.contrastsecurity.agent.loghog.sql.BatchedSelector;
 import com.contrastsecurity.agent.loghog.sql.CreatableSqlTable;
-import org.jooq.DataType;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -13,10 +13,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import org.jooq.DataType;
 
-import static com.contrastsecurity.agent.loghog.shred.PatternGroup.TIMESTAMP_VAR;
-
-public abstract class AbstractShred {
+public class AbstractShred {
     public static final String LOG_TABLE_LINE_COL = "log.col(line)";
     public static final int LOG_TABLE_LINE_IDX = 0;
     public static final String LAST_MATCH_KEY = "LAST_MATCH_KEY";
@@ -32,11 +31,11 @@ public abstract class AbstractShred {
     final List<ShredRowMetaData> misfitsMetadata;
 
     public AbstractShred(
-             final List<ShredRowMetaData> shredMetadata,
-             final CreatableSqlTable shredTable,
+            final List<ShredRowMetaData> shredMetadata,
+            final CreatableSqlTable shredTable,
             final List<ShredRowMetaData> misfitsMetadata,
-             final CreatableSqlTable misfitsTable,
-             final ShredSource shredSource) {
+            final CreatableSqlTable misfitsTable,
+            final ShredSource shredSource) {
         this.shredTable = shredTable;
         this.misfitsTable = misfitsTable;
         this.shredSource = shredSource;
@@ -44,7 +43,8 @@ public abstract class AbstractShred {
         this.misfitsMetadata = misfitsMetadata;
     }
 
-    public Object[] shredRowValues(final Object[] sourceRow, final Map<String, Object> extractedVals) {
+    public Object[] shredRowValues(
+            final Object[] sourceRow, final Map<String, Object> extractedVals) {
         Object[] shredRow = new Object[shredMetadata.size()];
         int idx = 0;
         for (ShredRowMetaData metaData : shredMetadata) {
@@ -113,7 +113,11 @@ public abstract class AbstractShred {
                     System.out.println(
                             "Added " + totalMisfits + " rows to table " + misfitsTable.name());
                 } else {
-                    System.out.println("Found " + totalMisfits + " misfit rows in source table " + shredSource.sourceTableName());
+                    System.out.println(
+                            "Found "
+                                    + totalMisfits
+                                    + " misfit rows in source table "
+                                    + shredSource.sourceTableName());
                 }
             }
         }
@@ -133,15 +137,16 @@ public abstract class AbstractShred {
 
     protected void createTable(final Statement stmt, CreatableSqlTable table) throws SQLException {
         stmt.execute(table.createSql());
-        for (String constraintSql: table.createContraintsSql()) {
+        for (String constraintSql : table.createContraintsSql()) {
             stmt.execute(constraintSql);
         }
-        for (String indexSql: table.createIndicesSql()) {
+        for (String indexSql : table.createIndicesSql()) {
             stmt.execute(indexSql);
         }
     }
 
-    protected AddRowsResult addRows(List<Object[]> sourceRows, Object previousGoodRowKey, Connection connection)
+    protected AddRowsResult addRows(
+            List<Object[]> sourceRows, Object previousGoodRowKey, Connection connection)
             throws SQLException {
         final List<Object[]> values = new ArrayList<>(sourceRows.size());
         final List<Object[]> misfits;
@@ -159,8 +164,10 @@ public abstract class AbstractShred {
         Object lastGoodRowKey = previousGoodRowKey;
         final boolean wasAutoCommit = connection.getAutoCommit();
         try (PreparedStatement insertStmt = connection.prepareStatement(shredTable.insertRowSql());
-                PreparedStatement insertMisfitsStmt = misfitsTable != null ?
-                        connection.prepareStatement(misfitsTable.insertRowSql()) : null) {
+                PreparedStatement insertMisfitsStmt =
+                        misfitsTable != null
+                                ? connection.prepareStatement(misfitsTable.insertRowSql())
+                                : null) {
             connection.setAutoCommit(false);
 
             for (Object[] row : sourceRows) {
@@ -214,5 +221,6 @@ public abstract class AbstractShred {
 
     record AddRowsResult(int numAddedShredRows, int numMisfitRows, Object lastGoodRowKey) {}
 
-    public record ShredRowMetaData(String columnName, DataType<?> jooqDataType, Class javaType, String extractName) {}
+    public record ShredRowMetaData(
+            String columnName, DataType<?> jooqDataType, Class javaType, String extractName) {}
 }

@@ -1,6 +1,6 @@
+/* (C)2024 */
 package com.contrastsecurity.agent.loghog.shred;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,11 +16,16 @@ public class PatternRowValuesExtractor implements RowValuesExtractor {
     final int sourceValueIdx;
     final int sourceKeyIdx;
 
-    public PatternRowValuesExtractor(Map<String, Pattern> patternMap, List<String> extractedValNames) {
+    public PatternRowValuesExtractor(
+            Map<String, Pattern> patternMap, List<String> extractedValNames) {
         this(patternMap, extractedValNames, LOG_TABLE_ENTRY_IDX, LOG_TABLE_LINE_IDX);
     }
 
-    public PatternRowValuesExtractor(Map<String, Pattern> patternMap, List<String> extractedValNames, final int sourceValueIdx, final int sourceKeyIdx) {
+    public PatternRowValuesExtractor(
+            Map<String, Pattern> patternMap,
+            List<String> extractedValNames,
+            final int sourceValueIdx,
+            final int sourceKeyIdx) {
         this.patternMap = Map.copyOf(patternMap);
         this.extractedValNames = List.copyOf(extractedValNames);
         this.sourceValueIdx = sourceValueIdx;
@@ -36,7 +41,7 @@ public class PatternRowValuesExtractor implements RowValuesExtractor {
     public Map<String, Object> extractValues(String patternId, Object[] row) {
         Pattern extractor = patternMap.get(patternId);
         if (extractor != null) {
-            Matcher match = extractor.matcher((String)row[sourceValueIdx]);
+            Matcher match = extractor.matcher((String) row[sourceValueIdx]);
             if (match.find()) {
                 Map<String, Object> extractedVals = new HashMap<>();
                 for (String extractedValName : this.extractedValNames) {
@@ -57,5 +62,4 @@ public class PatternRowValuesExtractor implements RowValuesExtractor {
     public Object sourceRowKey(Object[] row) {
         return row[sourceKeyIdx];
     }
-
 }

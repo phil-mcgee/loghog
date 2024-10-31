@@ -1,7 +1,7 @@
+/* (C)2024 */
 package com.contrastsecurity.agent.loghog.sql;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -23,10 +23,11 @@ public class BatchedSelector implements AutoCloseable {
         this.connection = connection;
         this.selectSql = selectSql;
         this.batchSize = batchSize;
-
     }
 
-    public static BatchedSelector open(final Connection connection, final String selectSql, int batchSize) throws SQLException {
+    public static BatchedSelector open(
+            final Connection connection, final String selectSql, int batchSize)
+            throws SQLException {
         return new BatchedSelector(connection, selectSql, batchSize).prepare();
     }
 
@@ -44,7 +45,7 @@ public class BatchedSelector implements AutoCloseable {
             }
             Object[] rowResult = new Object[nColumns];
             for (int i = 1; i <= nColumns; i++) {
-                rowResult[i-1] = resultSet.getObject(i);
+                rowResult[i - 1] = resultSet.getObject(i);
             }
             returned.add(rowResult);
         }

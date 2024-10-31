@@ -1,5 +1,5 @@
 /* (C)2024 */
-package com.contrastsecurity.agent.loghog.shred;
+package com.contrastsecurity.agent.loghog.logshreds;
 
 public class PatternGroup {
 

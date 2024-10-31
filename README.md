@@ -43,14 +43,12 @@ It can be installed with Homebrew:
 brew install –cask dbeaver-community
 ```
 
-You'll need to install an H2 JDBC driver.  The default installation (supposed to pull from Maven) didn't work for me.  
+You'll need to install an H2 JDBC driver.  The default installation (supposed to pull from Maven) didn't work for me.
 I blame Netskope based on zero evidence. I manually downloaded the H2 jar, h2-2.1.210.jar, and
 for the H2 connection settings selected `Driver settings`, opened the Libraries tab, and replaced the
 two existing entries with the file path to my downloaded H2 JAR.
 
 It's slightly fiddly.  Ask me for help if you need it.
 
-Once the driver is installed you "connect" to the H2 database by selecting the `db.mv.db` file 
+Once the driver is installed you "connect" to the H2 database by selecting the `db.mv.db` file
 you're interested in.
-
-

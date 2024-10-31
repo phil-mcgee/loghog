@@ -10,7 +10,13 @@ public class BaseCreatableSqlTable extends BaseSqlTable implements CreatableSqlT
     final List<String> createIndicesSql;
     final String insertRowSql;
 
-    public BaseCreatableSqlTable(final String name, final List<String> columnNames, final String createSql, final List<String> createContraintsSql, final List<String> createIndicesSql, final String insertRowSql) {
+    public BaseCreatableSqlTable(
+            final String name,
+            final List<String> columnNames,
+            final String createSql,
+            final List<String> createContraintsSql,
+            final List<String> createIndicesSql,
+            final String insertRowSql) {
         super(name, columnNames);
         this.createSql = createSql;
         this.createContraintsSql = List.copyOf(createContraintsSql);
