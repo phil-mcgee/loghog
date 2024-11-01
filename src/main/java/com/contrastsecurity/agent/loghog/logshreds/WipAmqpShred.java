@@ -1,9 +1,9 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-public class AmqpShred /* extends BaseShred */ {
+public class WipAmqpShred /* extends BaseShred */ {
 
-  //    public AmqpShred() {
+  //    public WipAmqpShred() {
   //        super(
   //                new SqlTableBase(
   //                        AMQP_TBL_NAME, AMQP_TBL_CREATE_SQL, AMQP_TBL_INDEX_SQLS,

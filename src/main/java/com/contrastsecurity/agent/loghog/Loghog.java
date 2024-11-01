@@ -5,6 +5,7 @@ import com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory;
 import com.contrastsecurity.agent.loghog.db.LogDatabaseUtil;
 import com.contrastsecurity.agent.loghog.logshreds.CrumbShred;
 import com.contrastsecurity.agent.loghog.logshreds.MesgShred;
+import com.contrastsecurity.agent.loghog.logshreds.TrakShred;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -18,9 +19,10 @@ public class Loghog {
       LogDatabaseUtil.initializeLogTable(connection, logFilepath);
       new MesgShred().createAndPopulateShredTables(connection);
       new CrumbShred().createAndPopulateShredTables(connection);
-      //            new AmqpShred().createTables(connection);
-      //            new LmclShred().createTables(connection);
-      //            new AcelShred().createTables(connection);
+      new TrakShred().createAndPopulateShredTables(connection);
+      //            new WipAmqpShred().createTables(connection);
+      //            new WipLmclShred().createTables(connection);
+      //            new WipAcelShred().createTables(connection);
     } catch (SQLException | IOException e) {
       e.printStackTrace();
     }

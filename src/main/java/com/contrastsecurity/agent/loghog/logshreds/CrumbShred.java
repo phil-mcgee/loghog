@@ -51,7 +51,7 @@ public class CrumbShred extends BaseShred {
               TIMESTAMP_VAR),
           new ShredRowMetaData("THREAD", SQLDataType.VARCHAR, String.class, THREAD_VAR),
           new ShredRowMetaData(
-              "pattern", SQLDataType.VARCHAR.notNull(), String.class, SHRED_TABLE_PATTERN_COL),
+              "PATTERN", SQLDataType.VARCHAR.notNull(), String.class, SHRED_TABLE_PATTERN_COL),
           new ShredRowMetaData("REQ", SQLDataType.VARCHAR, String.class, REQ_VAR),
           new ShredRowMetaData("RESP", SQLDataType.VARCHAR, String.class, RESP_VAR),
           new ShredRowMetaData("URL", SQLDataType.VARCHAR, String.class, URL_VAR),
@@ -82,7 +82,7 @@ public class CrumbShred extends BaseShred {
           List.of(
               jooq()
                   .createIndex("IDX_" + SHRED_TABLE_NAME + "_" + "REQ")
-                  .on(SHRED_TABLE_NAME, "req")
+                  .on(SHRED_TABLE_NAME, "REQ")
                   .getSQL(),
               jooq()
                   .createIndex("IDX_" + SHRED_TABLE_NAME + "_" + "REQ" + "_" + "PATTERN")
@@ -174,7 +174,5 @@ public class CrumbShred extends BaseShred {
 
   public CrumbShred() {
     super(SHRED_METADATA, SHRED_SQL_TABLE, MISFITS_METADATA, MISFITS_SQL_TABLE, SHRED_SOURCE);
-
-    PATTERN_METADATA.stream().map(pmd -> pmd.pattern().toString()).forEach(System.out::println);
   }
 }

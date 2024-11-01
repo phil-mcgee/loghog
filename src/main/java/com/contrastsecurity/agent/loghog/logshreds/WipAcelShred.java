@@ -1,9 +1,9 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-public class AcelShred /* extends BaseShred */ {
+public class WipAcelShred /* extends BaseShred */ {
 
-  //    public AcelShred() {
+  //    public WipAcelShred() {
   //        super(
   //                new SqlTableBase(
   //                        ACEL_TBL_NAME, ACEL_TBL_CREATE_SQL, ACEL_TBL_INDEX_SQLS,

@@ -22,9 +22,8 @@ public class ShredSource {
     this(
         sourceTableName,
         rowValuesExtractor,
-        new RowClassifier() {},
-        // FIXME!
-        jooq().select(DSL.asterisk()).from("\"" + sourceTableName + "\"").getSQL(),
+        new AllSameRowClassifier(),
+        jooq().select(DSL.asterisk()).from(sourceTableName).getSQL(),
         DEFAULT_BATCH_SIZE);
   }
 
@@ -34,8 +33,7 @@ public class ShredSource {
         sourceTableName,
         rowValuesExtractor,
         rowClassifier,
-        // FIXME!
-        jooq().select(DSL.asterisk()).from("\"" + sourceTableName + "\"").getSQL(),
+        jooq().select(DSL.asterisk()).from(sourceTableName).getSQL(),
         DEFAULT_BATCH_SIZE);
   }
 

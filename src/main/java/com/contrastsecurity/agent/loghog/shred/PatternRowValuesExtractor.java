@@ -62,4 +62,8 @@ public class PatternRowValuesExtractor implements RowValuesExtractor {
   public Object sourceRowKey(Object[] row) {
     return row[sourceKeyIdx];
   }
+
+  public Pattern getPattern(String patternId) {
+    return patternMap.get(patternId);
+  }
 }

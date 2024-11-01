@@ -63,4 +63,16 @@ public class PatternGroups {
 
   public static final String STACKFRAME_VAR = "stackframe";
   public static final String NO_STACKFRAME_XTRACT = "(?<" + STACKFRAME_VAR + ">~UNFOUND~)?";
+
+  public static final String TRACE_MAP_VAR = "traceMap";
+  public static final String TRACE_MAP_XTRACT = "(?<" + TRACE_MAP_VAR + ">\\S+)";
+
+  public static final String TRACKED_OBJ_VAR = "trackedObj";
+  public static final String TRACKED_OBJ_XTRACT = "(?<" + TRACKED_OBJ_VAR + ">\\S+)";
+
+  public static final String TRACE_NUM_VAR = "traceNum";
+  public static final String TRACE_NUM_XTRACT = "(?<" + TRACE_NUM_VAR + ">\\d+)";
+
+  public static final String TRACE_MAP_SIZE_VAR = "traceMapSize";
+  public static final String TRACE_MAP_SIZE_XTRACT = "(?<" + TRACE_MAP_SIZE_VAR + ">\\d+)";
 }

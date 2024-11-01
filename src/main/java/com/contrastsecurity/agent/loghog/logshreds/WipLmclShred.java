@@ -1,9 +1,9 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-public class LmclShred /* extends BaseShred */ {
+public class WipLmclShred /* extends BaseShred */ {
 
-  //    public LmclShred() {
+  //    public WipLmclShred() {
   //        super(
   //                new SqlTableBase(
   //                        LMCL_TBL_NAME, LMCL_TBL_CREATE_SQL, LMCL_TBL_INDEX_SQLS,
