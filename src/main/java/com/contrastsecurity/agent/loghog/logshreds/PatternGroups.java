@@ -11,7 +11,7 @@ public class PatternGroups {
   public static final String THREAD_VAR = "thread";
   public static final String LOGGER_VAR = "logger";
   public static final String LOG_THREAD_LOGGER_XTRACT =
-      "\\[(?<" + THREAD_VAR + ">\\S+) (?<" + LOGGER_VAR + ">\\S+)]";
+      "\\[(?<" + THREAD_VAR + ">[\\S ]+\\H) (?<" + LOGGER_VAR + ">\\S+)]";
   public static final String NO_THREAD_LOGGER_XTRACT =
       "(?<" + THREAD_VAR + ">~UNFOUND~)?(?<" + LOGGER_VAR + ">~UNFOUND~)?";
 

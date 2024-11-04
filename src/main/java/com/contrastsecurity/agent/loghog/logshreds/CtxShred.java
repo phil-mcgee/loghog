@@ -3,32 +3,7 @@ package com.contrastsecurity.agent.loghog.logshreds;
 
 import static com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory.jooq;
 import static com.contrastsecurity.agent.loghog.db.LogDatabaseUtil.LOG_TABLE_NAME;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.APP_CTX_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.ASSESS_CTX_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.ASSESS_CTX_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.CONCUR_CTX_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.CONCUR_CTX_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.DEBUG_PREAMBLE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_APP_CTX_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_ASSESS_CTX_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_CONCUR_CTX_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_RUNNABLE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_TASK_CLASS_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_TASK_OBJ_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_TRACE_MAP_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_WRAP_INIT_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RUNNABLE_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RUNNABLE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TASK_CLASS_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TASK_CLASS_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TASK_OBJ_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TASK_OBJ_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.THREAD_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TIMESTAMP_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACE_MAP_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACE_MAP_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.WRAP_INIT_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.WRAP_INIT_XTRACT;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.*;
 
 import com.contrastsecurity.agent.loghog.shred.BaseShred;
 import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
@@ -42,6 +17,8 @@ import com.contrastsecurity.agent.loghog.shred.ShredSqlTable;
 import com.contrastsecurity.agent.loghog.shred.TextSignatureRowClassifier;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import org.jooq.impl.DSL;
@@ -142,6 +119,10 @@ public class CtxShred extends BaseShred {
     return sb.toString();
   }
 
+  //  static String entryTestSql() {
+  //    return "LOG.LINE = 27621";
+  //  }
+
   static final List<PatternMetadata> PATTERN_METADATA =
       List.of(
           // 2024-10-28 14:36:25,737 [reactor-http-nio-3 AssessmentContext] DEBUG - Created context:
@@ -181,27 +162,26 @@ public class CtxShred extends BaseShred {
           // Saving app=[com.contrastsecurity.agent.apps.ApplicationContext@19503bf5],
           // HttpContext=[HttpContext{...}], and AssessmentContext=[AssessmentContext@71d8e43d] to
           // ConcurrencyContext=[d@5c7b2372]
-          // FIXME
-          //          new PatternMetadata(
-          //              "savingApp",
-          //              List.of("Saving app=["),
-          //              Pattern.compile(
-          //                  "\\s+Saving app=\\["
-          //                      + APP_CTX_XTRACT
-          //                      + "], HttpContext=\\[.+}], and AssessmentContext=\\["
-          //                      + "(AssessmentContext@)?"
-          //                      + ASSESS_CTX_XTRACT
-          //                      + "] to ConcurrencyContext=\\["
-          //                      + CONCUR_CTX_XTRACT
-          //                      + "]"
-          //                      + NO_TIMESTAMP_XTRACT
-          //                      + NO_THREAD_LOGGER_XTRACT
-          //                      + NO_TASK_CLASS_XTRACT
-          //                      + NO_TASK_OBJ_XTRACT
-          //                      + NO_WRAP_INIT_XTRACT
-          //                      + NO_RUNNABLE_XTRACT
-          //                      + NO_TRACE_MAP_XTRACT
-          //                      + "$")),
+          new PatternMetadata(
+              "savingApp",
+              List.of("Saving app=["),
+              Pattern.compile(
+                  "\\s+Saving app=\\["
+                      + APP_CTX_XTRACT
+                      + "], HttpContext=\\[.+}], and AssessmentContext=\\["
+                      + "(AssessmentContext@)?"
+                      + ASSESS_CTX_XTRACT
+                      + "] to ConcurrencyContext=\\["
+                      + CONCUR_CTX_XTRACT
+                      + "]"
+                      + NO_TIMESTAMP_XTRACT
+                      + NO_THREAD_LOGGER_XTRACT
+                      + NO_TASK_CLASS_XTRACT
+                      + NO_TASK_OBJ_XTRACT
+                      + NO_WRAP_INIT_XTRACT
+                      + NO_RUNNABLE_XTRACT
+                      + NO_TRACE_MAP_XTRACT
+                      + "$")),
           // 2024-10-28 14:36:23,207 [main b] DEBUG - main-1 onSubmitted
           // java.util.zip.ZipFile$CleanableResource$FinalizableResource
           // FinalizableResource@4dec9271 into map under context d@7609c5c0 and trace map null
@@ -210,7 +190,7 @@ public class CtxShred extends BaseShred {
               List.of(" onSubmitted ", " into map under context "),
               Pattern.compile(
                   DEBUG_PREAMBLE_XTRACT
-                      + "- \\S+ onSubmitted "
+                      + "- [\\S ]+ onSubmitted "
                       + TASK_CLASS_XTRACT
                       + " "
                       + TASK_OBJ_XTRACT
@@ -230,13 +210,33 @@ public class CtxShred extends BaseShred {
               List.of(" onStarted ", " and got context "),
               Pattern.compile(
                   DEBUG_PREAMBLE_XTRACT
-                      + "- \\S+ onStarted "
+                      + "- [\\S ]+ onStarted "
                       + TASK_CLASS_XTRACT
+                      + " "
                       + TASK_OBJ_XTRACT
                       + " and got context "
                       + CONCUR_CTX_XTRACT
                       + " and trace map "
                       + TRACE_MAP_XTRACT
+                      + NO_ASSESS_CTX_XTRACT
+                      + NO_APP_CTX_XTRACT
+                      + NO_WRAP_INIT_XTRACT
+                      + NO_RUNNABLE_XTRACT
+                      + "$")),
+          // 2024-10-28 14:36:22,782 [background-preinit b] DEBUG - background-preinit-29 onStarted
+          // java.lang.Thread Thread@7dfca9e6 and got context d@113a6636 and trace map null
+          new PatternMetadata(
+              "onStartedNullCtx",
+              List.of(" onStarted ", " but context was null"),
+              Pattern.compile(
+                  DEBUG_PREAMBLE_XTRACT
+                      + "- [\\S ]+ onStarted "
+                      + TASK_CLASS_XTRACT
+                      + " "
+                      + TASK_OBJ_XTRACT
+                      + " but context was null"
+                      + NO_CONCUR_CTX_XTRACT
+                      + NO_TRACE_MAP_XTRACT
                       + NO_ASSESS_CTX_XTRACT
                       + NO_APP_CTX_XTRACT
                       + NO_WRAP_INIT_XTRACT
@@ -253,6 +253,7 @@ public class CtxShred extends BaseShred {
                       + WRAP_INIT_XTRACT
                       + " wrapped a runnable: "
                       + RUNNABLE_XTRACT
+                      + " "
                       + NO_CONCUR_CTX_XTRACT
                       + NO_ASSESS_CTX_XTRACT
                       + NO_APP_CTX_XTRACT
@@ -290,24 +291,35 @@ public class CtxShred extends BaseShred {
 
   public CtxShred() {
     super(SHRED_METADATA, SHRED_SQL_TABLE, MISFITS_METADATA, MISFITS_SQL_TABLE, SHRED_SOURCE);
-    //    PATTERN_METADATA.stream().map(pmd -> pmd.pattern()).forEach(System.out::println);
-    //    final String matchThis =
-    //        "\tSaving app=[com.contrastsecurity.agent.apps.ApplicationContext@75f32817],
-    // HttpContext=[HttpContext{request=null, response=null}], and AssessmentContext=[null] to
-    // ConcurrencyContext=[d@30e2016a]";
-    //    PATTERN_METADATA.stream()
-    //        .filter(pmd -> "savingApp".equals(pmd.patternId()))
-    //        .map(pmd -> pmd.pattern().matcher(matchThis).matches())
-    //        .forEach(System.out::println);
-    //
-    //    final Pattern toTest =
-    //        PATTERN_METADATA.stream()
-    //            .filter(pmd -> "savingApp".equals(pmd.patternId()))
-    //            .map(PatternMetadata::pattern)
-    //            .findFirst()
-    //            .orElseGet(null);
-    //    System.out.println("Pattern: " + toTest);
-    //    System.out.println("Matches: " + matchThis);
-    //    System.out.println(" = " + toTest.matcher(matchThis).matches());
+  }
+
+  public static void main(String[] args) {
+    final String matchThis =
+        "2024-10-28 14:36:55,960 [Signal Dispatcher b] DEBUG - Signal Dispatcher-4 onSubmitted jdk.internal.misc.Signal$1 jdk.internal.misc.Signal$1@2f36c092 into map under context d@57db5523 and trace map null";
+
+    final Pattern toTest =
+        PATTERN_METADATA.stream()
+            .filter(pmd -> "onSubmitted".equals(pmd.patternId()))
+            .map(PatternMetadata::pattern)
+            .findFirst()
+            .orElseGet(null);
+    System.out.println("Pattern: " + toTest);
+    System.out.println("Matches? " + matchThis);
+    Matcher matcher = toTest.matcher(matchThis);
+    System.out.println(" = " + matcher.matches());
+    if (matcher.matches()) {
+      for (Map.Entry<String, Integer> entry : matcher.namedGroups().entrySet()) {
+        final String name = entry.getKey();
+        final Integer groupIdx = entry.getValue();
+        System.out.println(
+            "group("
+                + name
+                + ") -> \'"
+                + String.valueOf(matcher.group(groupIdx))
+                + "\'"
+                + " == null ? "
+                + String.valueOf(matcher.group(name) == null));
+      }
+    }
   }
 }

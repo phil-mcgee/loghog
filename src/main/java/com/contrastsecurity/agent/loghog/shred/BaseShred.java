@@ -57,7 +57,7 @@ public class BaseShred {
       } else if (SHRED_TABLE_PATTERN_COL.equals(metaData.extractName())) {
         val = patternId;
       }
-      if (TIMESTAMP_VAR.equals(metaData.extractName())) {
+      if (TIMESTAMP_VAR.equals(metaData.extractName()) && val != null) {
         val = String.valueOf(val).replace(',', '.');
       }
       shredRow[idx++] = val;

@@ -34,7 +34,8 @@ class ShredValueExtractor {
       if (match.find()) {
         Map<String, Object> extractedVals = new HashMap<>();
         for (String extractedValName : this.extractedValNames) {
-          extractedVals.put(extractedValName, match.group(extractedValName));
+          Object val = match.group(extractedValName);
+          extractedVals.put(extractedValName, "null".equals(val) ? null : val);
         }
         return extractedVals;
       }
