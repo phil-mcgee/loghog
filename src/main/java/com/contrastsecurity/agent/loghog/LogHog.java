@@ -7,16 +7,28 @@ import com.contrastsecurity.agent.loghog.logshreds.CrumbShred;
 import com.contrastsecurity.agent.loghog.logshreds.CtxShred;
 import com.contrastsecurity.agent.loghog.logshreds.MesgShred;
 import com.contrastsecurity.agent.loghog.logshreds.TrakShred;
+import com.contrastsecurity.agent.loghog.logviews.ViewCreator;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import org.jooq.codegen.GenerationTool;
+import org.jooq.meta.jaxb.Configuration;
 
-public class Loghog {
+public class LogHog {
 
-  public static void createAndPopulateDb(
-      final String logFilepath, final String dbFilepathNoSuffix) {
-    try (final Connection connection = EmbeddedDatabaseFactory.create(dbFilepathNoSuffix)) {
+  final ConnectionProvider connectionProvider;
+
+  public LogHog(final ConnectionProvider connectionProvider) {
+    this.connectionProvider = connectionProvider;
+  }
+
+  abstract static class ConnectionProvider {
+    public abstract Connection connect() throws SQLException;
+  }
+
+  void createAndPopulateDb(final String logFilepath) {
+    try (final Connection connection = connectionProvider.connect()) {
       LogDatabaseUtil.initializeLogTable(connection, logFilepath);
       new MesgShred().createAndPopulateShredTables(connection);
       new CrumbShred().createAndPopulateShredTables(connection);
@@ -30,7 +42,15 @@ public class Loghog {
     }
   }
 
-  public static void main(String[] args) {
+  public void createViews() {
+    try (final Connection connection = connectionProvider.connect()) {
+
+    } catch (SQLException e) {
+      e.printStackTrace();
+    }
+  }
+
+  public static void main(String[] args) throws Exception {
     if (args.length < 1) {
       System.out.println(
           "loghog requires a comand line argument specifying the path to a log file to"
@@ -69,6 +89,22 @@ public class Loghog {
       dbFile.delete();
     }
 
-    createAndPopulateDb(logFilepath, new File(dbFilepathNoSuffix).getAbsolutePath());
+    final String suffixlessAbsoluteDatabasePath = new File(dbFilepathNoSuffix).getAbsolutePath();
+    final LogHog logHog =
+        new LogHog(
+            new ConnectionProvider() {
+              @Override
+              public Connection connect() throws SQLException {
+                return EmbeddedDatabaseFactory.create(suffixlessAbsoluteDatabasePath);
+              }
+            });
+
+    logHog.createAndPopulateDb(logFilepath);
+
+    // FIXME jOOQ code generation
+    //    Configuration configuration = ViewCreator.jooqConfig(suffixlessAbsoluteDatabasePath);
+    //    GenerationTool.generate(configuration);
+
+    //    logHog.createViews();
   }
 }

@@ -38,9 +38,13 @@ dependencies {
     implementation 'org.apache.commons:commons-text'
     implementation 'com.h2database:h2'
     implementation 'org.jooq:jooq'
+    implementation 'org.jooq:jooq-meta'
+    implementation 'org.jooq:jooq-codegen'
 }
+
+//sourceSets.main.java.srcDirs += project(":loghog:build").file("build/generated/sources/jooq/java/main")
 
 application {
     // Define the main class for the application.
-    mainClass = 'com.contrastsecurity.agent.loghog.Loghog'
+    mainClass = 'com.contrastsecurity.agent.loghog.LogHog'
 }
