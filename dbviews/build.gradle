@@ -1,10 +1,32 @@
+
 plugins {
     id 'buildlogic.java-library-conventions'
 }
 
 dependencies {
+    implementation 'com.h2database:h2'
     implementation 'org.jooq:jooq'
     implementation 'org.jooq:jooq-meta'
     implementation 'org.jooq:jooq-codegen'
     implementation project(':dbschema')
 }
+
+//sourceSets {
+//    main {
+//        java {
+//            setSrcDirs(
+//                    ["${projectDir}/src/main/java"] as List +
+//                            "${projectDir}/build/generated/sources/jooq/main/java"
+//            )
+//        }
+//    }
+//}
+//
+//tasks.register("jooqClassGeneration") {
+//    dependsOn gradle.includedBuild(':dbschema').task('classes')
+//    doLast() {
+//        JooqGenerator.jooqLoghogSources("com.contrtastsecurity.agent.loghog.jooq",
+//                "dbviews/build/generated/sources/jooq/main/java")
+//    }
+//}
+//tasks.compileJava.dependsOn(jooqClassGeneration)
