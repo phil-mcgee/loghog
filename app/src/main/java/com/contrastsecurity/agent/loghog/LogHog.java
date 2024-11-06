@@ -7,6 +7,7 @@ import com.contrastsecurity.agent.loghog.logshreds.CrumbShred;
 import com.contrastsecurity.agent.loghog.logshreds.CtxShred;
 import com.contrastsecurity.agent.loghog.logshreds.MesgShred;
 import com.contrastsecurity.agent.loghog.logshreds.TrakShred;
+import com.contrastsecurity.agent.loghog.logviews.ViewCreator;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -98,10 +99,8 @@ public class LogHog {
 
     logHog.createAndPopulateDb(logFilepath);
 
-    // FIXME jOOQ code generation
-    //    Configuration configuration = ViewCreator.jooqConfig(suffixlessAbsoluteDatabasePath);
-    //    GenerationTool.generate(configuration);
-
-    //    logHog.createViews();
+    ViewCreator viewCreator = new ViewCreator(suffixlessAbsoluteDatabasePath);
+    viewCreator.createRequestView();
+    viewCreator.createThreadView();
   }
 }

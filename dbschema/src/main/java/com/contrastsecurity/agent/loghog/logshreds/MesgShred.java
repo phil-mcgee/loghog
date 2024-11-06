@@ -11,6 +11,7 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -62,13 +63,12 @@ public class MesgShred extends BaseShred {
                           .foreignKey(SHRED_KEY_COLUMN)
                           .references(LOG_TABLE_NAME, "LINE"))
                   .getSQL()),
-          /* is there really any point to index on thread?
-             Arrays.asList(
-                     jooq().createIndex("idx_" + SHRED_TABLE_NAME + "_thread")
-                             .on(SHRED_TABLE_NAME, "thread")
+              List.of(
+                     jooq().createIndex("IDX_" + SHRED_TABLE_NAME + "_THREAD_LINE")
+                             .on(SHRED_TABLE_NAME, "THREAD", "LINE")
                              .getSQL())
-          */
-          List.of());
+//              List.of()
+      );
 
   static final ShredSqlTable MISFITS_SQL_TABLE =
       new ShredSqlTable(
