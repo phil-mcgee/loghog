@@ -19,32 +19,6 @@ public class ViewCreator {
     this.dbPath = dbPath;
   }
 
-  public void createRequestView() throws SQLException {
-    System.out.println("Creating REQUEST view...");
-    try (Connection connect = EmbeddedDatabaseFactory.create(dbPath)) {
-      DSLContext jooq = DSL.using(connect);
-
-      final Crumb b = CRUMB.as("begin");
-      final Crumb e = CRUMB.as("end");
-      final String selectSql = """
-SELECT 
-  b.REQ, 
-  b.URL, 
-  b.LINE BEGIN_LINE, 
-  b.TIMESTAMP BEGIN_TIME, 
-  e.LINE END_LINE, 
-  e.TIMESTAMP END_TIME
-FROM (SELECT * FROM CRUMB WHERE PATTERN = 'req_begin') b
-LEFT JOIN (SELECT * FROM CRUMB WHERE PATTERN = 'req_end') e
-ON b.REQ = e.REQ
-""";
-      System.out.println("selectSql = \n" + selectSql);
-
-      jooq.createView("REQUEST").as(selectSql).execute();
-    }
-    System.out.println("REQUEST view created.");
-  }
-
   public void createThreadView() throws SQLException {
     System.out.println("Creating THREAD view...");
     try (Connection connect = EmbeddedDatabaseFactory.create(dbPath)) {
@@ -68,10 +42,74 @@ FROM MESG CURRENT
 """;
       System.out.println("selectSql = \n" + selectSql);
 
-//      jooq.createMaterializedView("THREAD").as(selectSql).execute();
+      //  TOO SLOW    jooq.createMaterializedView("THREAD").as(selectSql).execute();
+      // better to find lines as needed in ad hoc query joins
       jooq.createView("THREAD").as(selectSql).execute();
     }
     System.out.println("THREAD view created.");
+  }
+
+  public void createRequestView() throws SQLException {
+    System.out.println("Creating REQUEST view...");
+    try (Connection connect = EmbeddedDatabaseFactory.create(dbPath)) {
+      DSLContext jooq = DSL.using(connect);
+
+      final Crumb b = CRUMB.as("begin");
+      final Crumb e = CRUMB.as("end");
+      final String selectSql = """
+SELECT
+  b.REQ,
+  b.URL,
+  b.LINE BEGIN_LINE,
+  b.TIMESTAMP BEGIN_TIME,
+  b.THREAD BEGIN_THREAD,
+  b.CTX_BEG_LINE,
+  b.ASSESS_CTX,
+  b.TRACE_BEG_LINE,
+  b.TRACE_MAP,
+  e.LINE END_LINE,
+  e.TIMESTAMP END_TIME,
+  e.THREAD END_THREAD
+FROM (
+  SELECT 
+    CRUMB.REQ, 
+    CRUMB.URL, 
+    CRUMB.LINE, 
+    CRUMB.TIMESTAMP, 
+    CRUMB.THREAD, 
+    N.LINE CTX_BEG_LINE, 
+    N.ASSESS_CTX ASSESS_CTX, 
+    T.LINE TRACE_BEG_LINE, 
+    T.TRACE_MAP TRACE_MAP
+  FROM CRUMB
+  JOIN CTX N
+  JOIN TRAK T
+  ON
+   CRUMB.PATTERN = 'req_begin'
+   AND N.LINE IN (
+      SELECT min(A.LINE)
+      FROM CTX A
+      WHERE
+        A.THREAD = CRUMB.THREAD
+        AND A.PATTERN = 'createdAssessCtx'
+        AND A.LINE > CRUMB.LINE
+     )
+   AND T.LINE IN (
+      SELECT min(ST.LINE)
+      FROM TRAK ST
+      WHERE
+        ST.THREAD = CRUMB.THREAD
+        AND ST.LINE > CRUMB.LINE
+    )
+   ) b
+LEFT JOIN (SELECT * FROM CRUMB WHERE PATTERN = 'req_end') e
+ON b.REQ = e.REQ
+""";
+      System.out.println("selectSql = \n" + selectSql);
+
+      jooq.createView("REQUEST").as(selectSql).execute();
+    }
+    System.out.println("REQUEST view created.");
   }
 
 }

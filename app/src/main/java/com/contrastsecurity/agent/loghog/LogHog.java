@@ -100,7 +100,8 @@ public class LogHog {
     logHog.createAndPopulateDb(logFilepath);
 
     ViewCreator viewCreator = new ViewCreator(suffixlessAbsoluteDatabasePath);
-    viewCreator.createRequestView();
     viewCreator.createThreadView();
+    // REQUEST view requires THREAD view
+    viewCreator.createRequestView();
   }
 }

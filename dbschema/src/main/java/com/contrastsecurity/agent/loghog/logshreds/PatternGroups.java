@@ -68,7 +68,7 @@ public class PatternGroups {
   public static final String NO_STACKFRAME_XTRACT = "(?<" + STACKFRAME_VAR + ">~UNFOUND~)?";
 
   public static final String TRACE_MAP_VAR = "traceMap";
-  public static final String TRACE_MAP_XTRACT = "(?<" + TRACE_MAP_VAR + ">\\S+)";
+  public static final String TRACE_MAP_XTRACT = "[^@\\s]+@(?<" + TRACE_MAP_VAR + ">\\S+)";
   public static final String NO_TRACE_MAP_XTRACT = "(?<" + TRACE_MAP_VAR + ">~UNFOUND~)?";
 
   public static final String TRACKED_OBJ_VAR = "trackedObj";
@@ -81,13 +81,11 @@ public class PatternGroups {
   public static final String TRACE_MAP_SIZE_XTRACT = "(?<" + TRACE_MAP_SIZE_VAR + ">\\d+)";
 
   public static final String CONCUR_CTX_VAR = "concurCtx";
-  public static final String CONCUR_CTX_XTRACT = "(?<" + CONCUR_CTX_VAR + ">[^\\] ]+)";
+  public static final String CONCUR_CTX_XTRACT = "[^@\\s]+@(?<" + CONCUR_CTX_VAR + ">[^\\] ]+)";
   public static final String NO_CONCUR_CTX_XTRACT = "(?<" + CONCUR_CTX_VAR + ">~UNFOUND~)?";
 
   public static final String ASSESS_CTX_VAR = "assessCtx";
-  //  public static final String ASSESS_CTX_XTRACT =
-  //      "(AssessmentContext@(?<" + ASSESS_CTX_VAR + ">[^] ]+)|(?<\" + ASSESS_CTX_VAR + \">null))";
-  public static final String ASSESS_CTX_XTRACT = "(?<" + ASSESS_CTX_VAR + ">[^\\] ]+)";
+  public static final String ASSESS_CTX_XTRACT = "AssessmentContext@(?<" + ASSESS_CTX_VAR + ">[^\\] ]+)";
   public static final String NO_ASSESS_CTX_XTRACT = "(?<" + ASSESS_CTX_VAR + ">~UNFOUND~)?";
 
   public static final String APP_CTX_VAR = "appCtx";
