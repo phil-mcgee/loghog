@@ -103,5 +103,6 @@ public class LogHog {
     viewCreator.createThreadView();
     // REQUEST view requires THREAD view
     viewCreator.createRequestView();
+    viewCreator.createBadRequestView();
   }
 }
