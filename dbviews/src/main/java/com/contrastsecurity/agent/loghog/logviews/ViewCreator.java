@@ -70,19 +70,10 @@ SELECT
   REQEND.TIMESTAMP END_TIME,
   REQEND.THREAD END_THREAD
 FROM CRUMB REQBEG
-JOIN CTX NEWCTX
-ON
-  REQBEG.PATTERN = 'req_begin'
-  AND NEWCTX.LINE IN (
-    SELECT min(LINE)
-    FROM CTX
-    WHERE
-      THREAD = REQBEG.THREAD
-      AND PATTERN = 'createdAssessCtx'
-      AND LINE > REQBEG.LINE
-    )
 JOIN TRAK FIRSTTRK
-ON FIRSTTRK.LINE IN (
+ON
+   REQBEG.PATTERN = 'req_begin'
+   AND FIRSTTRK.LINE IN (
       SELECT min(LINE)
       FROM TRAK
       WHERE
@@ -97,9 +88,24 @@ ON LASTTRK.LINE IN (
       TRACE_MAP = FIRSTTRK.TRACE_MAP
   )
 LEFT JOIN CRUMB REQEND
-ON\s
-  REQEND.PATTERN = 'req_end'
-  AND REQEND.REQ = REQBEG.REQ
+ON
+  REQEND.LINE in (
+    SELECT max(LINE)
+    FROM CRUMB
+    WHERE
+      (PATTERN = 'req_end_hist' OR PATTERN = 'req_end')
+      AND REQ = REQBEG.REQ
+  )
+LEFT JOIN CTX NEWCTX
+  ON
+    NEWCTX.LINE IN (
+      SELECT min(LINE)
+      FROM CTX
+      WHERE
+        THREAD = REQBEG.THREAD
+        AND PATTERN = 'createdAssessCtx'
+        AND LINE > REQBEG.LINE
+     )
 """;
       System.out.println("selectSql = \n" + selectSql);
 

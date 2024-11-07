@@ -103,6 +103,7 @@ public class LogHog {
     viewCreator.createThreadView();
     // REQUEST view requires THREAD view
     viewCreator.createRequestView();
-    viewCreator.createBadRequestView();
+    //    viewCreator.createBadRequestView();
+    QuickCheck.reportTells(EmbeddedDatabaseFactory.create(suffixlessAbsoluteDatabasePath));
   }
 }

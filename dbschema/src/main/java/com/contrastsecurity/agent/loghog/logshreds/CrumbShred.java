@@ -134,13 +134,23 @@ public class CrumbShred extends BaseShred {
               List.of("response@", "\t\tBEGIN "),
               Pattern.compile(CRUMB_RESP_PREFIX + "\\t\\tBEGIN .*" + CRUMB_RESP_SUFFIX)),
           new PatternMetadata(
-              "req_end",
+              "req_end_hist",
               List.of("request@", "END & HISTORY:"),
               Pattern.compile(CRUMB_REQ_PREFIX + " END & HISTORY:" + CRUMB_REQ_SUFFIX)),
           new PatternMetadata(
-              "resp_end",
+              "resp_end_hist",
               List.of("response@", "END & HISTORY:"),
-              Pattern.compile(CRUMB_RESP_PREFIX + " END & HISTORY:" + CRUMB_RESP_SUFFIX)));
+              Pattern.compile(CRUMB_RESP_PREFIX + " END & HISTORY:" + CRUMB_RESP_SUFFIX)),
+              new PatternMetadata(
+                      "req_end",
+                      List.of("request@", "\tEND 20"),
+                      Pattern.compile(CRUMB_REQ_PREFIX + " END 20.*" + CRUMB_REQ_SUFFIX)),
+              new PatternMetadata(
+                      "resp_end",
+                      List.of("response@", "\tEND 20"),
+                      Pattern.compile(CRUMB_RESP_PREFIX + " END 20.*" + CRUMB_RESP_SUFFIX))
+
+      );
 
   static final List<String> EXTRACTED_VAL_NAMES =
       SHRED_METADATA.stream()
