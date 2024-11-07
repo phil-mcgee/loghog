@@ -49,4 +49,8 @@ public class JooqGenerator {
             e.printStackTrace();
         }
     }
+
+    public static void main(String[] args) {
+        jooqLoghogSources(args[0], args[1]);
+    }
 }

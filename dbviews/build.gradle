@@ -21,12 +21,12 @@ dependencies {
 //        }
 //    }
 //}
-//
-//tasks.register("jooqClassGeneration") {
-//    dependsOn gradle.includedBuild(':dbschema').task('classes')
-//    doLast() {
-//        JooqGenerator.jooqLoghogSources("com.contrtastsecurity.agent.loghog.jooq",
-//                "dbviews/build/generated/sources/jooq/main/java")
-//    }
+
+//tasks.register('jooqClassGeneration', JavaExec) {
+//    dependsOn(':dbschema:compileJava')
+//    classpath("${projectDir}/../dbschema/build/classes/java/main")
+//    mainClass = 'com.contrastsecurity.agent.loghog.JooqGenerator'
+//    args 'com.contrtastsecurity.agent.loghog.jooq', 'dbviews/build/generated/sources/jooq/main/java'
 //}
+//
 //tasks.compileJava.dependsOn(jooqClassGeneration)
