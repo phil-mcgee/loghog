@@ -5,6 +5,7 @@ import com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory;
 import com.contrastsecurity.agent.loghog.db.LogTable;
 import com.contrastsecurity.agent.loghog.logshreds.CrumbShred;
 import com.contrastsecurity.agent.loghog.logshreds.CtxShred;
+import com.contrastsecurity.agent.loghog.logshreds.HttpShred;
 import com.contrastsecurity.agent.loghog.logshreds.MesgShred;
 import com.contrastsecurity.agent.loghog.logshreds.TrakShred;
 import com.contrastsecurity.agent.loghog.logviews.ViewCreator;
@@ -32,6 +33,7 @@ public class LogHog {
       new CrumbShred().createAndPopulateShredTables(connection);
       new TrakShred().createAndPopulateShredTables(connection);
       new CtxShred().createAndPopulateShredTables(connection);
+      new HttpShred().createAndPopulateShredTables(connection);
       //            new WipAmqpShred().createTables(connection);
       //            new WipLmclShred().createTables(connection);
       //            new WipAcelShred().createTables(connection);

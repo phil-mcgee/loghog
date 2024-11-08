@@ -24,26 +24,25 @@ import java.util.stream.Collectors;
 import static com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory.jooq;
 import static com.contrastsecurity.agent.loghog.db.LogTable.LOG_TABLE_NAME;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.DEBUG_PREAMBLE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.FROM_THREAD_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.FROM_THREAD_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_FROM_THREAD_XTRACT;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NATIVE_RESP_VAR;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NATIVE_RESP_XTRACT;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_NATIVE_RESP_XTRACT;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_OUTPUT_MECHANISM_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_REQ_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_RESP_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_STACKFRAME_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_URL_XTRACT;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.OUTPUT_MECHANISM_VAR;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.OUTPUT_MECHANISM_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.REQ_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.REQ_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RESP_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RESP_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.STACKFRAME_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.THREAD_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TIMESTAMP_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.URL_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.URL_XTRACT;
 
-public class CrumbShred extends BaseShred {
+public class HttpShred extends BaseShred {
 
-  static final String SHRED_TABLE_NAME = "CRUMB";
+  static final String SHRED_TABLE_NAME = "HTTP";
   static final String SHRED_KEY_COLUMN = "LINE";
 
   static final List<ShredRowMetaData> SHRED_METADATA =
@@ -61,10 +60,10 @@ public class CrumbShred extends BaseShred {
           new ShredRowMetaData("REQ", SQLDataType.VARCHAR, String.class, REQ_VAR),
           new ShredRowMetaData("RESP", SQLDataType.VARCHAR, String.class, RESP_VAR),
           new ShredRowMetaData("URL", SQLDataType.VARCHAR, String.class, URL_VAR),
-          new ShredRowMetaData("STACKFRAME", SQLDataType.VARCHAR, String.class, STACKFRAME_VAR),
-          new ShredRowMetaData("FROM_THREAD", SQLDataType.VARCHAR, String.class, FROM_THREAD_VAR));
+              new ShredRowMetaData("NATIVE_RESP", SQLDataType.VARCHAR, String.class, NATIVE_RESP_VAR),
+              new ShredRowMetaData("OUTPUT_MECHANISM", SQLDataType.VARCHAR, String.class, OUTPUT_MECHANISM_VAR));
 
-  static final String MISFITS_TABLE_NAME = "CRUMB_MISFITS";
+  static final String MISFITS_TABLE_NAME = "HTTP_MISFITS";
   static final String MISFITS_KEY_COLUMN = "LINE";
 
   static final List<ShredRowMetaData> MISFITS_METADATA =
@@ -113,9 +112,7 @@ public class CrumbShred extends BaseShred {
           List.of());
 
   public static final String[] ENTRY_SIGNATURES = {
-          " CRUMB ",
-          "Request ending for ",
-          "!LM!RequestTime|RequestEnded"
+          " HttpManager] "
   };
 
   static String entryTestSql() {
@@ -131,105 +128,38 @@ public class CrumbShred extends BaseShred {
     return sb.toString();
   }
 
-  static final String CRUMB_REQ_PREFIX =
-      DEBUG_PREAMBLE_XTRACT + "- CRUMB " + REQ_XTRACT + " " + URL_XTRACT;
-  static final String CRUMB_REQ_SUFFIX = NO_RESP_XTRACT + NO_STACKFRAME_XTRACT;
-  static final String CRUMB_RESP_PREFIX = DEBUG_PREAMBLE_XTRACT + "- CRUMB " + RESP_XTRACT + " ";
-  static final String CRUMB_RESP_SUFFIX =
-      NO_REQ_XTRACT + NO_URL_XTRACT + NO_STACKFRAME_XTRACT ;
-
   static final List<PatternMetadata> PATTERN_METADATA =
       List.of(
+          //!LM!RequestTime|RequestEnded|uri=/routecoverage/annotation/&elapsed=29
           new PatternMetadata(
-              "histReqBegin",
-              List.of("request@", "\t\t\tBEGIN "),
-              Pattern.compile(CRUMB_REQ_PREFIX + "\\t\\t\\tBEGIN .*" + CRUMB_REQ_SUFFIX + NO_FROM_THREAD_XTRACT+ "$")),
+                  "lmReqTime",
+                  List.of("!LM!RequestTime|RequestEnded"),
+                  Pattern.compile(
+                          DEBUG_PREAMBLE_XTRACT
+                                  + "- !LM!RequestTime\\|RequestEnded\\|uri="
+                                  + "(?<" + URL_VAR + ">[^&]+)"
+                                  + "&elapsed=\\d+"
+                                  + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$")),
+          //Capturing response to memory
           new PatternMetadata(
-              "reqBegin",
-              List.of("request@", "\t\tBEGIN "),
-              Pattern.compile(CRUMB_REQ_PREFIX + "\\t\\tBEGIN .*" + CRUMB_REQ_SUFFIX + NO_FROM_THREAD_XTRACT+ "$")),
+              "respCapture",
+              List.of("Capturing response to memory"),
+              Pattern.compile(DEBUG_PREAMBLE_XTRACT + "- Capturing response to memory"
+                      + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_URL_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$")),
+          //2024-11-07 18:04:50,774 [reactor-http-nio-4 HttpManager] DEBUG - Request ending for /auto-binding/v1_0/autobind-unsafe - response is k@2a7ec4a7 and output mechanism is null
+          // FIXME OUTPUT_MECHANISM reports the string null instead of a null value
           new PatternMetadata(
-              "histRespBegin",
-              List.of("response@", "\t\t\tBEGIN "),
-              Pattern.compile(CRUMB_RESP_PREFIX + "\\t\\t\\tBEGIN .*" + CRUMB_RESP_SUFFIX + NO_FROM_THREAD_XTRACT+ "$")),
+              "reqEnding",
+              List.of("- Request ending for "),
+              Pattern.compile(DEBUG_PREAMBLE_XTRACT + "- Request ending for " + URL_XTRACT + " - response is "
+                      + NATIVE_RESP_XTRACT +  " and output mechanism is "  + OUTPUT_MECHANISM_XTRACT
+                      + NO_REQ_XTRACT + NO_RESP_XTRACT + "$")),
+          //Response was empty for URI /sources/v5_0/matrixVariable/foo;var=strawberries
           new PatternMetadata(
-              "respBegin",
-              List.of("response@", "\t\tBEGIN "),
-              Pattern.compile(CRUMB_RESP_PREFIX + "\\t\\tBEGIN .*" + CRUMB_RESP_SUFFIX + NO_FROM_THREAD_XTRACT+ "$")),
-          new PatternMetadata(
-              "reqEndHist",
-              List.of("request@", "END & HISTORY:"),
-              Pattern.compile(CRUMB_REQ_PREFIX + " END & HISTORY:" + CRUMB_REQ_SUFFIX + NO_FROM_THREAD_XTRACT+ "$")),
-          new PatternMetadata(
-              "respEndHist",
-              List.of("response@", "END & HISTORY:"),
-              Pattern.compile(CRUMB_RESP_PREFIX + " END & HISTORY:" + CRUMB_RESP_SUFFIX + NO_FROM_THREAD_XTRACT+ "$")),
-          new PatternMetadata(
-                  "reqEnd",
-                  List.of("request@", "\tEND 20"),
-                  Pattern.compile(CRUMB_REQ_PREFIX + " END 20.*" + CRUMB_REQ_SUFFIX + NO_FROM_THREAD_XTRACT+ "$")),
-          new PatternMetadata(
-                  "respEnd",
-                  List.of("response@", "\tEND 20"),
-                  Pattern.compile(CRUMB_RESP_PREFIX + " END 20.*" + CRUMB_RESP_SUFFIX + NO_FROM_THREAD_XTRACT+ "$")),
-              // 2024-10-28 14:36:24,863 [main b] DEBUG - io.netty.channel.nio.NioEventLoop@f8cd5d7
-              // wrapped a runnable: io.netty.channel.AbstractChannel$AbstractUnsafe$1@4d1d30dc
-              new PatternMetadata(
-                      "contextSwitchReqHist",
-                      List.of("\t\t\tCONTEXT_SWITCH"),
-                      Pattern.compile(
-                              CRUMB_REQ_PREFIX
-                                      + "\t\t\tCONTEXT_SWITCH \\S+ \\S+ "
-                                      + FROM_THREAD_XTRACT
-                                      + " ==> \\S+"
-                                      + CRUMB_REQ_SUFFIX
-                                      + "$")),
-              // 2024-11-07 18:04:50,407 [reactor-http-nio-1 b] DEBUG
-              // - CRUMB request@606865888 /client/v5_0/mono-body		CONTEXT_SWITCH 2024-11-07 18:04:50,407 reactor-http-nio-4 ==> reactor-http-nio-1
-              new PatternMetadata(
-                      "contextSwitchReq",
-                      List.of("\t\tCONTEXT_SWITCH"),
-                      Pattern.compile(
-                              CRUMB_REQ_PREFIX
-                                      + "\t\tCONTEXT_SWITCH \\S+ \\S+ "
-                                      + FROM_THREAD_XTRACT
-                                      + " ==> \\S+"
-                                      + CRUMB_REQ_SUFFIX
-                                      + "$")),
-              // 2024-10-28 14:36:24,863 [main b] DEBUG - io.netty.channel.nio.NioEventLoop@f8cd5d7
-              // wrapped a runnable: io.netty.channel.AbstractChannel$AbstractUnsafe$1@4d1d30dc
-              new PatternMetadata(
-                      "contextSwitchRespHist",
-                      List.of("\t\t\tCONTEXT_SWITCH"),
-                      Pattern.compile(
-                              CRUMB_RESP_PREFIX
-                                      + "\t\t\tCONTEXT_SWITCH \\S+ \\S+ "
-                                      + FROM_THREAD_XTRACT
-                                      + " ==> \\S+"
-                                      + CRUMB_RESP_SUFFIX
-                                      + "$")),
-              // 2024-11-07 18:04:51,077 [reactor-http-nio-4 b] DEBUG - CRUMB response@2147333596 		CONTEXT_SWITCH 2024-11-07 18:04:51,077 reactor-http-nio-2 ==> reactor-http-nio-4
-              new PatternMetadata(
-                      "contextSwitchResp",
-                      List.of("\t\tCONTEXT_SWITCH"),
-                      Pattern.compile(
-                              CRUMB_RESP_PREFIX
-                                      + "\t\tCONTEXT_SWITCH \\S+ \\S+ "
-                                      + FROM_THREAD_XTRACT
-                                      + " ==> \\S+"
-                                      + CRUMB_RESP_SUFFIX
-                                      + "$")),
-              // 2024-11-07 18:04:51,703 [reactor-http-nio-2 HttpManager] DEBUG - Request ending for /client/v5_0/internal/mono-body - response is k@5bedc8f2 and output mechanism is null
-              new PatternMetadata(
-                      "reqEndingFor",
-                      List.of("Request ending for "),
-                      Pattern.compile(
-                              DEBUG_PREAMBLE_XTRACT
-                                      + "- Request ending for "
-                                      + URL_XTRACT
-                                      + " - response is "
-                                      + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_STACKFRAME_XTRACT + NO_FROM_THREAD_XTRACT
-                                      + "$"))
+              "respEmpty",
+              List.of("Response was empty for "),
+              Pattern.compile(DEBUG_PREAMBLE_XTRACT + "- Response was empty for URI " + URL_XTRACT +
+                      NO_REQ_XTRACT + NO_RESP_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$"))
       );
 
   static final List<String> EXTRACTED_VAL_NAMES =
@@ -259,17 +189,17 @@ public class CrumbShred extends BaseShred {
           ROW_CLASSIFIER,
           jooq().select(DSL.asterisk()).from(LOG_TABLE_NAME).where(entryTestSql()).getSQL());
 
-  public CrumbShred() {
+  public HttpShred() {
     super(SHRED_METADATA, SHRED_SQL_TABLE, MISFITS_METADATA, MISFITS_SQL_TABLE, SHRED_SOURCE);
   }
 
   public static void main(String[] args) {
     final String matchThis =
-            "2024-11-07 18:04:51,678 [reactor-http-nio-1 HttpManager] DEBUG - !LM!RequestTime|RequestEnded|uri=/sources/v5_0/serverHttpRequest-uri&elapsed=55";
+            "2024-11-07 18:04:50,774 [reactor-http-nio-4 HttpManager] DEBUG - Request ending for /auto-binding/v1_0/autobind-unsafe - response is k@2a7ec4a7 and output mechanism is null";
 
     final Pattern toTest =
             PATTERN_METADATA.stream()
-                    .filter(pmd -> "lmReqTime".equals(pmd.patternId()))
+                    .filter(pmd -> "reqEnding".equals(pmd.patternId()))
                     .map(PatternMetadata::pattern)
                     .findFirst()
                     .orElseGet(null);

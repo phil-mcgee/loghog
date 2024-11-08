@@ -107,4 +107,18 @@ public class PatternGroups {
   public static final String RUNNABLE_VAR = "runnable";
   public static final String RUNNABLE_XTRACT = "(?<" + RUNNABLE_VAR + ">\\S+)";
   public static final String NO_RUNNABLE_XTRACT = "(?<" + RUNNABLE_VAR + ">~UNFOUND~)?";
+
+  public static final String FROM_THREAD_VAR = "fromThread";
+  public static final String FROM_THREAD_XTRACT = "(?<" + FROM_THREAD_VAR + ">\\S+)";
+  public static final String NO_FROM_THREAD_XTRACT = "(?<" + FROM_THREAD_VAR + ">~UNFOUND~)?";
+
+  public static final String NATIVE_RESP_VAR = "nativeResp";
+  public static final String NATIVE_RESP_XTRACT = "(?<" + NATIVE_RESP_VAR + ">\\S+)";
+  public static final String NO_NATIVE_RESP_XTRACT = "(?<" + NATIVE_RESP_VAR + ">~UNFOUND~)?";
+
+  public static final String OUTPUT_MECHANISM_VAR = "outputMechanism";
+  public static final String OUTPUT_MECHANISM_XTRACT = "(?<" + OUTPUT_MECHANISM_VAR + ">\\S+)";
+  public static final String NO_OUTPUT_MECHANISM_XTRACT = "(?<" + OUTPUT_MECHANISM_VAR + ">~UNFOUND~)?";
+
+
 }

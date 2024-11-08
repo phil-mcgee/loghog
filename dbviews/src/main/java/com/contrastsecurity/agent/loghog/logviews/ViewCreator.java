@@ -7,11 +7,9 @@ import org.jooq.impl.DSL;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-import static com.contrtastsecurity.agent.loghog.jooq.public_.tables.Crumb.*;
-
-import com.contrtastsecurity.agent.loghog.jooq.public_.tables.Crumb;
-
 public class ViewCreator {
+
+  final static boolean VERBOSE = false;
 
   final String dbPath;
 
@@ -40,7 +38,9 @@ SELECT CURRENT.LINE LINE, CURRENT.THREAD THREAD, (
   ) PREVIOUS_IN_THREAD
 FROM MESG CURRENT
 """;
-      System.out.println("selectSql = \n" + selectSql);
+      if (VERBOSE) {
+        System.out.println("selectSql = \n" + selectSql);
+      }
 
       //  TOO SLOW    jooq.createMaterializedView("THREAD").as(selectSql).execute();
       // better to find lines as needed in ad hoc query joins
@@ -72,7 +72,7 @@ SELECT
 FROM CRUMB REQBEG
 JOIN TRAK FIRSTTRK
 ON
-   REQBEG.PATTERN = 'req_begin'
+   REQBEG.PATTERN = 'reqBegin'
    AND FIRSTTRK.LINE IN (
       SELECT min(LINE)
       FROM TRAK
@@ -93,7 +93,7 @@ ON
     SELECT max(LINE)
     FROM CRUMB
     WHERE
-      (PATTERN = 'req_end_hist' OR PATTERN = 'req_end')
+      (PATTERN = 'reqEndHist' OR PATTERN = 'reqEnd')
       AND REQ = REQBEG.REQ
   )
 LEFT JOIN CTX NEWCTX
@@ -107,7 +107,9 @@ LEFT JOIN CTX NEWCTX
         AND LINE > REQBEG.LINE
      )
 """;
-      System.out.println("selectSql = \n" + selectSql);
+      if (VERBOSE) {
+        System.out.println("selectSql = \n" + selectSql);
+      }
 
       jooq.createView("REQUEST").as(selectSql).execute();
     }

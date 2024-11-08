@@ -11,6 +11,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class QuickCheck {
+
+  static final boolean VERBOSE = false;
+
   private static final List<String[]> TELLS =
       Arrays.asList(
           new String[] {
@@ -38,7 +41,10 @@ public class QuickCheck {
       qrystr.append("\n\t OR message like '%").append(tell[1]).append("%'");
     }
     qrystr.append(")\nORDER BY line;");
-    System.out.println("QuickCheck.reportTells() SQL :\n" + qrystr.toString());
+
+    if (VERBOSE) {
+      System.out.println("QuickCheck.reportTells() SQL :\n" + qrystr.toString());
+    }
 
     System.out.println("\nLog lines of concern:");
     try (PreparedStatement stmt = connection.prepareStatement(qrystr.toString())) {
