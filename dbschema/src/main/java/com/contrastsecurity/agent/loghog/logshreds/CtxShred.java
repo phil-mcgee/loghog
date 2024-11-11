@@ -295,12 +295,14 @@ public class CtxShred extends BaseShred {
   }
 
   public static void main(String[] args) {
+
+    // FIXME "wrapped" pattern doesn't match the PromiseTask@54439124(yada-yada) ending
     final String matchThis =
-        "2024-10-28 14:36:55,960 [Signal Dispatcher b] DEBUG - Signal Dispatcher-4 onSubmitted jdk.internal.misc.Signal$1 jdk.internal.misc.Signal$1@2f36c092 into map under context d@57db5523 and trace map null";
+        "2024-11-11 20:06:16,431 [reactor-http-nio-2 b] DEBUG - io.netty.channel.nio.NioEventLoop@3d3d596a wrapped a runnable: PromiseTask@54439124(incomplete, task: reactor.netty.resources.ColocatedEventLoopGroup$$Lambda$923/0x000000084089e040@4bb0072a) ";
 
     final Pattern toTest =
         PATTERN_METADATA.stream()
-            .filter(pmd -> "onSubmitted".equals(pmd.patternId()))
+            .filter(pmd -> "wrapped".equals(pmd.patternId()))
             .map(PatternMetadata::pattern)
             .findFirst()
             .orElseGet(null);

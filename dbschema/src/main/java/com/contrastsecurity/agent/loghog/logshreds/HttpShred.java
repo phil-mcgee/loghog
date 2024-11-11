@@ -34,7 +34,9 @@ import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_URL_X
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.OUTPUT_MECHANISM_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.OUTPUT_MECHANISM_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.REQ_VAR;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.REQ_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RESP_VAR;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RESP_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.THREAD_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TIMESTAMP_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.URL_VAR;
@@ -128,6 +130,7 @@ public class HttpShred extends BaseShred {
     return sb.toString();
   }
 
+  static final String HTTP_MANAGER_PREAMBLE_XTRACT = DEBUG_PREAMBLE_XTRACT + "- HttpContext\\{" + REQ_XTRACT + ", " + RESP_XTRACT + "\\} ";
   static final List<PatternMetadata> PATTERN_METADATA =
       List.of(
           //!LM!RequestTime|RequestEnded|uri=/routecoverage/annotation/&elapsed=29
@@ -144,22 +147,22 @@ public class HttpShred extends BaseShred {
           new PatternMetadata(
               "respCapture",
               List.of("Capturing response to memory"),
-              Pattern.compile(DEBUG_PREAMBLE_XTRACT + "- Capturing response to memory"
-                      + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_URL_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$")),
+              Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- Capturing response to memory"
+                      + NO_URL_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$")),
           //2024-11-07 18:04:50,774 [reactor-http-nio-4 HttpManager] DEBUG - Request ending for /auto-binding/v1_0/autobind-unsafe - response is k@2a7ec4a7 and output mechanism is null
           // FIXME OUTPUT_MECHANISM reports the string null instead of a null value
           new PatternMetadata(
               "reqEnding",
               List.of("- Request ending for "),
-              Pattern.compile(DEBUG_PREAMBLE_XTRACT + "- Request ending for " + URL_XTRACT + " - response is "
+              Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- Request ending for " + URL_XTRACT + " - response is "
                       + NATIVE_RESP_XTRACT +  " and output mechanism is "  + OUTPUT_MECHANISM_XTRACT
-                      + NO_REQ_XTRACT + NO_RESP_XTRACT + "$")),
+                      + "$")),
           //Response was empty for URI /sources/v5_0/matrixVariable/foo;var=strawberries
           new PatternMetadata(
               "respEmpty",
               List.of("Response was empty for "),
-              Pattern.compile(DEBUG_PREAMBLE_XTRACT + "- Response was empty for URI " + URL_XTRACT +
-                      NO_REQ_XTRACT + NO_RESP_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$"))
+              Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- Response was empty for URI " + URL_XTRACT +
+                      NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$"))
       );
 
   static final List<String> EXTRACTED_VAL_NAMES =
@@ -195,11 +198,11 @@ public class HttpShred extends BaseShred {
 
   public static void main(String[] args) {
     final String matchThis =
-            "2024-11-07 18:04:50,774 [reactor-http-nio-4 HttpManager] DEBUG - Request ending for /auto-binding/v1_0/autobind-unsafe - response is k@2a7ec4a7 and output mechanism is null";
+            "2024-11-11 20:06:16,277 [reactor-http-nio-2 HttpManager] DEBUG - HttpContext{HttpRequest@40d46f1f, k@52e20455} - Capturing response to memory";
 
     final Pattern toTest =
             PATTERN_METADATA.stream()
-                    .filter(pmd -> "reqEnding".equals(pmd.patternId()))
+                    .filter(pmd -> "respCapture".equals(pmd.patternId()))
                     .map(PatternMetadata::pattern)
                     .findFirst()
                     .orElseGet(null);

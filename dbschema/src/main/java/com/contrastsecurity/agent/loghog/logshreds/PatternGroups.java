@@ -53,11 +53,11 @@ public class PatternGroups {
   public static final String TRACE_PREAMBLE_XTRACT = SHORT_PREAMBLE_XTRACT + LOG_LEVEL_TRACE + " ";
 
   public static final String REQ_VAR = "req";
-  public static final String REQ_XTRACT = "request@(?<" + REQ_VAR + ">\\S+)";
+  public static final String REQ_XTRACT = "[^@\\s]+@(?<" + REQ_VAR + ">[^,\\s]+)";
   public static final String NO_REQ_XTRACT = "(?<" + REQ_VAR + ">~UNFOUND~)?";
 
   public static final String RESP_VAR = "resp";
-  public static final String RESP_XTRACT = "response@(?<" + RESP_VAR + ">\\S+)";
+  public static final String RESP_XTRACT = "[^@\\s]+@(?<" + RESP_VAR + ">[^}\\s]+)";
   public static final String NO_RESP_XTRACT = "(?<" + RESP_VAR + ">~UNFOUND~)?";
 
   public static final String URL_VAR = "url";
@@ -68,7 +68,7 @@ public class PatternGroups {
   public static final String NO_STACKFRAME_XTRACT = "(?<" + STACKFRAME_VAR + ">~UNFOUND~)?";
 
   public static final String TRACE_MAP_VAR = "traceMap";
-  public static final String TRACE_MAP_XTRACT = "[^@\\s]+@(?<" + TRACE_MAP_VAR + ">\\S+)";
+  public static final String TRACE_MAP_XTRACT = "([^@\\s]+@)?(?<" + TRACE_MAP_VAR + ">\\S+)";
   public static final String NO_TRACE_MAP_XTRACT = "(?<" + TRACE_MAP_VAR + ">~UNFOUND~)?";
 
   public static final String TRACKED_OBJ_VAR = "trackedObj";
@@ -85,7 +85,7 @@ public class PatternGroups {
   public static final String NO_CONCUR_CTX_XTRACT = "(?<" + CONCUR_CTX_VAR + ">~UNFOUND~)?";
 
   public static final String ASSESS_CTX_VAR = "assessCtx";
-  public static final String ASSESS_CTX_XTRACT = "AssessmentContext@(?<" + ASSESS_CTX_VAR + ">[^\\] ]+)";
+  public static final String ASSESS_CTX_XTRACT = "(?<" + ASSESS_CTX_VAR + ">[^\\] ]+)";
   public static final String NO_ASSESS_CTX_XTRACT = "(?<" + ASSESS_CTX_VAR + ">~UNFOUND~)?";
 
   public static final String APP_CTX_VAR = "appCtx";

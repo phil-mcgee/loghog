@@ -113,9 +113,7 @@ public class CrumbShred extends BaseShred {
           List.of());
 
   public static final String[] ENTRY_SIGNATURES = {
-          " CRUMB ",
-          "Request ending for ",
-          "!LM!RequestTime|RequestEnded"
+          " CRUMB "
   };
 
   static String entryTestSql() {
@@ -218,17 +216,6 @@ public class CrumbShred extends BaseShred {
                                       + FROM_THREAD_XTRACT
                                       + " ==> \\S+"
                                       + CRUMB_RESP_SUFFIX
-                                      + "$")),
-              // 2024-11-07 18:04:51,703 [reactor-http-nio-2 HttpManager] DEBUG - Request ending for /client/v5_0/internal/mono-body - response is k@5bedc8f2 and output mechanism is null
-              new PatternMetadata(
-                      "reqEndingFor",
-                      List.of("Request ending for "),
-                      Pattern.compile(
-                              DEBUG_PREAMBLE_XTRACT
-                                      + "- Request ending for "
-                                      + URL_XTRACT
-                                      + " - response is "
-                                      + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_STACKFRAME_XTRACT + NO_FROM_THREAD_XTRACT
                                       + "$"))
       );
 
@@ -265,11 +252,11 @@ public class CrumbShred extends BaseShred {
 
   public static void main(String[] args) {
     final String matchThis =
-            "2024-11-07 18:04:51,678 [reactor-http-nio-1 HttpManager] DEBUG - !LM!RequestTime|RequestEnded|uri=/sources/v5_0/serverHttpRequest-uri&elapsed=55";
+            "2024-11-11 20:06:16,284 [reactor-http-nio-2 HttpManager] DEBUG - HttpContext{HttpRequest@40d46f1f, k@52e20455} - Request ending for /ping - response is k@52e20455 and output mechanism is null";
 
     final Pattern toTest =
             PATTERN_METADATA.stream()
-                    .filter(pmd -> "lmReqTime".equals(pmd.patternId()))
+                    .filter(pmd -> "reqEndingFor".equals(pmd.patternId()))
                     .map(PatternMetadata::pattern)
                     .findFirst()
                     .orElseGet(null);
