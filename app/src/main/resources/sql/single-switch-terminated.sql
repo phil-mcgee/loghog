@@ -9,7 +9,7 @@ WHERE
         FROM REQUEST BAD_REQ
                  JOIN LOG
                       ON
-                          BAD_REQ.REQ = <?badReq>
+                          BAD_REQ.REQ = '<?badReq>'
                               AND (
                                   LOG.LINE = BAD_REQ.BEGIN_LINE
                                   OR LOG.LINE = BAD_REQ.CTX_BEG_LINE
@@ -21,9 +21,9 @@ SELECT CHG_CTX.LINE
 FROM REQUEST BAD_REQ
          JOIN CTX CHG_CTX
               ON
-                  BAD_REQ.REQ = <?badReq>
+                  BAD_REQ.REQ = '<?badReq>'
                               AND  CHG_CTX.ASSESS_CTX = BAD_REQ.ASSESS_CTX
-                              AND (CHG_CTX.PATTERN = 'savingApp' OR CHG_CTX.PATTERN = 'prepareJump')
+                              AND CHG_CTX.PATTERN != 'prepareJump'  -- replicates 'savingApp` with less info
 UNION
 SELECT NEXT_START.LINE FROM
     -- NEXT_START is the first context switch on the BAD_REQ thread (last detected)
@@ -31,7 +31,7 @@ SELECT NEXT_START.LINE FROM
     REQUEST BAD_REQ
         JOIN CTX SAVE_APP
              ON
-                 BAD_REQ.REQ = <?badReq>
+                 BAD_REQ.REQ = '<?badReq>'
                              AND SAVE_APP.ASSESS_CTX = BAD_REQ.ASSESS_CTX
                              AND SAVE_APP.PATTERN = 'savingApp'
                 JOIN CONT SAVE_APP_CONT
@@ -54,7 +54,7 @@ SELECT SUBMIT_TASK.LINE FROM
     REQUEST BAD_REQ
         JOIN CTX SAVE_APP
              ON
-                 BAD_REQ.REQ = <?badReq>
+                 BAD_REQ.REQ = '<?badReq>'
                              AND SAVE_APP.ASSESS_CTX = BAD_REQ.ASSESS_CTX
                              AND SAVE_APP.PATTERN = 'savingApp'
                 JOIN CONT SAVE_APP_CONT

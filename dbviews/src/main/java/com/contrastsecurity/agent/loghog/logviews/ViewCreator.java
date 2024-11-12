@@ -5,6 +5,9 @@ import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 public class ViewCreator {
@@ -50,73 +53,112 @@ FROM MESG CURRENT
   }
 
   public void createRequestView() throws SQLException {
-    System.out.println("Creating REQUEST view...");
+    System.out.println("Creating REQUEST_VIEW view...");
     try (Connection connect = EmbeddedDatabaseFactory.create(dbPath)) {
       DSLContext jooq = DSL.using(connect);
       final String selectSql = """
-SELECT
-  REQBEG.REQ,
-  REQBEG.URL,
-  REQBEG.LINE BEGIN_LINE,
-  REQBEG.TIMESTAMP BEGIN_TIME,
-  REQBEG.THREAD BEGIN_THREAD,
-  NEWCTX.LINE CTX_BEG_LINE,
-  NEWCTX.ASSESS_CTX,
-  FIRSTTRK.LINE TRACE_BEG_LINE,
-  FIRSTTRK.TRACE_MAP TRACE_MAP,
-  LASTTRK.LINE LAST_TRAK_LINE,
-  LASTTRK.THREAD LAST_TRAK_THREAD,
-  REQEND.LINE END_LINE,
-  REQEND.TIMESTAMP END_TIME,
-  REQEND.THREAD END_THREAD
-FROM CRUMB REQBEG
-JOIN TRAK FIRSTTRK
-ON
-   REQBEG.PATTERN = 'reqBegin'
-   AND FIRSTTRK.LINE IN (
-      SELECT min(LINE)
-      FROM TRAK
-      WHERE
-        THREAD = REQBEG.THREAD
-        AND LINE > REQBEG.LINE
-   )
-JOIN TRAK LASTTRK
-ON LASTTRK.LINE IN (
-    SELECT max(LINE)
-    FROM TRAK
-    WHERE
-      TRACE_MAP = FIRSTTRK.TRACE_MAP
-  )
-LEFT JOIN CRUMB REQEND
-ON
-  REQEND.LINE in (
-    SELECT max(LINE)
-    FROM CRUMB
-    WHERE
-      (PATTERN = 'reqEndHist' OR PATTERN = 'reqEnd')
-      AND REQ = REQBEG.REQ
-  )
-LEFT JOIN CTX NEWCTX
-  ON
-    NEWCTX.LINE IN (
-      SELECT min(LINE)
-      FROM CTX
-      WHERE
-        THREAD = REQBEG.THREAD
-        AND PATTERN = 'createdAssessCtx'
-        AND LINE > REQBEG.LINE
-     )
-""";
+              SELECT
+                REQBEG.REQ,
+                REQBEG.URL,
+                REQBEG.LINE BEGIN_LINE,
+                REQBEG.TIMESTAMP BEGIN_TIME,
+                REQBEG.THREAD BEGIN_THREAD,
+                NEWCTX.LINE CTX_BEG_LINE,
+                NEWCTX.ASSESS_CTX,
+                FIRSTTRK.LINE TRACE_BEG_LINE,
+                FIRSTTRK.TRACE_MAP TRACE_MAP,
+                LASTTRK.LINE LAST_TRAK_LINE,
+                LASTTRK.THREAD LAST_TRAK_THREAD,
+                REQEND.LINE END_LINE,
+                REQEND.TIMESTAMP END_TIME,
+                REQEND.THREAD END_THREAD
+              FROM CRUMB REQBEG
+              JOIN TRAK FIRSTTRK
+              ON
+                 REQBEG.PATTERN = 'reqBegin'
+                 AND FIRSTTRK.LINE IN (
+                    SELECT min(LINE)
+                    FROM TRAK
+                    WHERE
+                      THREAD = REQBEG.THREAD
+                      AND LINE > REQBEG.LINE
+                 )
+              JOIN TRAK LASTTRK
+              ON LASTTRK.LINE IN (
+                  SELECT max(LINE)
+                  FROM TRAK
+                  WHERE
+                    TRACE_MAP = FIRSTTRK.TRACE_MAP
+                )
+              LEFT JOIN HTTP REQEND
+              ON
+                REQEND.LINE in (
+                  SELECT max(LINE)
+                  FROM HTTP
+                  WHERE
+                    PATTERN = 'reqEnding'
+                    AND REQ = REQBEG.REQ
+                )
+              LEFT JOIN CTX NEWCTX
+                ON
+                  NEWCTX.LINE IN (
+                    SELECT min(LINE)
+                    FROM CTX
+                    WHERE
+                      THREAD = REQBEG.THREAD
+                      AND PATTERN = 'createdAssessCtx'
+                      AND LINE > REQBEG.LINE
+                   )
+              """;
       if (VERBOSE) {
         System.out.println("selectSql = \n" + selectSql);
       }
 
-      jooq.createView("REQUEST").as(selectSql).execute();
+      jooq.createView("REQUEST_VIEW").as(selectSql).execute();
+      System.out.println("REQUEST_VIEW view created.");
+
+      System.out.println("\nCreating a REQUEST table from view...");
+      final StringBuilder sb = new StringBuilder("create table REQUEST (\n");
+      // grumble, grumble.  h2 makes this way harder than it should be
+      PreparedStatement stmt = connect.prepareStatement("SELECT * FROM REQUEST_VIEW LIMIT 0");
+      ResultSet rs = stmt.executeQuery();
+      ResultSetMetaData rsmd = rs.getMetaData();
+      for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+        sb.append(rsmd.getColumnName(i)).append(" ");
+        final String dataType = rsmd.getColumnTypeName(i);
+        sb.append(
+                switch (dataType) {
+                  case "INTEGER" -> "int";
+                  case "CHARACTER VARYING" -> "VARCHAR2";
+                  default -> dataType;
+                }
+        ).append(", \n");
+      }
+      sb.setLength(sb.length() - ", \n".length());
+      sb.append("\n);");
+
+      final String createRequestTableSql = sb.toString();
+      if (VERBOSE) {
+        System.out.println("createRequestTableSql = \n" + createRequestTableSql);
     }
-    System.out.println("REQUEST view created.");
+      stmt.close();
+
+      // create the table
+      stmt = connect.prepareStatement(createRequestTableSql);
+      stmt.executeUpdate();
+      stmt.close();
+      System.out.println("REQUEST table created.");
+
+      System.out.println("Populating REQUEST table...");
+      stmt = connect.prepareStatement("INSERT INTO REQUEST SELECT * FROM REQUEST_VIEW");
+      stmt.executeUpdate();
+      stmt.close();
+      System.out.println("REQUEST table populated.");
+    }
   }
 
 
+  // NOT CURRENTLY USED
   public void createBadRequestView() throws SQLException {
     System.out.println("Creating BAD_REQUEST view...");
     try (Connection connect = EmbeddedDatabaseFactory.create(dbPath)) {
