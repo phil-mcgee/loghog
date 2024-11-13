@@ -96,7 +96,7 @@ public class PatternGroups {
   public static final String NO_CONCUR_CTX_XTRACT = "(?<" + CONCUR_CTX_VAR + UNFOUND_XTRACT_CLOSE;
 
   public static final String ASSESS_CTX_VAR = "assessCtx";
-  public static final String ASSESS_CTX_XTRACT = "(?<" + ASSESS_CTX_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
+  public static final String ASSESS_CTX_XTRACT = "(?<" + ASSESS_CTX_VAR + VAL_ID_XTRACT_CLOSE;
   public static final String NO_ASSESS_CTX_XTRACT = "(?<" + ASSESS_CTX_VAR + UNFOUND_XTRACT_CLOSE;
 
   public static final String APP_CTX_VAR = "appCtx";

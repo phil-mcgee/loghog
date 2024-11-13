@@ -1,0 +1,5 @@
+SELECT r.*
+FROM REQUEST r
+JOIN CTX C
+ON r.ASSESS_CTX = C.ASSESS_CTX
+AND c.PATTERN = 'clearedAssessment'

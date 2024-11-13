@@ -35,18 +35,18 @@ SELECT NEXT_START.LINE FROM
                              AND SAVE_APP.ASSESS_CTX = BAD_REQ.ASSESS_CTX
                              AND SAVE_APP.PATTERN = 'savingApp'
                 JOIN CONT SAVE_APP_CONT
-ON SAVE_APP.LINE = SAVE_APP_CONT.LINE
-    JOIN MESG APP_SAVE_MESG
-    ON APP_SAVE_MESG.LINE = SAVE_APP_CONT.MESG
-    JOIN CTX NEXT_START
-    ON NEXT_START.LINE IN (
-    SELECT min(c.LINE)
-    FROM CTX c
-    WHERE
-    (c.PATTERN = 'onStarted' OR c.PATTERN = 'onStartedNullCtx')
-    AND c.THREAD = APP_SAVE_MESG.THREAD
-    AND c.LINE > APP_SAVE_MESG.LINE
-    )
+				ON SAVE_APP.LINE = SAVE_APP_CONT.LINE
+				    JOIN MESG APP_SAVE_MESG
+				    ON APP_SAVE_MESG.LINE = SAVE_APP_CONT.MESG
+				    JOIN CTX NEXT_START
+				    ON NEXT_START.LINE IN (
+				    SELECT min(c.LINE)
+				    FROM CTX c
+				    WHERE
+				    (c.PATTERN = 'onStarted' OR c.PATTERN = 'onStartedNullCtx')
+				    AND c.THREAD = APP_SAVE_MESG.THREAD
+				    AND c.LINE > APP_SAVE_MESG.LINE
+				    )
 UNION
 SELECT SUBMIT_TASK.LINE FROM
     -- SUBMIT_TASK is the line where the task which triggers the NEXT_START was submitted

@@ -104,7 +104,9 @@ public class CtxShred extends BaseShred {
     "Saving app=[",
     " into map under context ",
     " onStarted ",
-    " wrapped a runnable: "
+    " wrapped a runnable: ",
+    "Removing long-living runnable/callable",
+    "Cleared expired assessment"
   };
 
   static String entryTestSql() {
@@ -134,7 +136,7 @@ public class CtxShred extends BaseShred {
               Pattern.compile(
                   DEBUG_PREAMBLE_XTRACT
                       + "- Created context: "
-                      + ASSESS_CTX_XTRACT
+                      + "AssessmentContext@" + ASSESS_CTX_XTRACT
                       + NO_CONCUR_CTX_XTRACT
                       + NO_APP_CTX_XTRACT
                       + NO_TASK_CLASS_XTRACT
@@ -151,7 +153,7 @@ public class CtxShred extends BaseShred {
               Pattern.compile(
                   DEBUG_PREAMBLE_XTRACT
                       + "- Preparing to jump context: "
-                      + ASSESS_CTX_XTRACT
+                      + "AssessmentContext@" + ASSESS_CTX_XTRACT
                       + NO_CONCUR_CTX_XTRACT
                       + NO_APP_CTX_XTRACT
                       + NO_TASK_CLASS_XTRACT
@@ -261,6 +263,22 @@ public class CtxShred extends BaseShred {
                       + NO_TASK_CLASS_XTRACT
                       + NO_TASK_OBJ_XTRACT
                       + NO_TRACE_MAP_XTRACT
+                      + "$")),
+          new PatternMetadata(
+              "clearedAssessment",
+              List.of("Cleared expired assessment context"),
+              Pattern.compile(
+              DEBUG_PREAMBLE_XTRACT
+                      + "- Cleared expired assessment context AssessmentContext@"
+                              + ASSESS_CTX_XTRACT
+                      + "in .+"
+                      + NO_CONCUR_CTX_XTRACT
+                      + NO_APP_CTX_XTRACT
+                      + NO_TASK_CLASS_XTRACT
+                      + NO_TASK_OBJ_XTRACT
+                      + NO_TRACE_MAP_XTRACT
+                      + NO_WRAP_INIT_XTRACT
+                      + NO_WRAPPED_RUNNABLE_XTRACT
                       + "$")));
 
   static final List<String> EXTRACTED_VAL_NAMES =
@@ -300,8 +318,9 @@ public class CtxShred extends BaseShred {
     "2024-11-12 16:26:53,461 [pool-2-thread-2 b] DEBUG - pool-2-thread-2-15 onStarted java.util.concurrent.Executors$RunnableAdapter RunnableAdapter@7780bf12 but context was null",
     "2024-11-12 16:27:03,428 [Thread-10 b] DEBUG - Thread-10-33 onSubmitted java.lang.Thread Thread@60e40443 into map under context a@53eb78bf and trace map null",
     "2024-11-12 16:27:03,425 [reactor-http-nio-2 AssessmentContext] DEBUG - Preparing to jump context: AssessmentContext@7ecb67d4",
-    "	Saving app=[com.contrastsecurity.agent.apps.ApplicationContext@5ca8fb0d], HttpContext=[HttpContext{request=null, response=null}], and AssessmentContext=[null] to ConcurrencyContext=[a@53eb78bf]",
-    "2024-11-12 16:27:03,425 [reactor-http-nio-1 b] DEBUG - io.netty.channel.nio.NioEventLoop@1564c848 wrapped a runnable: io.netty.channel.AbstractChannel$AbstractUnsafe$8@3aac0178 "
+    "\tSaving app=[com.contrastsecurity.agent.apps.ApplicationContext@1a9e4f22], HttpContext=[HttpContext{request=null, response=null}], and AssessmentContext=[AssessmentContext@7ecb67d4] to ConcurrencyContext=[a@00a90db9]",
+    "2024-11-12 16:27:03,425 [reactor-http-nio-1 b] DEBUG - io.netty.channel.nio.NioEventLoop@1564c848 wrapped a runnable: io.netty.channel.AbstractChannel$AbstractUnsafe$8@3aac0178 ",
+    "2024-11-12 16:27:03,424 [reactor-http-nio-3 AssessmentContext] DEBUG - Cleared expired assessment context AssessmentContext@393a609a in (29999ms)"
   );
   
   public static void main(String[] args) {
