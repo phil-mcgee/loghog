@@ -3,10 +3,10 @@ package com.contrastsecurity.agent.loghog.logshreds;
 
 public class PatternGroups {
 
-  public static final String VAL_ID_STR = "[^\\s@,}\\]]+";
+  public static final String VAL_ID_STR = "[^\\s@,}\\]\\)]+";
   public static final String VAL_ID_XTRACT_CLOSE = ">" + VAL_ID_STR + ")";
 
-  public static final String ALLOW_AT_ID_STR = "[^\\s,}\\]]+";
+  public static final String ALLOW_AT_ID_STR = "[^\\s,}\\]\\)]+";
   public static final String ALLOW_AT_ID_XTRACT_CLOSE = ">" + ALLOW_AT_ID_STR + ")";
 
   public static final String NON_WS_XTRACT_CLOSE = ">\\S+)";
@@ -108,7 +108,7 @@ public class PatternGroups {
   public static final String NO_TASK_CLASS_XTRACT = "(?<" + TASK_CLASS_VAR + UNFOUND_XTRACT_CLOSE;
 
   public static final String TASK_OBJ_VAR = "taskObj";
-  public static final String TASK_OBJ_XTRACT = "(?<" + TASK_OBJ_VAR + NON_WS_XTRACT_CLOSE;
+  public static final String TASK_OBJ_XTRACT = "(?<" + TASK_OBJ_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
   public static final String NO_TASK_OBJ_XTRACT = "(?<" + TASK_OBJ_VAR + UNFOUND_XTRACT_CLOSE;
 
   public static final String WRAP_INIT_VAR = "wrapInit";

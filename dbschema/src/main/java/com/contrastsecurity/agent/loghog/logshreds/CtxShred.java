@@ -106,7 +106,8 @@ public class CtxShred extends BaseShred {
     " onStarted ",
     " wrapped a runnable: ",
     "Removing long-living runnable/callable",
-    "Cleared expired assessment"
+    "Cleared expired assessment",
+    "AbstractEventExecutor.safeExecute"
   };
 
   static String entryTestSql() {
@@ -279,7 +280,28 @@ public class CtxShred extends BaseShred {
                       + NO_TRACE_MAP_XTRACT
                       + NO_WRAP_INIT_XTRACT
                       + NO_WRAPPED_RUNNABLE_XTRACT
-                      + "$")));
+                      + "$")),
+
+              // 2024-11-14 21:10:53,104 [reactor-http-nio-1 b] DEBUG - AbstractEventExecutor.safeExecute(java.lang.ContrastRunnableWrapper$ContrastClearStateRunnableWrapper@5bb04013) wrapping task io.netty.channel.AbstractChannel$AbstractUnsafe$1@6c6e0f32 with ContrastContext ContrastContext{application=com.contrastsecurity.agent.apps.ApplicationContext@353a9f6a, http=HttpContext{request=null, response=null}, scopeProvider=com.contrastsecurity.agent.scope.ScopeProviderImpl@25ac4989, scopeArchitecture=ScopeArchitecture{scope=0, sampling=0}, additionalScopes=[ASSESS=0, ASSESS_PROPAGATION=0, ASSESS_SAMPLING=0, ASSESS_SOURCE=0, ASSESS_VALIDATOR=0, CONCURRENCY_IGNORE_SUBMIT=0, GENERAL=0, JSP_INCLUDE=0, LOG_ENHANCER=0, OBSERVE_DEADZONE=0, SERVLET=0, SERVLET_MULTIPART=0, SERVLET_PARAMETER_RESOLUTION=0, SERVLET_RESPONSE_HEADER=0, THROWABLE=0, WEBSPHERE_JAR_PREVENTION=0], assessment=null, protect=com.contrastsecurity.agent.plugins.protect.ProtectContext@517692a6, observe=null}
+          new PatternMetadata(
+              "safeExecute",
+              List.of("AbstractEventExecutor.safeExecute"),
+              Pattern.compile(
+              DEBUG_PREAMBLE_XTRACT
+                      + "- AbstractEventExecutor.safeExecute\\("
+                              + TASK_OBJ_XTRACT
+                      + "\\) wrapping task "
+                              + WRAPPED_RUNNABLE_XTRACT
+                      + " with ContrastContext .+, http=HttpContext\\{request=.+, response="+ ".+\\}, "
+                      + ".+assessment=" + ASSESS_CTX_XTRACT
+                      + ".+"
+                      + NO_CONCUR_CTX_XTRACT
+                      + NO_APP_CTX_XTRACT
+                      + NO_TASK_CLASS_XTRACT
+                      + NO_TRACE_MAP_XTRACT
+                      + "$"
+              ))
+      );
 
   static final List<String> EXTRACTED_VAL_NAMES =
       SHRED_METADATA.stream()
@@ -320,7 +342,8 @@ public class CtxShred extends BaseShred {
     "2024-11-12 16:27:03,425 [reactor-http-nio-2 AssessmentContext] DEBUG - Preparing to jump context: AssessmentContext@7ecb67d4",
     "\tSaving app=[com.contrastsecurity.agent.apps.ApplicationContext@1a9e4f22], HttpContext=[HttpContext{request=null, response=null}], and AssessmentContext=[AssessmentContext@7ecb67d4] to ConcurrencyContext=[a@00a90db9]",
     "2024-11-12 16:27:03,425 [reactor-http-nio-1 b] DEBUG - io.netty.channel.nio.NioEventLoop@1564c848 wrapped a runnable: io.netty.channel.AbstractChannel$AbstractUnsafe$8@3aac0178 ",
-    "2024-11-12 16:27:03,424 [reactor-http-nio-3 AssessmentContext] DEBUG - Cleared expired assessment context AssessmentContext@393a609a in (29999ms)"
+    "2024-11-12 16:27:03,424 [reactor-http-nio-3 AssessmentContext] DEBUG - Cleared expired assessment context AssessmentContext@393a609a in (29999ms)",
+    "2024-11-14 21:10:53,104 [reactor-http-nio-1 b] DEBUG - AbstractEventExecutor.safeExecute(java.lang.ContrastRunnableWrapper$ContrastClearStateRunnableWrapper@5bb04013) wrapping task io.netty.channel.AbstractChannel$AbstractUnsafe$1@6c6e0f32 with ContrastContext ContrastContext{application=com.contrastsecurity.agent.apps.ApplicationContext@353a9f6a, http=HttpContext{request=null, response=null}, scopeProvider=com.contrastsecurity.agent.scope.ScopeProviderImpl@25ac4989, scopeArchitecture=ScopeArchitecture{scope=0, sampling=0}, additionalScopes=[ASSESS=0, ASSESS_PROPAGATION=0, ASSESS_SAMPLING=0, ASSESS_SOURCE=0, ASSESS_VALIDATOR=0, CONCURRENCY_IGNORE_SUBMIT=0, GENERAL=0, JSP_INCLUDE=0, LOG_ENHANCER=0, OBSERVE_DEADZONE=0, SERVLET=0, SERVLET_MULTIPART=0, SERVLET_PARAMETER_RESOLUTION=0, SERVLET_RESPONSE_HEADER=0, THROWABLE=0, WEBSPHERE_JAR_PREVENTION=0], assessment=null, protect=com.contrastsecurity.agent.plugins.protect.ProtectContext@517692a6, observe=null}"
   );
   
   public static void main(String[] args) {
