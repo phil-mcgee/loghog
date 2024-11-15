@@ -7,8 +7,8 @@ WHERE l.LINE IN (
 	FROM REQUEST req
 	         JOIN CTX cx
 	              ON
-	                  req.REQ = '<?reqREQ>'
-	                              AND (cx.ASSESS_CTX = req.ASSESS_CTX OR cx.TRACE_MAP = req.TRACE_MAP OR cx.ASSESS_CTX like CONCAT('%', req.ASSESS_CTX))
+	                  req.URL = '/sources/v5_0/cookieValue'
+	                              AND (cx.ASSESS_CTX = req.ASSESS_CTX OR cx.TRACE_MAP = req.TRACE_MAP OR cx.ASSESS_CTX like CONCAT('%', req.ASSESS_CTX) OR cx.THREAD = req.BEGIN_THREAD OR cx.THREAD = req.END_THREAD)
 	                              -- consider adding CONTRAST_CTX to REQUEST (begin and end?) and CTX
 	                              AND cx.PATTERN != 'prepareJump'  -- replicates 'savingApp` with less info
 UNION
@@ -16,7 +16,7 @@ UNION
 	    REQUEST req
 	        JOIN CRUMB cr
 	             ON
-	                 req.REQ = '<?reqREQ>'
+	                 req.URL = '/sources/v5_0/cookieValue'
 	                 			-- consider adding RESPONSE to REQUEST
 	                             AND (cr.REQ = req.REQ OR cr.URL = req.URL)
 UNION
@@ -24,7 +24,14 @@ UNION
 	    REQUEST req
 	        JOIN HTTP ht
 	             ON
-	                 req.REQ = '<?reqREQ>'
+	                 req.URL = '/sources/v5_0/cookieValue'
 	                 AND (ht.REQ = req.REQ OR ht.URL = req.URL )
- )
+UNION
+	SELECT tk.LINE FROM
+	    REQUEST req
+	        JOIN TRAK tk
+	             ON
+	                 req.URL = '/sources/v5_0/cookieValue'
+	                 AND tk.TRACE_MAP = req.TRACE_MAP
+)
  ORDER BY l.LINE

@@ -22,7 +22,8 @@ FROM REQUEST BAD_REQ
          JOIN CTX CHG_CTX
               ON
                   BAD_REQ.REQ = '<?badReq>'
-                              AND  CHG_CTX.ASSESS_CTX = BAD_REQ.ASSESS_CTX
+                              -- AND  CHG_CTX.ASSESS_CTX = BAD_REQ.ASSESS_CTX
+                              AND  (CHG_CTX.ASSESS_CTX = BAD_REQ.ASSESS_CTX OR CHG_CTX.ASSESS_CTX like CONCAT('%', BAD_REQ.ASSESS_CTX))
                               AND CHG_CTX.PATTERN != 'prepareJump'  -- replicates 'savingApp` with less info
 UNION
 SELECT NEXT_START.LINE FROM
