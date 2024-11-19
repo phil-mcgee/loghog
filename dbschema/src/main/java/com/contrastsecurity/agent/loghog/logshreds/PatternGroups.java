@@ -64,15 +64,15 @@ public class PatternGroups {
   public static final String TRACE_PREAMBLE_XTRACT = SHORT_PREAMBLE_XTRACT + LOG_LEVEL_TRACE + " ";
 
   public static final String REQ_VAR = "req";
-  public static final String REQ_XTRACT = "[^@\\s]+@(?<" + REQ_VAR + VAL_ID_XTRACT_CLOSE;
+  public static final String REQ_XTRACT = "([^@\\s]+@)?(?<" + REQ_VAR + VAL_ID_XTRACT_CLOSE;
   public static final String NO_REQ_XTRACT = "(?<" + REQ_VAR + UNFOUND_XTRACT_CLOSE;
 
   public static final String RESP_VAR = "resp";
-  public static final String RESP_XTRACT = "[^@\\s]+@(?<" + RESP_VAR +VAL_ID_XTRACT_CLOSE;
+  public static final String RESP_XTRACT = "([^@\\s]+@)?(?<" + RESP_VAR +VAL_ID_XTRACT_CLOSE;
   public static final String NO_RESP_XTRACT = "(?<" + RESP_VAR + UNFOUND_XTRACT_CLOSE;
 
   public static final String URL_VAR = "url";
-  public static final String URL_XTRACT = "(?<" + URL_VAR + NON_WS_XTRACT_CLOSE;
+  public static final String URL_XTRACT = "(?<" + URL_VAR + ">[^\\s']+)";
   public static final String NO_URL_XTRACT = "(?<" + URL_VAR + UNFOUND_XTRACT_CLOSE;
 
   public static final String STACKFRAME_VAR = "stackframe";
@@ -90,13 +90,14 @@ public class PatternGroups {
 
   public static final String TRACE_MAP_SIZE_VAR = "traceMapSize";
   public static final String TRACE_MAP_SIZE_XTRACT = "(?<" + TRACE_MAP_SIZE_VAR + DECIMAL_XTRACT_CLOSE;
+  public static final String NO_TRACE_MAP_SIZE_XTRACT = "(?<" + TRACE_MAP_SIZE_VAR + UNFOUND_XTRACT_CLOSE;
 
   public static final String CONCUR_CTX_VAR = "concurCtx";
   public static final String CONCUR_CTX_XTRACT = "[^@\\s]+@(?<" + CONCUR_CTX_VAR + VAL_ID_XTRACT_CLOSE;
   public static final String NO_CONCUR_CTX_XTRACT = "(?<" + CONCUR_CTX_VAR + UNFOUND_XTRACT_CLOSE;
 
   public static final String ASSESS_CTX_VAR = "assessCtx";
-  public static final String ASSESS_CTX_XTRACT = "(?<" + ASSESS_CTX_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
+  public static final String ASSESS_CTX_XTRACT = "(AssessmentContext@)?(?<" + ASSESS_CTX_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
   public static final String NO_ASSESS_CTX_XTRACT = "(?<" + ASSESS_CTX_VAR + UNFOUND_XTRACT_CLOSE;
 
   public static final String APP_CTX_VAR = "appCtx";
@@ -131,5 +132,8 @@ public class PatternGroups {
   public static final String OUTPUT_MECHANISM_XTRACT = "(?<" + OUTPUT_MECHANISM_VAR + NON_WS_XTRACT_CLOSE;
   public static final String NO_OUTPUT_MECHANISM_XTRACT = "(?<" + OUTPUT_MECHANISM_VAR + UNFOUND_XTRACT_CLOSE;
 
+  public static final String JUMPED_ASSESS_CTX_VAR = "jumpedAssessCtx";
+  public static final String JUMPED_ASSESS_CTX_XTRACT = "(?<" + JUMPED_ASSESS_CTX_VAR + VAL_ID_XTRACT_CLOSE;
+  public static final String NO_JUMPED_ASSESS_CTX_XTRACT = "(?<" + JUMPED_ASSESS_CTX_VAR + UNFOUND_XTRACT_CLOSE;
 
 }
