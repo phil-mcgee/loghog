@@ -9,6 +9,7 @@ import com.contrastsecurity.agent.loghog.logshreds.FluxShred;
 import com.contrastsecurity.agent.loghog.logshreds.HttpShred;
 import com.contrastsecurity.agent.loghog.logshreds.MesgShred;
 import com.contrastsecurity.agent.loghog.logshreds.TrakShred;
+import com.contrastsecurity.agent.loghog.logshreds.VulnShred;
 import com.contrastsecurity.agent.loghog.logviews.ViewCreator;
 import java.io.File;
 import java.io.IOException;
@@ -36,6 +37,7 @@ public class LogHog {
       new CtxShred().createAndPopulateShredTables(connection);
       new HttpShred().createAndPopulateShredTables(connection);
       new FluxShred().createAndPopulateShredTables(connection);
+      new VulnShred().createAndPopulateShredTables(connection);
       //            new WipAmqpShred().createTables(connection);
       //            new WipLmclShred().createTables(connection);
       //            new WipAcelShred().createTables(connection);

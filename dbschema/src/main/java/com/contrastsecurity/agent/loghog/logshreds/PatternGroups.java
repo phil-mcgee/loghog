@@ -1,12 +1,14 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
+import org.jooq.impl.SQLDataType;
+
 public class PatternGroups {
 
-  public static final String VAL_ID_STR = "[^\\s@,}\\]\\)\\{]+";
+  public static final String VAL_ID_STR = "[^\\s@,}\\]\\)\\{:\"]+";
   public static final String VAL_ID_XTRACT_CLOSE = ">" + VAL_ID_STR + ")";
 
-  public static final String ALLOW_AT_ID_STR = "[^\\s,}\\]\\)\\{]+";
+  public static final String ALLOW_AT_ID_STR = "[^\\s,}\\]\\)\\{:\"]+";
   public static final String ALLOW_AT_ID_XTRACT_CLOSE = ">" + ALLOW_AT_ID_STR + ")";
 
   public static final String NON_WS_XTRACT_CLOSE = ">\\S+)";
@@ -151,5 +153,25 @@ public class PatternGroups {
   public static final String DECODER_STATE_VAR = "decoderState";
   public static final String DECODER_STATE_XTRACT = "(?<" + DECODER_STATE_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
   public static final String NO_DECODER_STATE_XTRACT = "(?<" + DECODER_STATE_VAR + UNFOUND_XTRACT_CLOSE;
+
+public static final String RULE_VAR = "rule";
+  public static final String RULE_XTRACT = "(?<" + RULE_VAR + VAL_ID_XTRACT_CLOSE;
+  public static final String NO_RULE_XTRACT = "(?<" + RULE_VAR + UNFOUND_XTRACT_CLOSE;
+
+public static final String TRACE_VAR = "trace";
+  public static final String TRACE_XTRACT = "(?<" + TRACE_VAR + VAL_ID_XTRACT_CLOSE;
+  public static final String NO_TRACE_XTRACT = "(?<" + TRACE_VAR + UNFOUND_XTRACT_CLOSE;
+
+public static final String FATE_VAR = "fate";
+  public static final String FATE_XTRACT = "(?<" + FATE_VAR + VAL_ID_XTRACT_CLOSE;
+  public static final String NO_FATE_XTRACT = "(?<" + FATE_VAR + UNFOUND_XTRACT_CLOSE;
+
+public static final String TRACE_HASH_VAR = "traceHash";
+  public static final String TRACE_HASH_XTRACT = "(?<" + TRACE_HASH_VAR + VAL_ID_XTRACT_CLOSE;
+  public static final String NO_TRACE_HASH_XTRACT = "(?<" + TRACE_HASH_VAR + UNFOUND_XTRACT_CLOSE;
+
+public static final String RPT_QUEUE_VAR = "rptQueue";
+  public static final String RPT_QUEUE_XTRACT = "(?<" + RPT_QUEUE_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
+  public static final String NO_RPT_QUEUE_XTRACT = "(?<" + RPT_QUEUE_VAR + UNFOUND_XTRACT_CLOSE;
 
 }
