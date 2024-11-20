@@ -3,10 +3,10 @@ package com.contrastsecurity.agent.loghog.logshreds;
 
 public class PatternGroups {
 
-  public static final String VAL_ID_STR = "[^\\s@,}\\]\\)]+";
+  public static final String VAL_ID_STR = "[^\\s@,}\\]\\)\\{]+";
   public static final String VAL_ID_XTRACT_CLOSE = ">" + VAL_ID_STR + ")";
 
-  public static final String ALLOW_AT_ID_STR = "[^\\s,}\\]\\)]+";
+  public static final String ALLOW_AT_ID_STR = "[^\\s,}\\]\\)\\{]+";
   public static final String ALLOW_AT_ID_XTRACT_CLOSE = ">" + ALLOW_AT_ID_STR + ")";
 
   public static final String NON_WS_XTRACT_CLOSE = ">\\S+)";
@@ -135,5 +135,21 @@ public class PatternGroups {
   public static final String JUMPED_ASSESS_CTX_VAR = "jumpedAssessCtx";
   public static final String JUMPED_ASSESS_CTX_XTRACT = "(?<" + JUMPED_ASSESS_CTX_VAR + VAL_ID_XTRACT_CLOSE;
   public static final String NO_JUMPED_ASSESS_CTX_XTRACT = "(?<" + JUMPED_ASSESS_CTX_VAR + UNFOUND_XTRACT_CLOSE;
+
+  public static final String CHANNEL_HANDLER_CTX_VAR = "channelHandlerCtx";
+  public static final String CHANNEL_HANDLER_CTX_XTRACT = "(?<" + CHANNEL_HANDLER_CTX_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
+  public static final String NO_CHANNEL_HANDLER_CTX_XTRACT = "(?<" + CHANNEL_HANDLER_CTX_VAR + UNFOUND_XTRACT_CLOSE;
+
+  public static final String CHANNEL_VAR = "channel";
+  public static final String CHANNEL_XTRACT = "(?<" + CHANNEL_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
+  public static final String NO_CHANNEL_XTRACT = "(?<" + CHANNEL_VAR + UNFOUND_XTRACT_CLOSE;
+
+  public static final String NETTY_HTTP_MSG_VAR = "nettyHttpMsg";
+  public static final String NETTY_HTTP_MSG_XTRACT = "(?<" + NETTY_HTTP_MSG_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
+  public static final String NO_NETTY_HTTP_MSG_XTRACT = "(?<" + NETTY_HTTP_MSG_VAR + UNFOUND_XTRACT_CLOSE;
+
+  public static final String DECODER_STATE_VAR = "decoderState";
+  public static final String DECODER_STATE_XTRACT = "(?<" + DECODER_STATE_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
+  public static final String NO_DECODER_STATE_XTRACT = "(?<" + DECODER_STATE_VAR + UNFOUND_XTRACT_CLOSE;
 
 }
