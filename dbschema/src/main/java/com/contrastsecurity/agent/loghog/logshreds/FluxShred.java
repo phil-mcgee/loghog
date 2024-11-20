@@ -90,12 +90,10 @@ public class FluxShred extends BaseShred {
           new ShredRowMetaData("TIMESTAMP", SQLDataType.LOCALDATETIME(3), LocalDateTime.class, TIMESTAMP_VAR),
           new ShredRowMetaData("THREAD", SQLDataType.VARCHAR, String.class, THREAD_VAR),
           new ShredRowMetaData("PATTERN", SQLDataType.VARCHAR.notNull(), String.class, SHRED_TABLE_PATTERN_COL),
-          new ShredRowMetaData("CONCUR_CTX", SQLDataType.VARCHAR, String.class, CONCUR_CTX_VAR),
+          new ShredRowMetaData("CHANNEL", SQLDataType.VARCHAR, String.class, CHANNEL_VAR),
           new ShredRowMetaData("ASSESS_CTX", SQLDataType.VARCHAR, String.class, ASSESS_CTX_VAR),
           new ShredRowMetaData("REQ", SQLDataType.VARCHAR, String.class, REQ_VAR),
-          new ShredRowMetaData("RESP", SQLDataType.VARCHAR, String.class, RESP_VAR),
           new ShredRowMetaData("URL", SQLDataType.VARCHAR, String.class, URL_VAR),
-          new ShredRowMetaData("APP_CTX", SQLDataType.VARCHAR, String.class, APP_CTX_VAR),
           new ShredRowMetaData("TASK_CLASS", SQLDataType.VARCHAR, String.class, TASK_CLASS_VAR),
           new ShredRowMetaData("TASK_OBJ", SQLDataType.VARCHAR, String.class, TASK_OBJ_VAR),
           new ShredRowMetaData("WRAP_INIT", SQLDataType.VARCHAR, String.class, WRAP_INIT_VAR),
@@ -104,9 +102,11 @@ public class FluxShred extends BaseShred {
           new ShredRowMetaData("TRACE_MAP_SIZE", SQLDataType.INTEGER, Integer.class, TRACE_MAP_SIZE_VAR),
           new ShredRowMetaData("JUMPED_ASSESS_CTX", SQLDataType.BOOLEAN, Boolean.class, JUMPED_ASSESS_CTX_VAR),
           new ShredRowMetaData("CHANNEL_HANDLER_CTX", SQLDataType.VARCHAR, String.class, CHANNEL_HANDLER_CTX_VAR),
-              new ShredRowMetaData("CHANNEL", SQLDataType.VARCHAR, String.class, CHANNEL_VAR),
-              new ShredRowMetaData("HTTP_MSG", SQLDataType.VARCHAR, String.class, NETTY_HTTP_MSG_VAR),
-              new ShredRowMetaData("DECODER_STATE", SQLDataType.VARCHAR, String.class, DECODER_STATE_VAR));
+          new ShredRowMetaData("HTTP_MSG", SQLDataType.VARCHAR, String.class, NETTY_HTTP_MSG_VAR),
+          new ShredRowMetaData("DECODER_STATE", SQLDataType.VARCHAR, String.class, DECODER_STATE_VAR),
+          new ShredRowMetaData("RESP", SQLDataType.VARCHAR, String.class, RESP_VAR),
+          new ShredRowMetaData("APP_CTX", SQLDataType.VARCHAR, String.class, APP_CTX_VAR)
+      );
 
   static final String MISFITS_TABLE_NAME = "FLUX_MISFITS";
   static final String MISFITS_KEY_COLUMN = "LINE";
