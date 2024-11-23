@@ -157,7 +157,7 @@ public class VulnShred extends BaseShred {
     "- !LM!TraceFate|",
     "- Added finding for rule ID:",
           " added to reporting queue:",
-          "- MQPublisherImpl#publish call:",
+          "type=FINDING_DISCOVERED, ",
           "DataFlowTriggerHandlerImpl] DEBUG - TRACE  - URI:"
   };
 
@@ -222,7 +222,7 @@ public class VulnShred extends BaseShred {
               // , body: {"hash":3277375950,"version":4,"session_id":"AcceptanceTestSessionId","ruleId":"path-traversal",
                new PatternMetadata(
                       "mqpublish",
-                      List.of("- MQPublisherImpl#publish call:"),
+                      List.of("- MQPublisherImpl#publish call:", "type=FINDING_DISCOVERED," ),
                       Pattern.compile(
                                 DEBUG_PREAMBLE_XTRACT
                                       + "- MQPublisherImpl#publish call: exchangeName:[^,]+, queueName: " + RPT_QUEUE_XTRACT
@@ -278,14 +278,14 @@ public class VulnShred extends BaseShred {
   }
 
   static final List<String> exampleLogLines = List.of(
-    "2024-11-20 15:38:40,995 [reactor-http-nio-2 Finding] DEBUG - !LM!TraceFate|NewFinding|ruleId=path-traversal",
-    "2024-11-20 15:38:50,938 [reactor-http-nio-2 QueueFindingListener] INFO - Added finding for rule ID: path-traversal (hash=1142718516)",
-    "2024-11-20 15:38:50,944 [reactor-http-nio-2 g] DEBUG - Trace 1142718516 added to reporting queue: Trace path-traversal: TRACE 884 (881)",
-    new StringBuilder("2024-11-20 15:38:47,945 [reactor-http-nio-2 AMQP Publisher] DEBUG - MQPublisherImpl#publish call: exchangeName: , queueName: -00000-V5_1.it_tests_sources_V5, properties: #contentHeader<basic>(content-type=null, content-encoding=null, headers=null, delivery-mode=null, priority=null, correlation-id=null, reply-to=null, expiration=null, message-id=null, timestamp=null, type=FINDING_DISCOVERED, user-id=null, app-id=null, cluster-id=null), ")
-      .append("body: {\"hash\":3277375950,\"version\":4,\"session_id\":\"AcceptanceTestSessionId\",\"ruleId\":\"path-traversal\",\"properties\":{\"entrypointType\":\"HTTP\",\"entrypointSignature\":\"com.contrastsecurity.testapp.v5.PolicyController$SourceEndpoints.serverHttpRequestQueryParams(org.springframework.http.server.reactive.ServerHttpRequest)\"},")
-      .append("...")
-      .append(",\"observations\":[{\"url\":\"/sources/v5_0/serverHttpRequest-queryParams\",\"type\":\"HTTP\",\"verb\":\"POST\"}]}],\"request\":{\"contextPath\":\"/\",\"headers\":{\"Accept-Encoding\":[\"gzip\"],\"Connection\":[\"Keep-Alive\"],\"Content-Length\":[\"11\"],\"Content-Type\":[\"plain/text; charset\\u003dutf-8\"],\"contrast-mq-name\":[\"-00000-V5_1.it_tests_sources_V5\"],\"cookie\":[\"cookie\\u003dcookieVal\"],\"header\":[\"headerVal\"],\"Host\":[\"localhost:33766\"],\"User-Agent\":[\"okhttp/4.9.1\"]},\"method\":\"POST\",\"standardNormalizedUri\":\"/sources/v5_0/serverHttpRequest-queryParams\",\"parameters\":{\"requestParam\":[\"foo\"]},\"port\":8080,\"protocol\":\"http\",\"queryString\":\"requestParam\\u003dfoo\",\"uri\":\"/sources/v5_0/serverHttpRequest-queryParams\",\"version\":\"1.1\"}}")
-      .toString(),
+//    "2024-11-20 15:38:40,995 [reactor-http-nio-2 Finding] DEBUG - !LM!TraceFate|NewFinding|ruleId=path-traversal",
+//    "2024-11-20 15:38:50,938 [reactor-http-nio-2 QueueFindingListener] INFO - Added finding for rule ID: path-traversal (hash=1142718516)",
+//    "2024-11-20 15:38:50,944 [reactor-http-nio-2 g] DEBUG - Trace 1142718516 added to reporting queue: Trace path-traversal: TRACE 884 (881)",
+//    new StringBuilder("2024-11-20 15:38:47,945 [reactor-http-nio-2 AMQP Publisher] DEBUG - MQPublisherImpl#publish call: exchangeName: , queueName: -00000-V5_1.it_tests_sources_V5, properties: #contentHeader<basic>(content-type=null, content-encoding=null, headers=null, delivery-mode=null, priority=null, correlation-id=null, reply-to=null, expiration=null, message-id=null, timestamp=null, type=FINDING_DISCOVERED, user-id=null, app-id=null, cluster-id=null), ")
+//      .append("body: {\"hash\":3277375950,\"version\":4,\"session_id\":\"AcceptanceTestSessionId\",\"ruleId\":\"path-traversal\",\"properties\":{\"entrypointType\":\"HTTP\",\"entrypointSignature\":\"com.contrastsecurity.testapp.v5.PolicyController$SourceEndpoints.serverHttpRequestQueryParams(org.springframework.http.server.reactive.ServerHttpRequest)\"},")
+//      .append("...")
+//      .append(",\"observations\":[{\"url\":\"/sources/v5_0/serverHttpRequest-queryParams\",\"type\":\"HTTP\",\"verb\":\"POST\"}]}],\"request\":{\"contextPath\":\"/\",\"headers\":{\"Accept-Encoding\":[\"gzip\"],\"Connection\":[\"Keep-Alive\"],\"Content-Length\":[\"11\"],\"Content-Type\":[\"plain/text; charset\\u003dutf-8\"],\"contrast-mq-name\":[\"-00000-V5_1.it_tests_sources_V5\"],\"cookie\":[\"cookie\\u003dcookieVal\"],\"header\":[\"headerVal\"],\"Host\":[\"localhost:33766\"],\"User-Agent\":[\"okhttp/4.9.1\"]},\"method\":\"POST\",\"standardNormalizedUri\":\"/sources/v5_0/serverHttpRequest-queryParams\",\"parameters\":{\"requestParam\":[\"foo\"]},\"port\":8080,\"protocol\":\"http\",\"queryString\":\"requestParam\\u003dfoo\",\"uri\":\"/sources/v5_0/serverHttpRequest-queryParams\",\"version\":\"1.1\"}}")
+//      .toString(),
       "2024-11-20 15:38:42,968 [reactor-http-nio-2 DataFlowTriggerHandlerImpl] DEBUG - TRACE  - URI: /sources/v5_0/serverWebExchange-formData - PLUG"
   );
   

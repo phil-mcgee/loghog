@@ -1,3 +1,4 @@
+-- flux-by-channel.sql
 SELECT f.*
 FROM FLUX f
 JOIN (select CHANNEL, min(LINE) AS CHANNEL_START_LINE

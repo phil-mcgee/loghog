@@ -146,6 +146,10 @@ public class PatternGroups {
   public static final String CHANNEL_XTRACT = "(?<" + CHANNEL_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
   public static final String NO_CHANNEL_XTRACT = "(?<" + CHANNEL_VAR + UNFOUND_XTRACT_CLOSE;
 
+  public static final String PIPELINE_VAR = "pipeline";
+  public static final String PIPELINE_XTRACT = "(?<" + PIPELINE_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
+  public static final String NO_PIPELINE_XTRACT = "(?<" + PIPELINE_VAR + UNFOUND_XTRACT_CLOSE;
+
   public static final String NETTY_HTTP_MSG_VAR = "nettyHttpMsg";
   public static final String NETTY_HTTP_MSG_XTRACT = "(?<" + NETTY_HTTP_MSG_VAR + ALLOW_AT_ID_XTRACT_CLOSE;
   public static final String NO_NETTY_HTTP_MSG_XTRACT = "(?<" + NETTY_HTTP_MSG_VAR + UNFOUND_XTRACT_CLOSE;

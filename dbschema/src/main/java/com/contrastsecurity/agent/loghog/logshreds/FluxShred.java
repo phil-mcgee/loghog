@@ -47,6 +47,7 @@ import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_CONCU
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_DECODER_STATE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_JUMPED_ASSESS_CTX_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_NETTY_HTTP_MSG_XTRACT;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_PIPELINE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_REQ_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_RESP_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_TASK_CLASS_XTRACT;
@@ -58,6 +59,8 @@ import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_TRACE
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_URL_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_WRAPPED_RUNNABLE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_WRAP_INIT_XTRACT;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.PIPELINE_VAR;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.PIPELINE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.REQ_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.REQ_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RESP_VAR;
@@ -90,7 +93,8 @@ public class FluxShred extends BaseShred {
           new ShredRowMetaData("TIMESTAMP", SQLDataType.LOCALDATETIME(3), LocalDateTime.class, TIMESTAMP_VAR),
           new ShredRowMetaData("THREAD", SQLDataType.VARCHAR, String.class, THREAD_VAR),
           new ShredRowMetaData("PATTERN", SQLDataType.VARCHAR.notNull(), String.class, SHRED_TABLE_PATTERN_COL),
-          new ShredRowMetaData("CHANNEL", SQLDataType.VARCHAR, String.class, CHANNEL_VAR),
+              new ShredRowMetaData("CHANNEL", SQLDataType.VARCHAR, String.class, CHANNEL_VAR),
+              new ShredRowMetaData("PIPELINE", SQLDataType.VARCHAR, String.class, PIPELINE_VAR),
           new ShredRowMetaData("ASSESS_CTX", SQLDataType.VARCHAR, String.class, ASSESS_CTX_VAR),
           new ShredRowMetaData("REQ", SQLDataType.VARCHAR, String.class, REQ_VAR),
           new ShredRowMetaData("URL", SQLDataType.VARCHAR, String.class, URL_VAR),
@@ -199,6 +203,7 @@ public class FluxShred extends BaseShred {
                                       + NO_TASK_CLASS_XTRACT
                                       + NO_WRAP_INIT_XTRACT
                                       + NO_CHANNEL_XTRACT
+                                      + NO_PIPELINE_XTRACT
                                       + NO_CHANNEL_HANDLER_CTX_XTRACT
                                       + NO_NETTY_HTTP_MSG_XTRACT
                                       + NO_DECODER_STATE_XTRACT
@@ -218,6 +223,7 @@ public class FluxShred extends BaseShred {
                                       + NO_TASK_CLASS_XTRACT
                                       + NO_WRAP_INIT_XTRACT
                                       + NO_CHANNEL_XTRACT
+                                      + NO_PIPELINE_XTRACT
                                       + NO_CHANNEL_HANDLER_CTX_XTRACT
                                       + NO_NETTY_HTTP_MSG_XTRACT
                                       + NO_DECODER_STATE_XTRACT
@@ -239,6 +245,7 @@ public class FluxShred extends BaseShred {
                       + NO_WRAP_INIT_XTRACT
                       + NO_WRAPPED_RUNNABLE_XTRACT
                           + NO_CHANNEL_XTRACT
+                          + NO_PIPELINE_XTRACT
                           + NO_CHANNEL_HANDLER_CTX_XTRACT
                           + NO_NETTY_HTTP_MSG_XTRACT
                           + NO_DECODER_STATE_XTRACT
@@ -259,6 +266,7 @@ public class FluxShred extends BaseShred {
                                       + NO_WRAP_INIT_XTRACT
                                       + NO_WRAPPED_RUNNABLE_XTRACT
                                       + NO_CHANNEL_XTRACT
+                                      + NO_PIPELINE_XTRACT
                                       + NO_NETTY_HTTP_MSG_XTRACT
                                       + NO_DECODER_STATE_XTRACT
                                       + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
@@ -274,16 +282,17 @@ public class FluxShred extends BaseShred {
                               + ASSESS_NONNULL_XTRACTS
                               + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) with channel "
                               + CHANNEL_XTRACT
+                              + " and pipeline " + PIPELINE_XTRACT
                               + NO_CONCUR_CTX_XTRACT
                               + NO_APP_CTX_XTRACT
                               + NO_TASK_CLASS_XTRACT
                               + NO_WRAP_INIT_XTRACT
                               + NO_WRAPPED_RUNNABLE_XTRACT
-          + NO_NETTY_HTTP_MSG_XTRACT
-          + NO_DECODER_STATE_XTRACT
-          + NO_TASK_OBJ_XTRACT
-          + "$")),
-              new PatternMetadata(
+                              + NO_NETTY_HTTP_MSG_XTRACT
+                              + NO_DECODER_STATE_XTRACT
+                              + NO_TASK_OBJ_XTRACT
+                              + "$")),
+                                  new PatternMetadata(
                       "fireChannelReadAssessNull",
                       List.of("- ContrastNettyHttpDispatcherImpl.onFireChannelRead("),
               Pattern.compile(
@@ -293,6 +302,7 @@ public class FluxShred extends BaseShred {
                               + ASSESS_NULL_XTRACTS
                               + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) with channel "
           + CHANNEL_XTRACT
+          + " and pipeline " + PIPELINE_XTRACT
                               + NO_CONCUR_CTX_XTRACT
                               + NO_APP_CTX_XTRACT
                               + NO_TASK_CLASS_XTRACT
@@ -314,7 +324,9 @@ public class FluxShred extends BaseShred {
                                       + ", " + CHANNEL_HANDLER_CTX_XTRACT
                                       + ", " + NETTY_HTTP_MSG_XTRACT
                                       + "\\) with channel "
-                                      + CHANNEL_XTRACT + " and decoderState "
+                                      + CHANNEL_XTRACT
+                                      + " pipeline " + PIPELINE_XTRACT
+                                      + " and decoderState "
                                       + DECODER_STATE_XTRACT
                                       + NO_CONCUR_CTX_XTRACT
                                       + NO_APP_CTX_XTRACT
@@ -334,8 +346,9 @@ public class FluxShred extends BaseShred {
                                       + ASSESS_NULL_XTRACTS
                                       + ", " + CHANNEL_HANDLER_CTX_XTRACT
                                       + ", " + NETTY_HTTP_MSG_XTRACT
-                                      + "\\) with channel "
-                                      + CHANNEL_XTRACT + " and decoderState "
+                                      + "\\) with channel "+ CHANNEL_XTRACT
+                                      + " pipeline " + PIPELINE_XTRACT
+                                      + " and decoderState "
                                       + DECODER_STATE_XTRACT
                                       + NO_CONCUR_CTX_XTRACT
                                       + NO_APP_CTX_XTRACT
@@ -361,6 +374,7 @@ public class FluxShred extends BaseShred {
                                       + ", " + NETTY_HTTP_MSG_XTRACT
                                       + "\\) with channel "
                                       + CHANNEL_XTRACT
+                                      + " and pipeline " + PIPELINE_XTRACT
                                       + NO_CONCUR_CTX_XTRACT
                                       + NO_APP_CTX_XTRACT
                                       + NO_TASK_CLASS_XTRACT
@@ -381,6 +395,7 @@ public class FluxShred extends BaseShred {
                                       + ", " + NETTY_HTTP_MSG_XTRACT
                                       + "\\) with channel "
                                       + CHANNEL_XTRACT
+                                      + " and pipeline " + PIPELINE_XTRACT
                                       + NO_CONCUR_CTX_XTRACT
                                       + NO_APP_CTX_XTRACT
                                       + NO_TASK_CLASS_XTRACT
@@ -424,10 +439,10 @@ public class FluxShred extends BaseShred {
   }
 
   static final List<String> exampleLogLines = List.of(
-//          "2024-11-19 18:57:22,773 [reactor-http-nio-2 ContrastNettyHttpDispatcherImpl] DEBUG - ContrastNettyHttpDispatcherImpl.onRequestDecoded(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=AssessmentContext@2012d51f{traceMap=TraceMap@5c377c22 (with 27 items in it), jumpedContexts=true}}, HttpServerRequestDecoder@703be535, DefaultHttpRequest@7067eec3) with channel NioSocketChannel@55ea0ec0 and decoderState READ_FIXED_LENGTH_CONTENT",
-//          "2024-11-19 18:57:22,799 [reactor-http-nio-3 ContrastNettyHttpDispatcherImpl] DEBUG - ContrastNettyHttpDispatcherImpl.onRequestDecoded(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null{}, HttpServerRequestDecoder@2e6a8e10, DefaultHttpRequest@3ed207d3) with channel NioSocketChannel@52c17f46 and decoderState READ_FIXED_LENGTH_CONTENT",
-//          "2024-11-19 18:57:23,606 [reactor-http-nio-3 ContrastNettyHttpDispatcherImpl] DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten(ContrastContext{http=HttpContext{HttpRequest@0ec78ce2, null}, uri='/sources/v5_0/serverWebExchange-multipartData-file', assessment=AssessmentContext@496a99fc{traceMap=TraceMap@452706d3 (with 59 items in it), jumpedContexts=true}}, io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext@36fc72e6, io.netty.handler.codec.http.DefaultFullHttpResponse@09b67079) with channel NioSocketChannel@14df230e"
-    "2024-11-19 19:50:51,850 [reactor-http-nio-2 b] DEBUG - ContrastNettyHttpDispatcherImpl.onRequestDecoded(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, HttpServerRequestDecoder@3764e20a, DefaultHttpRequest@0ab4ff90) with channel NioSocketChannel@69bd21e6 and decoderState SKIP_CONTROL_CHARS"
+          "2024-11-21 20:37:32,345 [reactor-http-nio-3 ContrastNettyHttpDispatcherImpl] DEBUG - ContrastNettyHttpDispatcherImpl.onRequestDecoded(ContrastContext{http=HttpContext{HttpRequest@76140489, null}, uri='/sources/v5_0/serverWebExchange-multipartData-file', assessment=AssessmentContext@0dd1cc90{traceMap=TraceMap@281651b6 (with 34 items in it), jumpedContexts=false}}, HttpServerRequestDecoder@2df0ea6f, null) with channel NioSocketChannel@1d920791 pipeline DefaultChannelPipeline@154ecf9d and decoderState SKIP_CONTROL_CHARS",
+          "2024-11-21 20:37:32,332 [reactor-http-nio-2 ContrastNettyHttpDispatcherImpl] DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten(ContrastContext{http=HttpContext{HttpRequest@484b736b, null}, uri='/sources/v5_0/requestPart', assessment=AssessmentContext@7943d46b{traceMap=TraceMap@7038c921 (with 53 items in it), jumpedContexts=false}}, io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext@02ad20f1, io.netty.handler.codec.http.DefaultFullHttpResponse@1becf007) with channel NioSocketChannel@17e0aaf1 and pipeline DefaultChannelPipeline@7e4ed2e1",
+          "2024-11-21 20:37:32,318 [reactor-http-nio-3 ContrastNettyHttpDispatcherImpl] DEBUG - ContrastNettyHttpDispatcherImpl.onFireChannelRead(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=AssessmentContext@6dbe39f4{traceMap=TraceMap@51b3e0ae (with 0 items in it), jumpedContexts=true}}, io.netty.channel.DefaultChannelPipeline$HeadContext@36f2f8e2) with channel NioSocketChannel@1d920791 and pipeline DefaultChannelPipeline@154ecf9d",
+          ""
   );
   
   public static void main(String[] args) {
