@@ -22,7 +22,8 @@ public class QuickCheck {
           new String[] {"MAX_CONTEXT_PROPAGATION_EVENTS", "Ignoring propagator "},
           new String[] {"MAX_TRACE_TTL", "Cleared expired assessment context"},
           new String[] {"MAX_TRACE_TTL", "Removing expired key="},
-          new String[] {"CONTEXT_MAP_PURGE_TIMEOUT", "Removing long-living runnable"});
+          new String[] {"CONTEXT_MAP_PURGE_TIMEOUT", "Removing long-living runnable"},
+          new String[] {"CONTEXT_MAP_PURGE_TIMEOUT", "!LM!TraceFate|LocalCacheHit"});
 
   public static void reportTells(Connection connection) throws SQLException {
     StringBuilder qrystr =
