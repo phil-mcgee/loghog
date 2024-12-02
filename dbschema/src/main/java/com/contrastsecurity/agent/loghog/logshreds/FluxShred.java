@@ -15,6 +15,7 @@ import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
 import java.net.http.HttpRequest;
+import java.nio.channels.Channel;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -77,6 +78,7 @@ import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACE_MA
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACE_MAP_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.URL_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.URL_XTRACT;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.WARN_PREAMBLE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.WRAPPED_RUNNABLE_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.WRAPPED_RUNNABLE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.WRAP_INIT_VAR;
@@ -276,7 +278,7 @@ public class FluxShred extends BaseShred {
                       "fireChannelReadAssessNonnull",
                       List.of("- ContrastNettyHttpDispatcherImpl.onFireChannelRead(", "{traceMap="),
               Pattern.compile(
-  DEBUG_PREAMBLE_XTRACT
+                    DEBUG_PREAMBLE_XTRACT
                               + "- ContrastNettyHttpDispatcherImpl.onFireChannelRead\\("
                                       + START_CONTRAST_CONTEXT_EXTRACT
                               + ASSESS_NONNULL_XTRACTS
@@ -296,23 +298,23 @@ public class FluxShred extends BaseShred {
                       "fireChannelReadAssessNull",
                       List.of("- ContrastNettyHttpDispatcherImpl.onFireChannelRead("),
               Pattern.compile(
-  DEBUG_PREAMBLE_XTRACT
+                    DEBUG_PREAMBLE_XTRACT
                               + "- ContrastNettyHttpDispatcherImpl.onFireChannelRead\\("
                                       + START_CONTRAST_CONTEXT_EXTRACT
                               + ASSESS_NULL_XTRACTS
                               + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) with channel "
-          + CHANNEL_XTRACT
-          + " and pipeline " + PIPELINE_XTRACT
+                              + CHANNEL_XTRACT
+                              + " and pipeline " + PIPELINE_XTRACT
                               + NO_CONCUR_CTX_XTRACT
                               + NO_APP_CTX_XTRACT
                               + NO_TASK_CLASS_XTRACT
                               + NO_WRAP_INIT_XTRACT
                               + NO_WRAPPED_RUNNABLE_XTRACT
-          + NO_NETTY_HTTP_MSG_XTRACT
-          + NO_DECODER_STATE_XTRACT
-          + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
-          + NO_TASK_OBJ_XTRACT
-          + "$")),
+                              + NO_NETTY_HTTP_MSG_XTRACT
+                              + NO_DECODER_STATE_XTRACT
+                              + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                              + NO_TASK_OBJ_XTRACT
+                              + "$")),
               new PatternMetadata(
                       "requestDecodedAssessNonnull",
                       List.of("- ContrastNettyHttpDispatcherImpl.onRequestDecoded(", "{traceMap="),
@@ -358,10 +360,6 @@ public class FluxShred extends BaseShred {
                                       + NO_TASK_OBJ_XTRACT
                                       + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
                                       + "$")),
-              // 2024-11-19 18:57:23,606 [reactor-http-nio-3 ContrastNettyHttpDispatcherImpl] DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten(
-              //  ContrastContext{http=HttpContext{HttpRequest@0ec78ce2, null}, uri='/sources/v5_0/serverWebExchange-multipartData-file', assessment=AssessmentContext@496a99fc{traceMap=TraceMap@452706d3 (with 59 items in it), jumpedContexts=true}},
-              //  io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext@36fc72e6,
-              //  io.netty.handler.codec.http.DefaultFullHttpResponse@09b67079) with channel NioSocketChannel@14df230e
               new PatternMetadata(
                       "responseWrittenAssessNonnull",
                       List.of("- ContrastNettyHttpDispatcherImpl.onResponseWritten(", "{traceMap="),
@@ -404,6 +402,310 @@ public class FluxShred extends BaseShred {
                                       + NO_TASK_OBJ_XTRACT
                                       + NO_DECODER_STATE_XTRACT
                                       + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "moveChannelAttrAssessNonnull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing(", "{traceMap="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing\\("
+                                      + CHANNEL_XTRACT
+                                      + "\\) moved channel incoming attr "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NONNULL_XTRACTS
+                                      + " to channel outgoing att, replacing .+"
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                       + "$")),
+              new PatternMetadata(
+                      "moveChannelAttrSrcNonnull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing(", "incoming attr ContrastContext\\{http="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing\\("
+                                      + CHANNEL_XTRACT
+                                      + "\\) moved channel incoming attr "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NULL_XTRACTS
+                                      + " to channel outgoing att, replacing .+"
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "moveChannelAttrSrcNull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing(", "incoming attr null "),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing\\("
+                                      + CHANNEL_XTRACT
+                                      + "\\) moved channel incoming attr null to channel outgoing att, replacing .+"
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_ASSESS_CTX_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_URL_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "nullifyChannelAttrAssessNonnull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext(", "{traceMap="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext\\("
+                                      + CHANNEL_XTRACT
+                                      + "\\) removed channel outgoing ContrastContext "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NONNULL_XTRACTS
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "nullifyChannelAttrCCtxNonnull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext(", "ContrastContext\\{http="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext\\("
+                                      + CHANNEL_XTRACT
+                                      + "\\) removed channel outgoing ContrastContext "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NULL_XTRACTS
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "nullifyChannelAttrCCtxNull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext(", "outgoing ContrastContext null"),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext\\("
+                                      + CHANNEL_XTRACT
+                                      + "\\) removed channel outgoing ContrastContext null"
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_ASSESS_CTX_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_URL_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "updateChannelIncomingAssessNonnull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.updateChannelIncomingContrastContext(", "{traceMap="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.updateChannelIncomingContrastContext\\("
+                                      + CHANNEL_XTRACT + ", "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NONNULL_XTRACTS
+                                      + "\\) saved channel incoming attr, replacing .+"
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "updateChannelIncomingAssessNull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.updateChannelIncomingContrastContext(", "ContrastContext\\{http="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.updateChannelIncomingContrastContext\\("
+                                      + CHANNEL_XTRACT + ", "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NULL_XTRACTS
+                                      + "\\) replacing .+"
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "updateCurrentCCtxAssessNonnull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(", "{traceMap="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel\\("
+                                      + CHANNEL_XTRACT + ", "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NONNULL_XTRACTS
+                                      + ", [^)]+\\) replacing .+"
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "updateCurrentCCtxAssessNull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(", "ContrastContext\\{http="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel\\("
+                                      + CHANNEL_XTRACT + ", "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NULL_XTRACTS
+                                      + ", [^)]+\\) replacing .+"
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "WarnUpdateCurrentCCtxFromChannelAssessNonnull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(",  "{traceMap="),
+                      Pattern.compile(
+                              WARN_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel\\("
+                                      + CHANNEL_XTRACT + ", "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NONNULL_XTRACTS
+                                      + ", [^)]+\\) retieved null ContrastContext from channel.  Leaving current ContrastContext as is\\."
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "WarnUpdateCurrentCCtxFromChannelAssessNull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(", "ContrastContext\\{http="),
+                      Pattern.compile(
+                              WARN_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel\\("
+                                      + CHANNEL_XTRACT + ", "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NULL_XTRACTS
+                                      + ", [^)]+\\) retieved null ContrastContext from channel.  Leaving current ContrastContext as is\\."
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "WarnOnResponseWrittenAssessNonnull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.onResponseWritten(",  "{traceMap="),
+                      Pattern.compile(
+                              WARN_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\("
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NONNULL_XTRACTS + ", "
+                                      + CHANNEL_HANDLER_CTX_XTRACT + ", "
+                                      + NETTY_HTTP_MSG_XTRACT + "\\) with channel "
+                                      + CHANNEL_XTRACT
+                                      + " found null Channel incoming and outgoing contexts, so continuing with ContrastContext from thread\\."
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "WarnOnResponseWrittenAssessNull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.onResponseWritten(", "ContrastContext\\{http="),
+                      Pattern.compile(
+                              WARN_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\("
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NULL_XTRACTS + ", "
+                                      + CHANNEL_HANDLER_CTX_XTRACT + ", "
+                                      + NETTY_HTTP_MSG_XTRACT
+                                      + "\\) with channel "
+                                      + CHANNEL_XTRACT
+                                      + " found null Channel incoming and outgoing contexts, so continuing with ContrastContext from thread\\."                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
                                       + "$"))
       );
 
@@ -439,12 +741,16 @@ public class FluxShred extends BaseShred {
   }
 
   static final List<String> exampleLogLines = List.of(
-          "2024-11-21 20:37:32,345 [reactor-http-nio-3 ContrastNettyHttpDispatcherImpl] DEBUG - ContrastNettyHttpDispatcherImpl.onRequestDecoded(ContrastContext{http=HttpContext{HttpRequest@76140489, null}, uri='/sources/v5_0/serverWebExchange-multipartData-file', assessment=AssessmentContext@0dd1cc90{traceMap=TraceMap@281651b6 (with 34 items in it), jumpedContexts=false}}, HttpServerRequestDecoder@2df0ea6f, null) with channel NioSocketChannel@1d920791 pipeline DefaultChannelPipeline@154ecf9d and decoderState SKIP_CONTROL_CHARS",
-          "2024-11-21 20:37:32,332 [reactor-http-nio-2 ContrastNettyHttpDispatcherImpl] DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten(ContrastContext{http=HttpContext{HttpRequest@484b736b, null}, uri='/sources/v5_0/requestPart', assessment=AssessmentContext@7943d46b{traceMap=TraceMap@7038c921 (with 53 items in it), jumpedContexts=false}}, io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext@02ad20f1, io.netty.handler.codec.http.DefaultFullHttpResponse@1becf007) with channel NioSocketChannel@17e0aaf1 and pipeline DefaultChannelPipeline@7e4ed2e1",
-          "2024-11-21 20:37:32,318 [reactor-http-nio-3 ContrastNettyHttpDispatcherImpl] DEBUG - ContrastNettyHttpDispatcherImpl.onFireChannelRead(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=AssessmentContext@6dbe39f4{traceMap=TraceMap@51b3e0ae (with 0 items in it), jumpedContexts=true}}, io.netty.channel.DefaultChannelPipeline$HeadContext@36f2f8e2) with channel NioSocketChannel@1d920791 and pipeline DefaultChannelPipeline@154ecf9d",
-          ""
+          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing(NioSocketChannel@101cd7af) moved channel incoming attr ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 37 items in it), jumpedContexts=true}} to channel outgoing att, replacing null",
+          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing(NioSocketChannel@279e3881) moved channel incoming attr null to channel outgoing att, replacing null",
+          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext(NioSocketChannel@279e3881) removed channel outgoing ContrastContext null",
+          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext(NioSocketChannel@101cd7af) removed channel outgoing ContrastContext ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 37 items in it), jumpedContexts=true}}",
+          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.updateChannelIncomingContrastContext(NioSocketChannel@101cd7af, ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 0 items in it), jumpedContexts=false}}) saved channel incoming attr, replacing null",
+          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(NioSocketChannel@101cd7af, ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 37 items in it), jumpedContexts=true}}, AttributeKey@5c1c2aa2) replacing ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 37 items in it), jumpedContexts=true}}",
+          "2024-12-02 17:32:39,234 [reactor-http-nio-2 b] WARN - ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(NioSocketChannel@4bc2ea8d, ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, AttributeKey@75aeac5f) retieved null ContrastContext from channel.  Leaving current ContrastContext as is.",
+          "2024-12-02 17:32:39,362 [reactor-http-nio-2 b] WARN - ContrastNettyHttpDispatcherImpl.onResponseWritten(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, DelegatingChannelHandlerContext@2f959e0f, DefaultFullHttpResponse@100e2a47) with channel NioSocketChannel@4bc2ea8d found null Channel incoming and outgoing contexts, so continuing with ContrastContext from thread."
   );
-  
+
   public static void main(String[] args) {
     testPatternMatching(exampleLogLines, PATTERN_METADATA, true);
   }
