@@ -166,7 +166,9 @@ public class FluxShred extends BaseShred {
 
   public static final String[] ENTRY_SIGNATURES = {
     "- AbstractEventExecutor.safeExecute(",
-    "- ContrastNettyHttpDispatcherImpl."
+    "- ContrastNettyHttpDispatcherImpl.",
+    "- Exiting ContrastNettyHttpDispatcherImpl.",
+    "ing NioEventLoop.processSelectedKey("
   };
 
   static String entryTestSql() {
@@ -282,13 +284,13 @@ public class FluxShred extends BaseShred {
                               + "- ContrastNettyHttpDispatcherImpl.onFireChannelRead\\("
                                       + START_CONTRAST_CONTEXT_EXTRACT
                               + ASSESS_NONNULL_XTRACTS
-                              + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) with channel "
+                              + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) from handler "
+                              + WRAP_INIT_XTRACT + " with channel " // I hijacked this field inappropriately
                               + CHANNEL_XTRACT
                               + " and pipeline " + PIPELINE_XTRACT
                               + NO_CONCUR_CTX_XTRACT
                               + NO_APP_CTX_XTRACT
                               + NO_TASK_CLASS_XTRACT
-                              + NO_WRAP_INIT_XTRACT
                               + NO_WRAPPED_RUNNABLE_XTRACT
                               + NO_NETTY_HTTP_MSG_XTRACT
                               + NO_DECODER_STATE_XTRACT
@@ -302,13 +304,13 @@ public class FluxShred extends BaseShred {
                               + "- ContrastNettyHttpDispatcherImpl.onFireChannelRead\\("
                                       + START_CONTRAST_CONTEXT_EXTRACT
                               + ASSESS_NULL_XTRACTS
-                              + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) with channel "
+                              + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) from handler "
+                              + WRAP_INIT_XTRACT + " with channel " // I hijacked this field inappropriately
                               + CHANNEL_XTRACT
                               + " and pipeline " + PIPELINE_XTRACT
                               + NO_CONCUR_CTX_XTRACT
                               + NO_APP_CTX_XTRACT
                               + NO_TASK_CLASS_XTRACT
-                              + NO_WRAP_INIT_XTRACT
                               + NO_WRAPPED_RUNNABLE_XTRACT
                               + NO_NETTY_HTTP_MSG_XTRACT
                               + NO_DECODER_STATE_XTRACT
@@ -317,19 +319,18 @@ public class FluxShred extends BaseShred {
                               + "$")),
               new PatternMetadata(
                       "requestDecodedAssessNonnull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.onRequestDecoded(", "{traceMap="),
+                      List.of("- Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded(", "{traceMap="),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
-                                      + "- ContrastNettyHttpDispatcherImpl.onRequestDecoded\\("
+                                      + "- Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded\\("
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NONNULL_XTRACTS
                                       + ", " + CHANNEL_HANDLER_CTX_XTRACT
                                       + ", " + NETTY_HTTP_MSG_XTRACT
-                                      + "\\) with channel "
-                                      + CHANNEL_XTRACT
+                                      + "\\) with channel "+ CHANNEL_XTRACT
                                       + " pipeline " + PIPELINE_XTRACT
-                                      + " and decoderState "
-                                      + DECODER_STATE_XTRACT
+                                      + " decoderState " + DECODER_STATE_XTRACT
+                                      + " and ContrastContext .+"
                                       + NO_CONCUR_CTX_XTRACT
                                       + NO_APP_CTX_XTRACT
                                       + NO_TASK_CLASS_XTRACT
@@ -339,19 +340,18 @@ public class FluxShred extends BaseShred {
                                       + "$")),
               new PatternMetadata(
                       "requestDecodedAssessNull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.onRequestDecoded("),
+                      List.of("- Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded(", "ContrastContext{http="),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
-                                      + "- ContrastNettyHttpDispatcherImpl.onRequestDecoded\\("
-
+                                      + "- Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded\\("
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NULL_XTRACTS
                                       + ", " + CHANNEL_HANDLER_CTX_XTRACT
                                       + ", " + NETTY_HTTP_MSG_XTRACT
                                       + "\\) with channel "+ CHANNEL_XTRACT
                                       + " pipeline " + PIPELINE_XTRACT
-                                      + " and decoderState "
-                                      + DECODER_STATE_XTRACT
+                                      + " decoderState " + DECODER_STATE_XTRACT
+                                      + " and ContrastContext .+"
                                       + NO_CONCUR_CTX_XTRACT
                                       + NO_APP_CTX_XTRACT
                                       + NO_TASK_CLASS_XTRACT
@@ -383,7 +383,7 @@ public class FluxShred extends BaseShred {
                                       + "$")),
               new PatternMetadata(
                       "responseWrittenAssessNull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.onResponseWritten("),
+                      List.of("DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten("),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\("
@@ -427,7 +427,7 @@ public class FluxShred extends BaseShred {
                                        + "$")),
               new PatternMetadata(
                       "moveChannelAttrSrcNonnull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing(", "incoming attr ContrastContext\\{http="),
+                      List.of("- ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing(", "incoming attr ContrastContext{http="),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing\\("
@@ -493,7 +493,7 @@ public class FluxShred extends BaseShred {
                                       + "$")),
               new PatternMetadata(
                       "nullifyChannelAttrCCtxNonnull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext(", "ContrastContext\\{http="),
+                      List.of("- ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext(", "ContrastContext{http="),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext\\("
@@ -558,7 +558,7 @@ public class FluxShred extends BaseShred {
                                       + "$")),
               new PatternMetadata(
                       "updateChannelIncomingAssessNull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.updateChannelIncomingContrastContext(", "ContrastContext\\{http="),
+                      List.of("- ContrastNettyHttpDispatcherImpl.updateChannelIncomingContrastContext(", "ContrastContext{http="),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.updateChannelIncomingContrastContext\\("
@@ -580,7 +580,7 @@ public class FluxShred extends BaseShred {
                                       + "$")),
               new PatternMetadata(
                       "updateCurrentCCtxAssessNonnull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(", "{traceMap="),
+                      List.of("DEBUG - ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(", "{traceMap="),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel\\("
@@ -601,9 +601,9 @@ public class FluxShred extends BaseShred {
                                       + "$")),
               new PatternMetadata(
                       "updateCurrentCCtxAssessNull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(", "ContrastContext\\{http="),
+                      List.of("DEBUG - ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(", "ContrastContext{http="),
                       Pattern.compile(
-                              DEBUG_PREAMBLE_XTRACT
+                              WARN_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel\\("
                                       + CHANNEL_XTRACT + ", "
                                       + START_CONTRAST_CONTEXT_EXTRACT
@@ -623,7 +623,7 @@ public class FluxShred extends BaseShred {
                                       + "$")),
               new PatternMetadata(
                       "WarnUpdateCurrentCCtxFromChannelAssessNonnull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(",  "{traceMap="),
+                      List.of("WARN - ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(",  "{traceMap="),
                       Pattern.compile(
                               WARN_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel\\("
@@ -644,7 +644,7 @@ public class FluxShred extends BaseShred {
                                       + "$")),
               new PatternMetadata(
                       "WarnUpdateCurrentCCtxFromChannelAssessNull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(", "ContrastContext\\{http="),
+                      List.of("WARN - ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(", "ContrastContext{http="),
                       Pattern.compile(
                               WARN_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel\\("
@@ -666,7 +666,7 @@ public class FluxShred extends BaseShred {
                                       + "$")),
               new PatternMetadata(
                       "WarnOnResponseWrittenAssessNonnull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.onResponseWritten(",  "{traceMap="),
+                      List.of("WARN - ContrastNettyHttpDispatcherImpl.onResponseWritten(",  "{traceMap="),
                       Pattern.compile(
                               WARN_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\("
@@ -687,7 +687,7 @@ public class FluxShred extends BaseShred {
                                       + "$")),
               new PatternMetadata(
                       "WarnOnResponseWrittenAssessNull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.onResponseWritten(", "ContrastContext\\{http="),
+                      List.of("WARN - ContrastNettyHttpDispatcherImpl.onResponseWritten(", "ContrastContext{http="),
                       Pattern.compile(
                               WARN_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\("
@@ -705,6 +705,92 @@ public class FluxShred extends BaseShred {
                                       + NO_WRAPPED_RUNNABLE_XTRACT
                                       + NO_TASK_OBJ_XTRACT
                                       + NO_DECODER_STATE_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "EnterProcessSelectedKeyAssessNonnull",
+                      List.of("- Entering NioEventLoop.processSelectedKey(",  "{traceMap="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- Entering NioEventLoop.processSelectedKey\\("
+                                      + "[^,]+, "
+                                      + CHANNEL_XTRACT + "\\) with "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NONNULL_XTRACTS
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "EnterProcessSelectedKeyAssessNull",
+                      List.of("- Entering NioEventLoop.processSelectedKey(", "ContrastContext{http="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- Entering NioEventLoop.processSelectedKey\\("
+                                      + "[^,]+, "
+                                      + CHANNEL_XTRACT + "\\) with "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NULL_XTRACTS
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "ExitProcessSelectedKeyAssessNonnull",
+                      List.of("- Exiting NioEventLoop.processSelectedKey(",  "{traceMap="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- Exiting NioEventLoop.processSelectedKey\\("
+                                      + "[^,]+, "
+                                      + CHANNEL_XTRACT + "\\) with "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NONNULL_XTRACTS
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "ExitProcessSelectedKeyAssessNull",
+                      List.of("- Exiting NioEventLoop.processSelectedKey(", "ContrastContext{http="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- Exiting NioEventLoop.processSelectedKey\\("
+                                      + "[^,]+, "
+                                      + CHANNEL_XTRACT + "\\) with "
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NULL_XTRACTS
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_PIPELINE_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
                                       + "$"))
       );
@@ -741,14 +827,17 @@ public class FluxShred extends BaseShred {
   }
 
   static final List<String> exampleLogLines = List.of(
-          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing(NioSocketChannel@101cd7af) moved channel incoming attr ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 37 items in it), jumpedContexts=true}} to channel outgoing att, replacing null",
-          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing(NioSocketChannel@279e3881) moved channel incoming attr null to channel outgoing att, replacing null",
-          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext(NioSocketChannel@279e3881) removed channel outgoing ContrastContext null",
-          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext(NioSocketChannel@101cd7af) removed channel outgoing ContrastContext ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 37 items in it), jumpedContexts=true}}",
-          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.updateChannelIncomingContrastContext(NioSocketChannel@101cd7af, ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 0 items in it), jumpedContexts=false}}) saved channel incoming attr, replacing null",
-          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(NioSocketChannel@101cd7af, ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 37 items in it), jumpedContexts=true}}, AttributeKey@5c1c2aa2) replacing ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 37 items in it), jumpedContexts=true}}",
-          "2024-12-02 17:32:39,234 [reactor-http-nio-2 b] WARN - ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(NioSocketChannel@4bc2ea8d, ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, AttributeKey@75aeac5f) retieved null ContrastContext from channel.  Leaving current ContrastContext as is.",
-          "2024-12-02 17:32:39,362 [reactor-http-nio-2 b] WARN - ContrastNettyHttpDispatcherImpl.onResponseWritten(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, DelegatingChannelHandlerContext@2f959e0f, DefaultFullHttpResponse@100e2a47) with channel NioSocketChannel@4bc2ea8d found null Channel incoming and outgoing contexts, so continuing with ContrastContext from thread."
+//          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing(NioSocketChannel@101cd7af) moved channel incoming attr ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 37 items in it), jumpedContexts=true}} to channel outgoing att, replacing null",
+//          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.moveChannelIncomingContrastContextToOutgoing(NioSocketChannel@279e3881) moved channel incoming attr null to channel outgoing att, replacing null",
+//          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext(NioSocketChannel@279e3881) removed channel outgoing ContrastContext null",
+//          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.nullifyChannelOutgoingContrastContext(NioSocketChannel@101cd7af) removed channel outgoing ContrastContext ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 37 items in it), jumpedContexts=true}}",
+//          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.updateChannelIncomingContrastContext(NioSocketChannel@101cd7af, ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 0 items in it), jumpedContexts=false}}) saved channel incoming attr, replacing null",
+//          "2024-12-01 23:03:58,997 [main ContrastPolicy] DEBUG - ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(NioSocketChannel@101cd7af, ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 37 items in it), jumpedContexts=true}}, AttributeKey@5c1c2aa2) replacing ContrastContext{http=HttpContext{HttpRequest@7b4ddd9d, null}, uri='/sources/v5_0/serverHttpRequest-headers', assessment=AssessmentContext@0e70d780{traceMap=b@2a1a4394 (with 37 items in it), jumpedContexts=true}}",
+//          "2024-12-02 20:31:22,215 [reactor-http-nio-2 b] WARN - ContrastNettyHttpDispatcherImpl.updateCurrentContrastContextFromChannel(NioSocketChannel@34aef235, ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, AttributeKey@39128da0) retieved null ContrastContext from channel.  Leaving current ContrastContext as is.",
+//          "2024-12-02 20:31:22,373 [reactor-http-nio-2 b] WARN - ContrastNettyHttpDispatcherImpl.onResponseWritten(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, DelegatingChannelHandlerContext@3b4427f6, DefaultFullHttpResponse@151844e4) with channel NioSocketChannel@34aef235 found null Channel incoming and outgoing contexts, so continuing with ContrastContext from thread.",
+//          "2024-12-02 20:31:22,052 [reactor-http-nio-1 b] DEBUG - Entering NioEventLoop.processSelectedKey(sun.nio.ch.SelectionKeyImpl@2d12d504, io.netty.channel.socket.nio.NioServerSocketChannel@15417052) with ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}",
+//          "2024-12-02 20:31:22,069 [reactor-http-nio-1 b] DEBUG - Exiting NioEventLoop.processSelectedKey(sun.nio.ch.SelectionKeyImpl@2d12d504, io.netty.channel.socket.nio.NioServerSocketChannel@15417052) with ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}",
+          "2024-12-02 20:31:22,215 [reactor-http-nio-2 b] DEBUG - Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, HttpServerRequestDecoder@647b870a, DefaultHttpRequest@3262fdab) with channel NioSocketChannel@34aef235 pipeline DefaultChannelPipeline@173b7869 decoderState SKIP_CONTROL_CHARS and ContrastContext ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}"
   );
 
   public static void main(String[] args) {

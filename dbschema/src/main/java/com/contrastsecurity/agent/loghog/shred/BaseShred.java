@@ -185,6 +185,9 @@ public class BaseShred {
         } else {
           if (SHOW_MISFITS) {
             System.out.println("Extraction/transformation failed in row " + Arrays.asList(row));
+            System.out.println("patternId = " + patternId);
+            System.out.println("Expecting " + valuesExtractor.expectedCount() + " values, but found:\n");
+            System.out.println(extractedVals);
           }
           if (misfitsTable != null) {
             final Object[] misfitVals = misfitsRowValues(row, lastGoodRowKey);
