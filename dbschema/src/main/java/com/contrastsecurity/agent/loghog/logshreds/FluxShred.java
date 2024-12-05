@@ -318,6 +318,47 @@ public class FluxShred extends BaseShred {
                               + NO_TASK_OBJ_XTRACT
                               + "$")),
               new PatternMetadata(
+                      "channelFlushAssessNonnull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.onFlush(", "{traceMap="),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.onFlush\\("
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NONNULL_XTRACTS
+                                      + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) from handler "
+                                      + WRAP_INIT_XTRACT + " with channel " // I hijacked this field inappropriately
+                                      + CHANNEL_XTRACT
+                                      + " and pipeline " + PIPELINE_XTRACT
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "channelFlushAssessNull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.onFlush("),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.onFlush\\("
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NULL_XTRACTS
+                                      + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) from handler "
+                                      + WRAP_INIT_XTRACT + " with channel " // I hijacked this field inappropriately
+                                      + CHANNEL_XTRACT
+                                      + " and pipeline " + PIPELINE_XTRACT
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + "$")),
+              new PatternMetadata(
                       "requestDecodedAssessNonnull",
                       List.of("- Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded(", "{traceMap="),
                       Pattern.compile(
