@@ -34,7 +34,9 @@ import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_URL_X
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.OUTPUT_MECHANISM_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.OUTPUT_MECHANISM_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.REQ_VAR;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.REQ_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RESP_VAR;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RESP_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.THREAD_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TIMESTAMP_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.URL_VAR;

@@ -3,6 +3,7 @@ package com.contrastsecurity.agent.loghog.logshreds;
 
 import com.contrastsecurity.agent.loghog.shred.AllSameRowClassifier;
 import com.contrastsecurity.agent.loghog.shred.BaseShred;
+import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
 import com.contrastsecurity.agent.loghog.shred.PatternRowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.RowClassifier;
 import com.contrastsecurity.agent.loghog.shred.RowValuesExtractor;
@@ -111,10 +112,11 @@ public class TrakShred extends BaseShred {
   // ... DEBUG - Adding trace 35 to map b@2936c20e (with 1 items in it) keyed by traced object
   // String@19c07c00
 
-  public static final RowValuesExtractor VALUE_EXTRACTOR =
-      new PatternRowValuesExtractor(
-          Map.of(
+  static final List<PatternMetadata> PATTERN_METADATA =
+          List.of(
+                  new PatternMetadata(
               ANY_PATTERN_ID,
+                          List.of(""),
               Pattern.compile(
                   DEBUG_PREAMBLE_XTRACT
                       + "- Adding trace "
@@ -125,7 +127,14 @@ public class TrakShred extends BaseShred {
                       + TRACE_MAP_SIZE_XTRACT
                       + " items in it\\) keyed by traced object +"
                       + TRACKED_OBJ_XTRACT
-                      + "$")),
+                                          + "$")));
+
+  public static final RowValuesExtractor VALUE_EXTRACTOR =
+      new PatternRowValuesExtractor(
+          Map.of(
+              ANY_PATTERN_ID,
+              PATTERN_METADATA.get(0).pattern()
+             ),
           SHRED_METADATA.stream()
               .map(srmd -> srmd.extractName())
               .filter(extractName -> extractName != LOG_TABLE_LINE_COL)
@@ -144,5 +153,13 @@ public class TrakShred extends BaseShred {
 
   public TrakShred() {
     super(SHRED_METADATA, SHRED_SQL_TABLE, MISFITS_METADATA, MISFITS_SQL_TABLE, SHRED_SOURCE);
+  }
+
+  static final List<String> exampleLogLines = List.of(
+    "2024-11-12 16:26:32,917 [reactor-http-nio-2 e] DEBUG - Adding trace 1 to map b@2fab5e45 (with 1 items in it) keyed by traced object String@2f3c5c9a"
+  );
+
+  public static void main(String[] args) {
+    testPatternMatching(exampleLogLines, PATTERN_METADATA, true);
   }
 }

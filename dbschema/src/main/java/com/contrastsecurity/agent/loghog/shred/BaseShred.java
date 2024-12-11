@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TIMESTAMP_VAR;
 
@@ -184,6 +185,9 @@ public class BaseShred {
         } else {
           if (SHOW_MISFITS) {
             System.out.println("Extraction/transformation failed in row " + Arrays.asList(row));
+            System.out.println("patternId = " + patternId);
+            System.out.println("Expecting " + valuesExtractor.expectedCount() + " values, but found:\n");
+            System.out.println(extractedVals);
           }
           if (misfitsTable != null) {
             final Object[] misfitVals = misfitsRowValues(row, lastGoodRowKey);
@@ -218,6 +222,53 @@ public class BaseShred {
     }
 
     return new AddRowsResult(nAdded, nMisfits, lastGoodRowKey);
+  }
+
+  // for debugging
+
+  public static void testPatternMatching(final List<String> exampleLogLines, final List<PatternMetadata> patternMetadataList, final boolean verbose) {
+    if (verbose) {
+      System.out.println("Patterns:");
+      patternMetadataList.stream().map(pmd -> "Pattern " + pmd.patternId() +": " + pmd.pattern()).forEach(System.out::println);
+    }
+    for (final String example : exampleLogLines) {
+      PatternMetadata matchPmd = null;
+      System.out.println("\nExample log line: " + example);
+      for (final PatternMetadata pmd : patternMetadataList) {
+        final Matcher matcher = pmd.pattern().matcher(example);
+        if (matcher.matches()) {
+          if (matchPmd == null) {
+            matchPmd = pmd;
+            System.out.println("Found matching pattern (" + pmd.patternId() + "): " + pmd.pattern());
+            if (verbose) {
+              printExtractedDetail(matcher);
+            }
+          } else {
+            System.out.println("Additional matching pattern (" + pmd.patternId() + "): " + pmd.pattern());
+            if (verbose) {
+              printExtractedDetail(matcher);
+            }          }
+        }
+      }
+      if (matchPmd == null) {
+        System.out.println("No matching pattern for log line!");
+      }
+    }
+  }
+
+  public static void printExtractedDetail(Matcher matcher) {
+    for (Map.Entry<String, Integer> entry : matcher.namedGroups().entrySet()) {
+      final String name = entry.getKey();
+      final Integer groupIdx = entry.getValue();
+      System.out.println(
+              "group("
+                      + name
+                      + ") -> \'"
+                      + String.valueOf(matcher.group(groupIdx))
+                      + "\'"
+                      + " == null ? "
+                      + String.valueOf(matcher.group(name) == null));
+    }
   }
 
   record AddRowsResult(int numAddedShredRows, int numMisfitRows, Object lastGoodRowKey) {}

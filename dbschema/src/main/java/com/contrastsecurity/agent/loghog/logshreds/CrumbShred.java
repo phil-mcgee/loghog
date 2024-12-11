@@ -113,9 +113,7 @@ public class CrumbShred extends BaseShred {
           List.of());
 
   public static final String[] ENTRY_SIGNATURES = {
-          " CRUMB ",
-          "Request ending for ",
-          "!LM!RequestTime|RequestEnded"
+          " CRUMB "
   };
 
   static String entryTestSql() {
