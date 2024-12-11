@@ -21,35 +21,66 @@ public class ViewCreator {
   }
 
   public void createThreadView() throws SQLException {
-    System.out.println("Creating THREAD view...");
+    System.out.println("Creating THREAD_VIEW view...");
     try (Connection connect = EmbeddedDatabaseFactory.create(dbPath)) {
       DSLContext jooq = DSL.using(connect);
 
       final String selectSql = """
-SELECT CURRENT.LINE LINE, CURRENT.THREAD THREAD, (
-    SELECT min(N.LINE)
-    FROM MESG N
-    WHERE
-      N.THREAD = CURRENT.THREAD
-      AND N.LINE > CURRENT.LINE
-  ) NEXT_IN_THREAD, (
-    SELECT max(P.LINE)
-    FROM MESG P
-    WHERE
-      P.THREAD = CURRENT.THREAD
-      AND P.LINE < CURRENT.LINE
-  ) PREVIOUS_IN_THREAD
-FROM MESG CURRENT
+SELECT
+  thread,
+  line,
+  timestamp,
+  ROW_NUMBER() OVER (PARTITION BY thread ORDER BY line) thread_line,
+  LAG(line) OVER (PARTITION BY thread ORDER BY line) prev_in_thread,
+  LEAD(line) OVER (PARTITION BY thread ORDER BY line) next_in_thread
+FROM mesg
+ORDER BY thread, thread_line
 """;
       if (VERBOSE) {
         System.out.println("selectSql = \n" + selectSql);
       }
 
-      //  TOO SLOW    jooq.createMaterializedView("THREAD").as(selectSql).execute();
-      // better to find lines as needed in ad hoc query joins
-      jooq.createView("THREAD").as(selectSql).execute();
+      jooq.createView("THREAD_VIEW").as(selectSql).execute();
+      System.out.println("THREAD_VIEW view created.");
+
+      System.out.println("\nCreating a THREAD table from view...");
+      final StringBuilder sb = new StringBuilder("create table THREAD (\n");
+      // grumble, grumble.  h2 makes this way harder than it should be
+      PreparedStatement stmt = connect.prepareStatement("SELECT * FROM THREAD_VIEW LIMIT 0");
+      ResultSet rs = stmt.executeQuery();
+      ResultSetMetaData rsmd = rs.getMetaData();
+      for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+        sb.append(rsmd.getColumnName(i)).append(" ");
+        final String dataType = rsmd.getColumnTypeName(i);
+        sb.append(
+                switch (dataType) {
+                  case "INTEGER" -> "int";
+                  case "CHARACTER VARYING" -> "VARCHAR2";
+                  default -> dataType;
+                }
+        ).append(", \n");
+      }
+      sb.setLength(sb.length() - ", \n".length());
+      sb.append("\n);");
+
+      final String createThreadTableSql = sb.toString();
+      if (VERBOSE) {
+        System.out.println("createThreadTableSql = \n" + createThreadTableSql);
+      }
+      stmt.close();
+
+      // create the table
+      stmt = connect.prepareStatement(createThreadTableSql);
+      stmt.executeUpdate();
+      stmt.close();
+      System.out.println("THREAD table created.");
+
+      System.out.println("Populating THREAD table...");
+      stmt = connect.prepareStatement("INSERT INTO THREAD SELECT * FROM THREAD_VIEW");
+      stmt.executeUpdate();
+      stmt.close();
     }
-    System.out.println("THREAD view created.");
+    System.out.println("THREAD table populated.");
   }
 
   public void createRequestView() throws SQLException {
