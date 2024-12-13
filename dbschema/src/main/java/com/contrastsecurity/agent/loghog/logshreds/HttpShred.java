@@ -48,70 +48,70 @@ public class HttpShred extends BaseShred {
   static final String SHRED_KEY_COLUMN = "LINE";
 
   static final List<ShredRowMetaData> SHRED_METADATA =
-      List.of(
-          new ShredRowMetaData(
-              "LINE", SQLDataType.INTEGER.notNull(), Integer.class, LOG_TABLE_LINE_COL),
-          new ShredRowMetaData(
-              "TIMESTAMP",
-              SQLDataType.LOCALDATETIME(3).notNull(),
-              LocalDateTime.class,
-              TIMESTAMP_VAR),
-          new ShredRowMetaData("THREAD", SQLDataType.VARCHAR, String.class, THREAD_VAR),
-          new ShredRowMetaData(
-              "PATTERN", SQLDataType.VARCHAR.notNull(), String.class, SHRED_TABLE_PATTERN_COL),
-          new ShredRowMetaData("REQ", SQLDataType.VARCHAR, String.class, REQ_VAR),
-          new ShredRowMetaData("RESP", SQLDataType.VARCHAR, String.class, RESP_VAR),
-          new ShredRowMetaData("URL", SQLDataType.VARCHAR, String.class, URL_VAR),
-              new ShredRowMetaData("NATIVE_RESP", SQLDataType.VARCHAR, String.class, NATIVE_RESP_VAR),
-              new ShredRowMetaData("OUTPUT_MECHANISM", SQLDataType.VARCHAR, String.class, OUTPUT_MECHANISM_VAR));
+          List.of(
+                  new ShredRowMetaData(
+                          "LINE", SQLDataType.INTEGER.notNull(), Integer.class, LOG_TABLE_LINE_COL),
+                  new ShredRowMetaData(
+                          "TIMESTAMP",
+                          SQLDataType.LOCALDATETIME(3).notNull(),
+                          LocalDateTime.class,
+                          TIMESTAMP_VAR),
+                  new ShredRowMetaData("THREAD", SQLDataType.VARCHAR, String.class, THREAD_VAR),
+                  new ShredRowMetaData(
+                          "PATTERN", SQLDataType.VARCHAR.notNull(), String.class, SHRED_TABLE_PATTERN_COL),
+                  new ShredRowMetaData("REQ", SQLDataType.VARCHAR, String.class, REQ_VAR),
+                  new ShredRowMetaData("RESP", SQLDataType.VARCHAR, String.class, RESP_VAR),
+                  new ShredRowMetaData("URL", SQLDataType.VARCHAR, String.class, URL_VAR),
+                  new ShredRowMetaData("NATIVE_RESP", SQLDataType.VARCHAR, String.class, NATIVE_RESP_VAR),
+                  new ShredRowMetaData("OUTPUT_MECHANISM", SQLDataType.VARCHAR, String.class, OUTPUT_MECHANISM_VAR));
 
   static final String MISFITS_TABLE_NAME = "HTTP_MISFITS";
   static final String MISFITS_KEY_COLUMN = "LINE";
 
   static final List<ShredRowMetaData> MISFITS_METADATA =
-      List.of(
-          new ShredRowMetaData(
-              "LINE", SQLDataType.INTEGER.notNull(), Integer.class, LOG_TABLE_LINE_COL));
+          List.of(
+                  new ShredRowMetaData(
+                          "LINE", SQLDataType.INTEGER.notNull(), Integer.class, LOG_TABLE_LINE_COL));
 
   static final ShredSqlTable SHRED_SQL_TABLE =
-      new ShredSqlTable(
-          SHRED_TABLE_NAME,
-          SHRED_METADATA,
-          SHRED_KEY_COLUMN,
-          List.of(
-              // mesg.line references log.line
-              jooq()
-                  .alterTable(SHRED_TABLE_NAME)
-                  .add(
-                      DSL.constraint(SHRED_TABLE_NAME + "_FK_" + SHRED_KEY_COLUMN)
-                          .foreignKey(SHRED_KEY_COLUMN)
-                          .references(LOG_TABLE_NAME, "LINE"))
-                  .getSQL()),
-          List.of(
-              jooq()
-                  .createIndex("IDX_" + SHRED_TABLE_NAME + "_" + "REQ")
-                  .on(SHRED_TABLE_NAME, "REQ")
-                  .getSQL(),
-              jooq()
-                  .createIndex("IDX_" + SHRED_TABLE_NAME + "_" + "REQ" + "_" + "PATTERN")
-                  .on(SHRED_TABLE_NAME, "REQ", "PATTERN")
-                  .getSQL()));
+          new ShredSqlTable(
+                  SHRED_TABLE_NAME,
+                  SHRED_METADATA,
+                  SHRED_KEY_COLUMN,
+                  List.of(
+                          // mesg.line references log.line
+                          jooq()
+                                  .alterTable(SHRED_TABLE_NAME)
+                                  .add(
+                                          DSL.constraint(SHRED_TABLE_NAME + "_FK_" + SHRED_KEY_COLUMN)
+                                                  .foreignKey(SHRED_KEY_COLUMN)
+                                                  .references(LOG_TABLE_NAME, "LINE"))
+                                  .getSQL()),
+                  List.of(
+                          jooq()
+                                  .createIndex("IDX_" + SHRED_TABLE_NAME + "_" + "REQ")
+                                  .on(SHRED_TABLE_NAME, "REQ")
+                                  .getSQL(),
+                          jooq()
+                                  .createIndex("IDX_" + SHRED_TABLE_NAME + "_" + "REQ" + "_" + "PATTERN")
+                                  .on(SHRED_TABLE_NAME, "REQ", "PATTERN")
+                                  .getSQL()));
 
   static final ShredSqlTable MISFITS_SQL_TABLE =
-      new ShredSqlTable(
-          MISFITS_TABLE_NAME,
-          MISFITS_METADATA,
-          MISFITS_KEY_COLUMN,
-          List.of(
-              // cont.line references log.line
-              jooq()
-                  .alterTable(MISFITS_TABLE_NAME)
-                  .add(
-                      DSL.constraint(MISFITS_TABLE_NAME + "_FK_" + MISFITS_KEY_COLUMN)
-                          .foreignKey(MISFITS_KEY_COLUMN)
-                          .references(LOG_TABLE_NAME, "LINE"))
-                  .getSQL()),
-          List.of());
+          new ShredSqlTable(
+                  MISFITS_TABLE_NAME,
+                  MISFITS_METADATA,
+                  MISFITS_KEY_COLUMN,
+                  List.of(
+                          // cont.line references log.line
+                          jooq()
+                                  .alterTable(MISFITS_TABLE_NAME)
+                                  .add(
+                                          DSL.constraint(MISFITS_TABLE_NAME + "_FK_" + MISFITS_KEY_COLUMN)
+                                                  .foreignKey(MISFITS_KEY_COLUMN)
+                                                  .references(LOG_TABLE_NAME, "LINE"))
+                                  .getSQL()),
+                  List.of());
 
   public static final String[] ENTRY_SIGNATURES = {
           " HttpManager] "
@@ -132,98 +132,86 @@ public class HttpShred extends BaseShred {
 
   static final String HTTP_MANAGER_PREAMBLE_XTRACT = DEBUG_PREAMBLE_XTRACT + "- HttpContext\\{" + REQ_XTRACT + ", " + RESP_XTRACT + "\\} ";
   static final List<PatternMetadata> PATTERN_METADATA =
-      List.of(
-          //!LM!RequestTime|RequestEnded|uri=/routecoverage/annotation/&elapsed=29
-          new PatternMetadata(
-                  "lmReqTime",
-                  List.of("!LM!RequestTime|RequestEnded"),
-                  Pattern.compile(
-                          DEBUG_PREAMBLE_XTRACT
-                                  + "- !LM!RequestTime\\|RequestEnded\\|uri="
-                                  + "(?<" + URL_VAR + ">[^&]+)"
-                                  + "&elapsed=\\d+"
-                                  + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$")),
-          //Capturing response to memory
-          new PatternMetadata(
-              "respCapture",
-              List.of("Capturing response to memory"),
-              Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- Capturing response to memory"
-                      + NO_URL_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$")),
-          //2024-11-07 18:04:50,774 [reactor-http-nio-4 HttpManager] DEBUG - Request ending for /auto-binding/v1_0/autobind-unsafe - response is k@2a7ec4a7 and output mechanism is null
-          // FIXME OUTPUT_MECHANISM reports the string null instead of a null value
-          new PatternMetadata(
-              "reqEnding",
-              List.of("- Request ending for "),
-              Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- Request ending for " + URL_XTRACT + " - response is "
-                      + NATIVE_RESP_XTRACT +  " and output mechanism is "  + OUTPUT_MECHANISM_XTRACT
-                      + "$")),
-          //Response was empty for URI /sources/v5_0/matrixVariable/foo;var=strawberries
-          new PatternMetadata(
-              "respEmpty",
-              List.of("Response was empty for "),
-              Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- Response was empty for URI " + URL_XTRACT +
-                      NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$"))
-      );
+          List.of(
+                  //!LM!RequestTime|RequestEnded|uri=/routecoverage/annotation/&elapsed=29
+                  new PatternMetadata(
+                          "lmReqTime",
+                          List.of("!LM!RequestTime|RequestEnded"),
+                          Pattern.compile(
+                                  DEBUG_PREAMBLE_XTRACT
+                                          + "- !LM!RequestTime\\|RequestEnded\\|uri="
+                                          + "(?<" + URL_VAR + ">[^&]+)"
+                                          + "&elapsed=\\d+"
+                                          + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$")),
+                  //Capturing response to memory
+                  new PatternMetadata(
+                          "respCapture",
+                          List.of("Capturing response to memory"),
+                          Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- onResponseStart\\(\\) Capturing response to memory"
+                                  + NO_URL_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$")),
+                  //2024-11-07 18:04:50,774 [reactor-http-nio-4 HttpManager] DEBUG - Request ending for /auto-binding/v1_0/autobind-unsafe - response is k@2a7ec4a7 and output mechanism is null
+                  // FIXME OUTPUT_MECHANISM reports the string null instead of a null value
+                  new PatternMetadata(
+                          "reqEnding",
+                          List.of(" Request ending for "),
+                          Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- onRequestEnd\\(\\) Request ending for " + URL_XTRACT + " - response is "
+                                  + NATIVE_RESP_XTRACT + " and output mechanism is " + OUTPUT_MECHANISM_XTRACT
+                                  + "$")),
+                  //Response was empty for URI /sources/v5_0/matrixVariable/foo;var=strawberries
+                  new PatternMetadata(
+                          "respEmpty",
+                          List.of("Response was empty for "),
+                          Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- analyzeResponseContents\\(\\) Response was empty for URI " + URL_XTRACT +
+                                  NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$")),
+                  //Response was empty for URI /sources/v5_0/matrixVariable/foo;var=strawberries
+                  new PatternMetadata(
+                          "nullReqRespStart",
+                          List.of("Current HTTPRequest was null"),
+                          Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- onResponseStart\\(\\) Current HTTPRequest was null" +
+                                  NO_URL_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$"))
+
+          );
 
   static final List<String> EXTRACTED_VAL_NAMES =
-      SHRED_METADATA.stream()
-          .map(srmd -> srmd.extractName())
-          .filter(
-              extractName ->
-                  extractName != LOG_TABLE_LINE_COL && extractName != SHRED_TABLE_PATTERN_COL)
-          .toList();
+          SHRED_METADATA.stream()
+                  .map(srmd -> srmd.extractName())
+                  .filter(
+                          extractName ->
+                                  extractName != LOG_TABLE_LINE_COL && extractName != SHRED_TABLE_PATTERN_COL)
+                  .toList();
 
   static final RowValuesExtractor VALUE_EXTRACTOR =
-      new PatternRowValuesExtractor(
-          PATTERN_METADATA.stream()
-              .collect(Collectors.toMap(pmd -> pmd.patternId(), pmd -> pmd.pattern())),
-          EXTRACTED_VAL_NAMES);
+          new PatternRowValuesExtractor(
+                  PATTERN_METADATA.stream()
+                          .collect(Collectors.toMap(pmd -> pmd.patternId(), pmd -> pmd.pattern())),
+                  EXTRACTED_VAL_NAMES);
 
   static final RowClassifier ROW_CLASSIFIER =
-      new TextSignatureRowClassifier(
-          PATTERN_METADATA.stream()
-              .map(pmd -> new PatternSignatures(pmd.patternId(), pmd.signatures()))
-              .toList());
+          new TextSignatureRowClassifier(
+                  PATTERN_METADATA.stream()
+                          .map(pmd -> new PatternSignatures(pmd.patternId(), pmd.signatures()))
+                          .toList());
 
   public static final ShredSource SHRED_SOURCE =
-      new ShredSource(
-          LOG_TABLE_NAME,
-          VALUE_EXTRACTOR,
-          ROW_CLASSIFIER,
-          jooq().select(DSL.asterisk()).from(LOG_TABLE_NAME).where(entryTestSql()).getSQL());
+          new ShredSource(
+                  LOG_TABLE_NAME,
+                  VALUE_EXTRACTOR,
+                  ROW_CLASSIFIER,
+                  jooq().select(DSL.asterisk()).from(LOG_TABLE_NAME).where(entryTestSql()).getSQL());
 
   public HttpShred() {
-    super(SHRED_METADATA, SHRED_SQL_TABLE, MISFITS_METADATA, MISFITS_SQL_TABLE, SHRED_SOURCE);
+    super(SHRED_METADATA, SHRED_SQL_TABLE, MISFITS_METADATA, MISFITS_SQL_TABLE, SHRED_SOURCE, true);
   }
+
+  static final List<String> exampleLogLines = List.of(
+//  "2024-12-13 15:09:58,700 [reactor-http-nio-1 HttpManager] DEBUG - HttpContext{HttpRequest@57fbf777, m@1fac8f85} - onResponseStart() Capturing response to memory"
+//          "2024-12-13 15:09:51,517 [reactor-http-nio-2 HttpManager] DEBUG - HttpContext{HttpRequest@0a4277f9, m@5b4aefa7} - onRequestEnd() Request ending for /ping - response is m@5b4aefa7 and output mechanism is null"
+//          "2024-12-13 15:09:52,115 [reactor-http-nio-3 HttpManager] DEBUG - HttpContext{HttpRequest@6a40d6a3, m@1a309d43} - analyzeResponseContents() Response was empty for URI /sources/v5_0/serverHttpRequest-body"
+          "2024-12-13 15:09:51,750 [reactor-http-nio-2 HttpManager] DEBUG - HttpContext{null, null} - onResponseStart() Current HTTPRequest was null"
+  );
+
 
   public static void main(String[] args) {
-    final String matchThis =
-            "2024-11-11 20:06:16,277 [reactor-http-nio-2 HttpManager] DEBUG - HttpContext{HttpRequest@40d46f1f, k@52e20455} - Capturing response to memory";
-
-    final Pattern toTest =
-            PATTERN_METADATA.stream()
-                    .filter(pmd -> "respCapture".equals(pmd.patternId()))
-                    .map(PatternMetadata::pattern)
-                    .findFirst()
-                    .orElseGet(null);
-    System.out.println("Pattern: " + toTest);
-    System.out.println("Matches? " + matchThis);
-    Matcher matcher = toTest.matcher(matchThis);
-    System.out.println(" = " + matcher.matches());
-    if (matcher.matches()) {
-      for (Map.Entry<String, Integer> entry : matcher.namedGroups().entrySet()) {
-        final String name = entry.getKey();
-        final Integer groupIdx = entry.getValue();
-        System.out.println(
-                "group("
-                        + name
-                        + ") -> \'"
-                        + String.valueOf(matcher.group(groupIdx))
-                        + "\'"
-                        + " == null ? "
-                        + String.valueOf(matcher.group(name) == null));
-      }
-    }
+    testPatternMatching(exampleLogLines, PATTERN_METADATA.stream().filter(pmd -> pmd.patternId().startsWith("")).toList(), true);
   }
-
 }
