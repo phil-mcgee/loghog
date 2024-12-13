@@ -353,13 +353,14 @@ public class FluxShred extends BaseShred {
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
                                       + "- Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded\\("
-                                      + SKIP_CONTRAST_CONTEXT
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NONNULL_XTRACTS
                                       + ", " + CHANNEL_HANDLER_CTX_XTRACT
                                       + ", " + NETTY_HTTP_MSG_XTRACT
                                       + "\\) with channel "+ CHANNEL_XTRACT
                                       + " decoderState " + DECODER_STATE_XTRACT
-                                      + " and " + START_CONTRAST_CONTEXT_EXTRACT
-                                      + ASSESS_NONNULL_XTRACTS
+//  FIXME                                     + " and channelContext  .+"
+                                      + " and .+"
                                       + NO_CONCUR_CTX_XTRACT
                                       + NO_APP_CTX_XTRACT
                                       + NO_TASK_CLASS_XTRACT
@@ -373,13 +374,14 @@ public class FluxShred extends BaseShred {
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
                                       + "- Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded\\("
-                                      + SKIP_CONTRAST_CONTEXT
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NULL_XTRACTS
                                       + ", " + CHANNEL_HANDLER_CTX_XTRACT
                                       + ", " + NETTY_HTTP_MSG_XTRACT
                                       + "\\) with channel "+ CHANNEL_XTRACT
                                       + " decoderState " + DECODER_STATE_XTRACT
-                                      + " and " + START_CONTRAST_CONTEXT_EXTRACT
-                                      + ASSESS_NULL_XTRACTS
+//  FIXME                                     + " and channelContext  .+"
+                                      + " and .+"
                                       + NO_CONCUR_CTX_XTRACT
                                       + NO_APP_CTX_XTRACT
                                       + NO_TASK_CLASS_XTRACT
@@ -451,7 +453,7 @@ public class FluxShred extends BaseShred {
                                       + "$")),
               new PatternMetadata(
                       "responseWrittenAssessNull",
-                      List.of("DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten("),
+                      List.of("DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten(", "with channel"),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\("
@@ -802,6 +804,54 @@ public class FluxShred extends BaseShred {
                                       + NO_CHANNEL_HANDLER_CTX_XTRACT
                                       + NO_NETTY_HTTP_MSG_XTRACT
                                       + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "responseWrittenUnexpectedMessage",
+                      List.of("- ContrastNettyHttpDispatcherImpl.onResponseWritten() found unexpected message"),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\(\\) found unexpected message "
+                                      + NETTY_HTTP_MSG_XTRACT
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_ASSESS_CTX_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_URL_XTRACT
+                                      + NO_DECODER_STATE_XTRACT
+                                      + NO_CHANNEL_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_REQ_XTRACT
+                                      + NO_RESP_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "invalidDecodedStateNullCCtx",
+                      List.of("- ContrastNettyHttpDispatcherImpl.onRequestDecoded()", "found invalid state with incoming channel context"),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.onRequestDecoded\\(\\) found invalid state with incoming channel context "
+                                      + "null"    // FIXME
+                                      + " message "
+                                      + NETTY_HTTP_MSG_XTRACT
+                                      + " decoderState "
+                                      + DECODER_STATE_XTRACT
+                                      + " with channel "
+                                      + CHANNEL_XTRACT
+                                      + NO_CONCUR_CTX_XTRACT
+                                      + NO_APP_CTX_XTRACT
+                                      + NO_ASSESS_CTX_XTRACT
+                                      + NO_TASK_CLASS_XTRACT
+                                      + NO_WRAP_INIT_XTRACT
+                                      + NO_WRAPPED_RUNNABLE_XTRACT
+                                      + NO_TASK_OBJ_XTRACT
+                                      + NO_URL_XTRACT
+                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
+                                      + NO_REQ_XTRACT
+                                      + NO_RESP_XTRACT
+                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
                                       + "$"))
       );
 
@@ -855,10 +905,12 @@ public class FluxShred extends BaseShred {
 //  "2024-12-11 22:41:24,487 [reactor-http-nio-2 NettyChannelContext] DEBUG - NettyChannelContext.nullifyChannelContext(NioSocketChannel@209969be, INCOMING) replacing ContrastContext{http=HttpContext{HttpRequest@0cd5566d, null}, uri='/routecoverage/annotation/', assessment=AssessmentContext@3010e784{traceMap=TraceMap@58fcf37d (with 48 items in it), jumpedContexts=true}}",
 //  "2024-12-11 22:41:24,487 [reactor-http-nio-2 NettyChannelContext] WARN - NettyChannelContext.updateCurrentContrastContextFromChannel(NioSocketChannel@209969be, ContrastContext{http=HttpContext{HttpRequest@0cd5566d, null}, uri='/routecoverage/annotation/', assessment=AssessmentContext@3010e784{traceMap=TraceMap@58fcf37d (with 48 items in it), jumpedContexts=true}}, INCOMING) retieved null ContrastContext from channel.  Leaving current ContrastContext as is."
 //          "2024-12-12 15:08:45,760 [reactor-http-nio-2 NettyChannelContext] WARN - NettyChannelContext.updateContextFromChannel(NioSocketChannel@66814be9, ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, INCOMING) retieved null ContrastContext from channel.  Leaving current ContrastContext as is."
-          "2024-12-12 15:08:45,877 [reactor-http-nio-2 ContrastNettyHttpDispatcherImpl] DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, DelegatingChannelHandlerContext@0b81f521, DefaultFullHttpResponse@46f1b32f) with channel NioSocketChannel@66814be9 found null Channel incoming and outgoing contexts, so continuing with ContrastContext from thread."
+//          "2024-12-13 15:09:54,817 [reactor-http-nio-2 b] DEBUG - Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded(ContrastContext{http=HttpContext{HttpRequest@1d3e95ef, null}, uri='/ping', assessment=AssessmentContext@7d1949c9{traceMap=b@01eee868 (with 0 items in it), jumpedContexts=true}}, HttpServerRequestDecoder@6d16d6a6, DefaultHttpRequest@031b95f5) with channel NioSocketChannel@207ac018 decoderState SKIP_CONTROL_CHARS and null"
+//          "2024-12-13 15:09:55,121 [reactor-http-nio-2 b] DEBUG - Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded(ContrastContext{http=HttpContext{HttpRequest@5159d481, null}, uri='/client/v5_0/entity-headers', assessment=AssessmentContext@047a5fac{traceMap=b@5745553a (with 0 items in it), jumpedContexts=true}}, HttpServerRequestDecoder@42933174, DefaultHttpRequest@59edd928) with channel NioSocketChannel@4610b4e7 decoderState SKIP_CONTROL_CHARS and null"
+          "2024-12-13 15:09:55,205 [reactor-http-nio-2 b] DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten() found unexpected message io.netty.handler.codec.http.DefaultHttpRequest@636032f2"
   );
 
   public static void main(String[] args) {
-    testPatternMatching(exampleLogLines, PATTERN_METADATA.stream().filter(pmd -> pmd.patternId().startsWith("")).toList(), true);
+    testPatternMatching(exampleLogLines, PATTERN_METADATA.stream().filter(pmd -> pmd.patternId().startsWith("responseWrittenUnexpectedMessage")).toList(), true);
   }
 }
