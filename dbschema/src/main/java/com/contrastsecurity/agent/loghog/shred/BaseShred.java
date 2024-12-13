@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TIMESTAMP_VAR;
+import static com.contrastsecurity.agent.loghog.shred.RowClassifier.MISFIT_PATTERN_ID;
 
 public class BaseShred {
   public static final String LOG_TABLE_LINE_COL = "LOG.col(LINE)";
@@ -24,7 +25,7 @@ public class BaseShred {
   public static final String SHRED_TABLE_PATTERN_COL = "shred.col(PATTERN)";
 
   public static final boolean SHOW_PROGRESS = false;
-  public static final boolean SHOW_MISFITS = false;
+  final boolean showMisfits;
   public static final boolean VERBOSE = true;
 
   private final CreatableSqlTable shredTable;
@@ -34,16 +35,28 @@ public class BaseShred {
   final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> misfitsMetadata;
 
   public BaseShred(
+          final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> shredMetadata,
+          final CreatableSqlTable shredTable,
+          final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> misfitsMetadata,
+          final CreatableSqlTable misfitsTable,
+          final com.contrastsecurity.agent.loghog.shred.ShredSource shredSource
+  ) {
+    this(shredMetadata,shredTable,misfitsMetadata,misfitsTable,shredSource,false);
+  }
+
+  public BaseShred(
       final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> shredMetadata,
       final CreatableSqlTable shredTable,
       final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> misfitsMetadata,
       final CreatableSqlTable misfitsTable,
-      final com.contrastsecurity.agent.loghog.shred.ShredSource shredSource) {
+      final com.contrastsecurity.agent.loghog.shred.ShredSource shredSource,
+      final boolean showMisfits) {
     this.shredTable = shredTable;
     this.misfitsTable = misfitsTable;
     this.shredSource = shredSource;
     this.shredMetadata = shredMetadata;
     this.misfitsMetadata = misfitsMetadata;
+    this.showMisfits = showMisfits;
   }
 
   public Object[] shredRowValues(
@@ -175,20 +188,29 @@ public class BaseShred {
       connection.setAutoCommit(false);
 
       for (Object[] row : sourceRows) {
-        String patternId = rowClassifier.identifyPattern(row);
-        Map<String, Object> extractedVals = valuesExtractor.extractValues(patternId, row);
-        if (extractedVals != null && extractedVals.size() == valuesExtractor.expectedCount()) {
-          Object[] insertVals = shredRowValues(row, patternId, extractedVals);
-          values.add(insertVals);
-          lastGoodRowKey = valuesExtractor.sourceRowKey(row);
-          nAdded++;
-        } else {
-          if (SHOW_MISFITS) {
-            System.out.println("Extraction/transformation failed in row " + Arrays.asList(row));
-            System.out.println("patternId = " + patternId);
-            System.out.println("Expecting " + valuesExtractor.expectedCount() + " values, but found:\n");
-            System.out.println(extractedVals);
+        final String patternId = rowClassifier.identifyPattern(row);
+        Map<String, Object> extractedVals =
+                MISFIT_PATTERN_ID != patternId ?
+                valuesExtractor.extractValues(patternId, row, /* FIXME showMisfits*/ false) : null;
+        if (extractedVals != null) {
+          if (extractedVals.size() == valuesExtractor.expectedCount()) {
+            Object[] insertVals = shredRowValues(row, patternId, extractedVals);
+            values.add(insertVals);
+            lastGoodRowKey = valuesExtractor.sourceRowKey(row);
+            nAdded++;
+          } else {
+            if (showMisfits) {
+              System.out.println("\nExtraction/transformation failed in row " + Arrays.asList(row));
+              System.out.println("PatternId " + patternId + " returned extractedVals:\n\t" + extractedVals +
+                      "\n\tbut expected size was " + valuesExtractor.expectedCount());
+            }
+            extractedVals = null;
           }
+        } else if (showMisfits) {
+            System.out.println("\nExtraction/transformation failed in row " + Arrays.asList(row));
+            System.out.println("PatternId " + patternId + " returned null extractedVals");
+        }
+        if (extractedVals == null) {
           if (misfitsTable != null) {
             final Object[] misfitVals = misfitsRowValues(row, lastGoodRowKey);
             misfits.add(misfitVals);

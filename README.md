@@ -21,7 +21,7 @@ Uses `Spotless` for formatting:
 ### Running loghog to create the database
 
 ```shell
-java -jar build/libs/loghog-all.jar ~/logs/somelog.err
+java -jar app/build/libs/app-all.jar ~/logs/somelog.err
 ```
 
 Will produce an H2 embedded database as a sibling file to the parsed log and with the same name but with file type `.mv.db`.

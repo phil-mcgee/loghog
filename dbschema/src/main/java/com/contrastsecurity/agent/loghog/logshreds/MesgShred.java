@@ -1,4 +1,3 @@
-/* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
 import com.contrastsecurity.agent.loghog.shred.BaseShred;

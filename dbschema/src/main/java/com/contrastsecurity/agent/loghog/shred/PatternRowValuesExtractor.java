@@ -17,13 +17,13 @@ public class PatternRowValuesExtractor implements com.contrastsecurity.agent.log
   final int sourceKeyIdx;
 
   public PatternRowValuesExtractor(
-      Map<String, Pattern> patternMap, List<String> extractedValNames) {
+          final Map<String, Pattern> patternMap,final  List<String> extractedValNames) {
     this(patternMap, extractedValNames, LOG_TABLE_ENTRY_IDX, LOG_TABLE_LINE_IDX);
   }
 
   public PatternRowValuesExtractor(
-      Map<String, Pattern> patternMap,
-      List<String> extractedValNames,
+          final Map<String, Pattern> patternMap,
+          final List<String> extractedValNames,
       final int sourceValueIdx,
       final int sourceKeyIdx) {
     this.patternMap = Map.copyOf(patternMap);
@@ -38,7 +38,7 @@ public class PatternRowValuesExtractor implements com.contrastsecurity.agent.log
   }
 
   @Override
-  public Map<String, Object> extractValues(String patternId, Object[] row) {
+  public Map<String, Object> extractValues(final String patternId, final Object[] row, final boolean verbose) {
     Pattern extractor = patternMap.get(patternId);
     if (extractor != null) {
       Matcher match = extractor.matcher((String) row[sourceValueIdx]);
@@ -48,7 +48,11 @@ public class PatternRowValuesExtractor implements com.contrastsecurity.agent.log
           extractedVals.put(extractedValName, match.group(extractedValName));
         }
         return extractedVals;
+      } else if (verbose) {
+        System.out.println("PatternRowValuesExtractor found no match for " + row[sourceValueIdx]);
       }
+    } else if (verbose) {
+      System.out.println("Cannot invoke extractor.matcher because extractor is null for patternId '" + patternId + "'");
     }
     return null;
   }
@@ -59,11 +63,11 @@ public class PatternRowValuesExtractor implements com.contrastsecurity.agent.log
   }
 
   @Override
-  public Object sourceRowKey(Object[] row) {
+  public Object sourceRowKey(final Object[] row) {
     return row[sourceKeyIdx];
   }
 
-  public Pattern getPattern(String patternId) {
+  public Pattern getPattern(final String patternId) {
     return patternMap.get(patternId);
   }
 }
