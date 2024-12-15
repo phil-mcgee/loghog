@@ -138,13 +138,6 @@ public class CtxShred extends BaseShred {
                   DEBUG_PREAMBLE_XTRACT
                       + "- Created context: "
                       + "AssessmentContext@" + ASSESS_CTX_XTRACT
-                      + NO_CONCUR_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_TASK_CLASS_XTRACT
-                      + NO_TASK_OBJ_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
-                      + NO_TRACE_MAP_XTRACT
                       + "$")),
           // 2024-10-28 14:36:25,872 [reactor-http-nio-2 AssessmentContext] DEBUG - Preparing to
           // jump context: AssessmentContext@71d8e43d
@@ -155,13 +148,6 @@ public class CtxShred extends BaseShred {
                   DEBUG_PREAMBLE_XTRACT
                       + "- Preparing to jump context: "
                       + "AssessmentContext@" + ASSESS_CTX_XTRACT
-                      + NO_CONCUR_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_TASK_CLASS_XTRACT
-                      + NO_TASK_OBJ_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
-                      + NO_TRACE_MAP_XTRACT
                       + "$")),
           // Saving app=[com.contrastsecurity.agent.apps.ApplicationContext@19503bf5],
           // HttpContext=[HttpContext{...}], and AssessmentContext=[AssessmentContext@71d8e43d] to
@@ -178,13 +164,6 @@ public class CtxShred extends BaseShred {
                       + "] to ConcurrencyContext=\\["
                       + CONCUR_CTX_XTRACT
                       + "]"
-                      + NO_TIMESTAMP_XTRACT
-                      + NO_THREAD_LOGGER_XTRACT
-                      + NO_TASK_CLASS_XTRACT
-                      + NO_TASK_OBJ_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
-                      + NO_TRACE_MAP_XTRACT
                       + "$")),
           // 2024-10-28 14:36:23,207 [main b] DEBUG - main-1 onSubmitted
           // java.util.zip.ZipFile$CleanableResource$FinalizableResource
@@ -202,10 +181,6 @@ public class CtxShred extends BaseShred {
                       + CONCUR_CTX_XTRACT
                       + " and trace map "
                       + TRACE_MAP_XTRACT
-                      + NO_ASSESS_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
                       + "$")),
           // 2024-10-28 14:36:22,782 [background-preinit b] DEBUG - background-preinit-29 onStarted
           // java.lang.Thread Thread@7dfca9e6 and got context d@113a6636 and trace map null
@@ -222,10 +197,6 @@ public class CtxShred extends BaseShred {
                       + CONCUR_CTX_XTRACT
                       + " and trace map "
                       + TRACE_MAP_XTRACT
-                      + NO_ASSESS_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
                       + "$")),
           // 2024-10-28 14:36:22,782 [background-preinit b] DEBUG - background-preinit-29 onStarted
           // java.lang.Thread Thread@7dfca9e6 and got context d@113a6636 and trace map null
@@ -239,12 +210,6 @@ public class CtxShred extends BaseShred {
                       + " "
                       + TASK_OBJ_XTRACT
                       + " but context was null"
-                      + NO_CONCUR_CTX_XTRACT
-                      + NO_TRACE_MAP_XTRACT
-                      + NO_ASSESS_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
                       + "$")),
           // 2024-10-28 14:36:24,863 [main b] DEBUG - io.netty.channel.nio.NioEventLoop@f8cd5d7
           // wrapped a runnable: io.netty.channel.AbstractChannel$AbstractUnsafe$1@4d1d30dc
@@ -258,12 +223,6 @@ public class CtxShred extends BaseShred {
                       + " wrapped a runnable: "
                       + WRAPPED_RUNNABLE_XTRACT
                       + " "
-                      + NO_CONCUR_CTX_XTRACT
-                      + NO_ASSESS_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_TASK_CLASS_XTRACT
-                      + NO_TASK_OBJ_XTRACT
-                      + NO_TRACE_MAP_XTRACT
                       + "$")),
           new PatternMetadata(
               "clearedAssessment",
@@ -273,12 +232,6 @@ public class CtxShred extends BaseShred {
                       + "- Cleared expired assessment context AssessmentContext@"
                               + ASSESS_CTX_XTRACT
                       + " with traceMap " + TRACE_MAP_XTRACT + " in .+"
-                      + NO_CONCUR_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_TASK_CLASS_XTRACT
-                      + NO_TASK_OBJ_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
                       + "$"))
 //              ,
 //

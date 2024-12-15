@@ -5,5 +5,6 @@ public interface RowClassifier {
   String MISFIT_PATTERN_ID = "misfit";
   String ANY_PATTERN_ID = "any";
 
-  String identifyPattern(Object[] sourceRow);
+  String findPattern(Object[] sourceRow);
+
 }

@@ -194,7 +194,6 @@ public class VulnShred extends BaseShred {
                               DEBUG_PREAMBLE_XTRACT
                                       + "- !LM!TraceFate\\|"
                                               + FATE_XTRACT + "\\|ruleId=" + RULE_XTRACT
-                                      + NO_URL_XTRACT + NO_TRACE_XTRACT + NO_TRACE_HASH_XTRACT + NO_RPT_QUEUE_XTRACT
                                       + "$")),
               // 2024-11-20 15:38:50,938 [reactor-http-nio-2 QueueFindingListener] INFO - Added finding for rule ID: path-traversal (hash=1142718516)
               new PatternMetadata(
@@ -204,7 +203,6 @@ public class VulnShred extends BaseShred {
                               INFO_PREAMBLE_XTRACT
                           + "- Added finding for rule ID: "
                           + RULE_XTRACT + " \\(hash=" + TRACE_HASH_XTRACT + "\\)"
-                          + NO_URL_XTRACT + NO_TRACE_XTRACT + NO_FATE_XTRACT  + NO_RPT_QUEUE_XTRACT
                           + "$")),
               // 2024-11-20 15:38:50,944 [reactor-http-nio-2 g] DEBUG - Trace 1142718516 added to reporting queue: Trace path-traversal: TRACE 884 (881)
               new PatternMetadata(
@@ -216,7 +214,6 @@ public class VulnShred extends BaseShred {
                                       + " added to reporting queue: "
                                       // TODO what is the second trace number?
                                       + "Trace " + RULE_XTRACT + ": TRACE " + TRACE_XTRACT + " \\(\\d+\\)"
-                                      + NO_URL_XTRACT + NO_FATE_XTRACT + NO_RPT_QUEUE_XTRACT
                                       + "$")),
               // 2024-11-20 15:38:47,945 [reactor-http-nio-2 AMQP Publisher] DEBUG - MQPublisherImpl#publish call: exchangeName: , queueName: -00000-V5_1.it_tests_sources_V5, properties: #contentHeader<basic>(...)
               // , body: {"hash":3277375950,"version":4,"session_id":"AcceptanceTestSessionId","ruleId":"path-traversal",
@@ -231,7 +228,6 @@ public class VulnShred extends BaseShred {
                                       + TRACE_HASH_XTRACT + ",\"version\":.+?,\"ruleId\":\""
                                       + RULE_XTRACT + "\","
                                       + ".+\"standardNormalizedUri\":\"(?<" + URL_VAR + ">[^\"]+)\",.+"
-                                      + NO_TRACE_XTRACT + NO_FATE_XTRACT
                                       + "$")),
               // 2024-11-20 15:38:42,968 [reactor-http-nio-2 DataFlowTriggerHandlerImpl] DEBUG - TRACE  - URI: /sources/v5_0/serverWebExchange-formData - PLUG
               new PatternMetadata(
@@ -242,7 +238,6 @@ public class VulnShred extends BaseShred {
                                       + "- TRACE  - URI: "
                                       + URL_XTRACT
                                       + " - PLUG"
-                                      + NO_RULE_XTRACT + NO_TRACE_XTRACT + NO_FATE_XTRACT + NO_TRACE_HASH_XTRACT + NO_RPT_QUEUE_XTRACT
                                       + "$"))
       );
 

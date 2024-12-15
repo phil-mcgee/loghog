@@ -6,7 +6,7 @@ package com.contrastsecurity.agent.loghog.shred;
  * order matters in the PatternSignatures list.
  */
 public class AllSameRowClassifier implements com.contrastsecurity.agent.loghog.shred.RowClassifier {
-  public String identifyPattern(Object[] sourceRow) {
+  public String findPattern(Object[] sourceRow) {
     return ANY_PATTERN_ID;
   }
 }

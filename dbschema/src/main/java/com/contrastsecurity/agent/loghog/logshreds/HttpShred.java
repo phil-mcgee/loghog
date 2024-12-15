@@ -142,13 +142,13 @@ public class HttpShred extends BaseShred {
                                           + "- !LM!RequestTime\\|RequestEnded\\|uri="
                                           + "(?<" + URL_VAR + ">[^&]+)"
                                           + "&elapsed=\\d+"
-                                          + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$")),
+                                          + "$")),
                   //Capturing response to memory
                   new PatternMetadata(
                           "respCapture",
                           List.of("Capturing response to memory"),
                           Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- onResponseStart\\(\\) Capturing response to memory"
-                                  + NO_URL_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$")),
+                                  + "$")),
                   //2024-11-07 18:04:50,774 [reactor-http-nio-4 HttpManager] DEBUG - Request ending for /auto-binding/v1_0/autobind-unsafe - response is k@2a7ec4a7 and output mechanism is null
                   // FIXME OUTPUT_MECHANISM reports the string null instead of a null value
                   new PatternMetadata(
@@ -162,15 +162,22 @@ public class HttpShred extends BaseShred {
                           "respEmpty",
                           List.of("Response was empty for "),
                           Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- analyzeResponseContents\\(\\) Response was empty for URI " + URL_XTRACT +
-                                  NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$")),
+                                  "$")),
                   //Response was empty for URI /sources/v5_0/matrixVariable/foo;var=strawberries
                   new PatternMetadata(
                           "nullReqRespStart",
                           List.of("Current HTTPRequest was null"),
                           Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- onResponseStart\\(\\) Current HTTPRequest was null" +
-                                  NO_URL_XTRACT + NO_NATIVE_RESP_XTRACT + NO_OUTPUT_MECHANISM_XTRACT + "$"))
-
+                                   "$")),
+                  //Response was empty for URI /sources/v5_0/matrixVariable/foo;var=strawberries
+                  new PatternMetadata(
+                          "nullRespCrumb",
+                          List.of("- logCrumbData() Unexpected null response for request"),
+                          Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- logCrumbData\\(\\) Unexpected null response for request.+"
+                                  + "$"))
+//                  "2024-12-14 19:42:24,815 [reactor-http-nio-3 HttpManager] DEBUG - HttpContext{HttpRequest@7d722350, null} - logCrumbData() Unexpected null response for request=[HttpRequest{protocol=http, version=HTTP/1.1, method='GET', uri='/routecoverage/annotation/get', queryString='param=paramFromQuery&param2=param2FromQuery&name=%3Cscript%3Ealert%28%27xss%27%29%3C%2Fscript%3E', normalizedUri='/routecoverage/annotation/get', port=8080, parameters={name=[Ljava.lang.String;@7d1fba1b, param=[Ljava.lang.String;@78283f1a, param2=[Ljava.lang.String;@5204212a}, headers={Accept-Encoding=[Ljava.lang.String;@29349f0b, Connection=[Ljava.lang.String;@24f1c64d, contrast-mq-name=[Ljava.lang.String;@786ed221, Host=[Ljava.lang.String;@407cd952, User-Agent=[Ljava.lang.String;@5f509696, x-contrast-1=[Ljava.lang.String;@64b5ee60, x-contrast-2=[Ljava.lang.String;@55f38f7a}, contextPath='/', serverVersionInfo='null', cachedBodyStr='null', contentLength=0, cachedContentType=com.contrastsecurity.agent.http.ContrastContentType@65524393, requestID=2104632144, template='/routecoverage/annotation/get', normalizedTemplate='/routecoverage/annotation/get', path='/routecoverage/annotation/get', secure=false, type=NETTY, active=false, capturingInMemory=false}], CRUMB:"
           );
+
 
   static final List<String> EXTRACTED_VAL_NAMES =
           SHRED_METADATA.stream()
@@ -207,7 +214,8 @@ public class HttpShred extends BaseShred {
 //  "2024-12-13 15:09:58,700 [reactor-http-nio-1 HttpManager] DEBUG - HttpContext{HttpRequest@57fbf777, m@1fac8f85} - onResponseStart() Capturing response to memory"
 //          "2024-12-13 15:09:51,517 [reactor-http-nio-2 HttpManager] DEBUG - HttpContext{HttpRequest@0a4277f9, m@5b4aefa7} - onRequestEnd() Request ending for /ping - response is m@5b4aefa7 and output mechanism is null"
 //          "2024-12-13 15:09:52,115 [reactor-http-nio-3 HttpManager] DEBUG - HttpContext{HttpRequest@6a40d6a3, m@1a309d43} - analyzeResponseContents() Response was empty for URI /sources/v5_0/serverHttpRequest-body"
-          "2024-12-13 15:09:51,750 [reactor-http-nio-2 HttpManager] DEBUG - HttpContext{null, null} - onResponseStart() Current HTTPRequest was null"
+//          "2024-12-13 15:09:51,750 [reactor-http-nio-2 HttpManager] DEBUG - HttpContext{null, null} - onResponseStart() Current HTTPRequest was null"
+          "2024-12-14 19:42:24,815 [reactor-http-nio-3 HttpManager] DEBUG - HttpContext{HttpRequest@7d722350, null} - logCrumbData() Unexpected null response for request=[HttpRequest{protocol=http, version=HTTP/1.1, method='GET', uri='/routecoverage/annotation/get', queryString='param=paramFromQuery&param2=param2FromQuery&name=%3Cscript%3Ealert%28%27xss%27%29%3C%2Fscript%3E', normalizedUri='/routecoverage/annotation/get', port=8080, parameters={name=[Ljava.lang.String;@7d1fba1b, param=[Ljava.lang.String;@78283f1a, param2=[Ljava.lang.String;@5204212a}, headers={Accept-Encoding=[Ljava.lang.String;@29349f0b, Connection=[Ljava.lang.String;@24f1c64d, contrast-mq-name=[Ljava.lang.String;@786ed221, Host=[Ljava.lang.String;@407cd952, User-Agent=[Ljava.lang.String;@5f509696, x-contrast-1=[Ljava.lang.String;@64b5ee60, x-contrast-2=[Ljava.lang.String;@55f38f7a}, contextPath='/', serverVersionInfo='null', cachedBodyStr='null', contentLength=0, cachedContentType=com.contrastsecurity.agent.http.ContrastContentType@65524393, requestID=2104632144, template='/routecoverage/annotation/get', normalizedTemplate='/routecoverage/annotation/get', path='/routecoverage/annotation/get', secure=false, type=NETTY, active=false, capturingInMemory=false}], CRUMB:"
   );
 
 

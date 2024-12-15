@@ -4,6 +4,7 @@ package com.contrastsecurity.agent.loghog.shred;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -17,7 +18,7 @@ public class PatternRowValuesExtractor implements com.contrastsecurity.agent.log
   final int sourceKeyIdx;
 
   public PatternRowValuesExtractor(
-          final Map<String, Pattern> patternMap,final  List<String> extractedValNames) {
+          final Map<String, Pattern> patternMap, final  List<String> extractedValNames) {
     this(patternMap, extractedValNames, LOG_TABLE_ENTRY_IDX, LOG_TABLE_LINE_IDX);
   }
 
@@ -30,6 +31,18 @@ public class PatternRowValuesExtractor implements com.contrastsecurity.agent.log
     this.extractedValNames = List.copyOf(extractedValNames);
     this.sourceValueIdx = sourceValueIdx;
     this.sourceKeyIdx = sourceKeyIdx;
+  }
+
+  public PatternRowValuesExtractor(final PatternRowValuesExtractor source, final Function<Pattern,Pattern> patternGroomer) {
+     this.sourceKeyIdx = source.sourceKeyIdx;
+     this.sourceValueIdx = source.sourceValueIdx;
+     this.extractedValNames = List.copyOf(source.extractedValNames);
+
+     // created a new patternMap with groomed patterns
+     this.patternMap = new HashMap<>(source.patternMap.size());
+     for (final Map.Entry<String, Pattern> mapEntry : source.patternMap.entrySet()) {
+       patternMap.put(mapEntry.getKey(), patternGroomer.apply(mapEntry.getValue()));
+     }
   }
 
   @Override

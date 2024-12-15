@@ -64,6 +64,16 @@ public class ShredSource {
     this.batchSize = batchSize;
   }
 
+  public ShredSource(final ShredSource source,
+          final RowValuesExtractor rowValuesExtractor) {
+    this.sourceTableName = source.sourceTableName;
+     this.rowClassifier = source.rowClassifier;
+    this.candidateRowSelectorSql = source.candidateRowSelectorSql;
+    this.batchSize = source.batchSize;
+
+    this.rowValuesExtractor = rowValuesExtractor;
+  }
+
   public String sourceTableName() {
     return sourceTableName;
   }

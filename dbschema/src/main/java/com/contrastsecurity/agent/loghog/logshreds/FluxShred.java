@@ -199,14 +199,6 @@ public class FluxShred extends BaseShred {
                                       + WITH_WRAPPED_RUNNABLE_XTRACT
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NONNULL_XTRACTS
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_CHANNEL_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "safeExecuteWrappingAssessNull",
@@ -218,15 +210,6 @@ public class FluxShred extends BaseShred {
                                       + WITH_WRAPPED_RUNNABLE_XTRACT
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NULL_XTRACTS
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_CHANNEL_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
                                       + "$")),
               new PatternMetadata(
               "safeExecuteAssessNonnull",
@@ -238,15 +221,6 @@ public class FluxShred extends BaseShred {
                       + WITHOUT_WRAPPED_RUNNABLE_XTRACT
                           + " " + START_CONTRAST_CONTEXT_EXTRACT
                           + ASSESS_NONNULL_XTRACTS
-                          + NO_CONCUR_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_TASK_CLASS_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
-                          + NO_CHANNEL_XTRACT
-                          + NO_CHANNEL_HANDLER_CTX_XTRACT
-                          + NO_NETTY_HTTP_MSG_XTRACT
-                          + NO_DECODER_STATE_XTRACT
                           + "$")),
               new PatternMetadata(
                       "safeExecuteAssessNull",
@@ -258,16 +232,6 @@ public class FluxShred extends BaseShred {
                                       + WITHOUT_WRAPPED_RUNNABLE_XTRACT
                                       + " " + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NULL_XTRACTS
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_CHANNEL_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "fireChannelReadAssessNonnull",
@@ -280,15 +244,8 @@ public class FluxShred extends BaseShred {
                               + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) from handler "
                               + WRAP_INIT_XTRACT + " with channel " // I hijacked this field inappropriately
                               + CHANNEL_XTRACT
-                              + NO_CONCUR_CTX_XTRACT
-                              + NO_APP_CTX_XTRACT
-                              + NO_TASK_CLASS_XTRACT
-                              + NO_WRAPPED_RUNNABLE_XTRACT
-                              + NO_NETTY_HTTP_MSG_XTRACT
-                              + NO_DECODER_STATE_XTRACT
-                              + NO_TASK_OBJ_XTRACT
                               + "$")),
-                                  new PatternMetadata(
+            new PatternMetadata(
                       "fireChannelReadAssessNull",
                       List.of("- ContrastNettyHttpDispatcherImpl.onFireChannelRead("),
               Pattern.compile(
@@ -296,56 +253,31 @@ public class FluxShred extends BaseShred {
                               + "- ContrastNettyHttpDispatcherImpl.onFireChannelRead\\("
                                       + START_CONTRAST_CONTEXT_EXTRACT
                               + ASSESS_NULL_XTRACTS
-                              + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) from handler "
-                              + WRAP_INIT_XTRACT + " with channel " // I hijacked this field inappropriately
-                              + CHANNEL_XTRACT
-                              + NO_CONCUR_CTX_XTRACT
-                              + NO_APP_CTX_XTRACT
-                              + NO_TASK_CLASS_XTRACT
-                              + NO_WRAPPED_RUNNABLE_XTRACT
-                              + NO_NETTY_HTTP_MSG_XTRACT
-                              + NO_DECODER_STATE_XTRACT
-                              + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
-                              + NO_TASK_OBJ_XTRACT
+                              + ", " + CHANNEL_HANDLER_CTX_XTRACT
+                              + "\\) from handler "
+                            + WRAP_INIT_XTRACT
+                            + " with channel "
+                            + CHANNEL_XTRACT
                               + "$")),
               new PatternMetadata(
-                      "channelFlushAssessNonnull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.onFlush(", "{traceMap="),
+                      "channelWriteCompleteAssessNonnull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.onChannelWriteComplete(", "{traceMap="),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
-                                      + "- ContrastNettyHttpDispatcherImpl.onFlush\\("
+                                      + "- ContrastNettyHttpDispatcherImpl.onChannelWriteComplete\\("
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NONNULL_XTRACTS
-                                      + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) from handler "
-                                      + WRAP_INIT_XTRACT + " with channel " // I hijacked this field inappropriately
-                                      + CHANNEL_XTRACT
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
+                                      + ", " + CHANNEL_XTRACT + "\\)"
                                       + "$")),
               new PatternMetadata(
-                      "channelFlushAssessNull",
-                      List.of("- ContrastNettyHttpDispatcherImpl.onFlush("),
+                      "channelWriteCompleteAssessNull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.onChannelWriteComplete("),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
-                                      + "- ContrastNettyHttpDispatcherImpl.onFlush\\("
+                                      + "- ContrastNettyHttpDispatcherImpl.onChannelWriteComplete\\("
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NULL_XTRACTS
-                                      + ", " + CHANNEL_HANDLER_CTX_XTRACT + "\\) from handler "
-                                      + WRAP_INIT_XTRACT + " with channel " // I hijacked this field inappropriately
-                                      + CHANNEL_XTRACT
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
+                                      + ", " + CHANNEL_XTRACT + "\\)"
                                       + "$")),
               new PatternMetadata(
                       "requestDecodedAssessNonnull",
@@ -359,14 +291,7 @@ public class FluxShred extends BaseShred {
                                       + ", " + NETTY_HTTP_MSG_XTRACT
                                       + "\\) with channel "+ CHANNEL_XTRACT
                                       + " decoderState " + DECODER_STATE_XTRACT
-//  FIXME                                     + " and channelContext  .+"
-                                      + " and .+"
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
+                                      + " and channelContext .+"
                                       + "$")),
               new PatternMetadata(
                       "requestDecodedAssessNull",
@@ -380,15 +305,7 @@ public class FluxShred extends BaseShred {
                                       + ", " + NETTY_HTTP_MSG_XTRACT
                                       + "\\) with channel "+ CHANNEL_XTRACT
                                       + " decoderState " + DECODER_STATE_XTRACT
-//  FIXME                                     + " and channelContext  .+"
-                                      + " and .+"
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + " and channelContext .+"
                                       + "$")),
               new PatternMetadata(
                       "WarnOnResponseWrittenAssessNonnull",
@@ -402,13 +319,6 @@ public class FluxShred extends BaseShred {
                                       + NETTY_HTTP_MSG_XTRACT + "\\) with channel "
                                       + CHANNEL_XTRACT
                                       + " found null Channel incoming and outgoing contexts, so continuing with ContrastContext from thread\\."
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "WarnOnResponseWrittenAssessNull",
@@ -423,13 +333,19 @@ public class FluxShred extends BaseShred {
                                       + "\\) with channel "
                                       + CHANNEL_XTRACT
                                       + " found null Channel incoming and outgoing contexts, so continuing with ContrastContext from thread\\."                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + "$")),
+              new PatternMetadata(
+                      "nullOutgoingChannelCtx",
+                      List.of("- ContrastNettyHttpDispatcherImpl.onResponseWritten(", "unexpectedly found null outgoing Channel context"),
+                      Pattern.compile(
+                              DEBUG_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\("
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NULL_XTRACTS
+                                      + ", " + CHANNEL_HANDLER_CTX_XTRACT
+                                      + ", " + NETTY_HTTP_MSG_XTRACT
+                                      + "\\) with channel "+ CHANNEL_XTRACT
+                                      + " unexpectedly found null outgoing Channel context, so continuing with ContrastContext from thread\\."
                                       + "$")),
               new PatternMetadata(
                       "responseWrittenAssessNonnull",
@@ -443,17 +359,10 @@ public class FluxShred extends BaseShred {
                                       + ", " + NETTY_HTTP_MSG_XTRACT
                                       + "\\) with channel "
                                       + CHANNEL_XTRACT
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "responseWrittenAssessNull",
-                      List.of("DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten(", "with channel"),
+                      List.of("- ContrastNettyHttpDispatcherImpl.onResponseWritten(ContrastContext{http="),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\("
@@ -463,14 +372,6 @@ public class FluxShred extends BaseShred {
                                       + ", " + NETTY_HTTP_MSG_XTRACT
                                       + "\\) with channel "
                                       + CHANNEL_XTRACT
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "copyIncomingToOutgoingAssessNonnull",
@@ -483,15 +384,6 @@ public class FluxShred extends BaseShred {
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NONNULL_XTRACTS
                                       + " to channel outgoing att, replacing .+"
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                        + "$")),
               new PatternMetadata(
                       "copyIncomingToOutgoingAssessNull",
@@ -504,16 +396,6 @@ public class FluxShred extends BaseShred {
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NULL_XTRACTS
                                       + " to channel outgoing att, replacing .+"
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "copyIncomingToOutgoingCCtxNull",
@@ -524,18 +406,6 @@ public class FluxShred extends BaseShred {
                                       + CHANNEL_XTRACT
                                       + "\\) copied channel incoming null to channel outgoing att, replacing .+"
                                       // NettyChannelContext.copyChannelIncomingToOutgoing(
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_ASSESS_CTX_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
-                                      + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_URL_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "nullifyChannelAttrAssessNonnull",
@@ -547,15 +417,6 @@ public class FluxShred extends BaseShred {
                                       + "\\) replacing "
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NONNULL_XTRACTS
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "nullifyChannelAttrCCtxNonnull",
@@ -567,16 +428,6 @@ public class FluxShred extends BaseShred {
                                       + "\\) replacing "
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NULL_XTRACTS
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "nullifyChannelAttrCCtxNull",
@@ -586,18 +437,6 @@ public class FluxShred extends BaseShred {
                                       + "- NettyChannelContext.nullifyChannelContext\\("
                                       + CHANNEL_XTRACT + ", " + "(INCOMING|OUTGOING)"  // FIXME
                                       + "\\) replacing null"
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_ASSESS_CTX_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
-                                      + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_URL_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "updateChannelIncomingAssessNonnull",
@@ -609,16 +448,6 @@ public class FluxShred extends BaseShred {
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NONNULL_XTRACTS
                                       + "\\) saved channel incoming attr, replacing .+"
-//                                      + ".+"
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "updateChannelIncomingAssessNull",
@@ -630,16 +459,6 @@ public class FluxShred extends BaseShred {
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NULL_XTRACTS
                                       + "\\) saved channel incoming attr, replacing .+"
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "updateCurrentCCtxAssessNonnull",
@@ -651,15 +470,6 @@ public class FluxShred extends BaseShred {
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NONNULL_XTRACTS
                                       + ", [^)]+\\) replacing .+"
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "updateCurrentCCtxAssessNull",
@@ -671,16 +481,6 @@ public class FluxShred extends BaseShred {
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NULL_XTRACTS
                                       + ", [^)]+\\) replacing .+"
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "UpdateCCtxFromChannelAssessNonnull",
@@ -692,15 +492,6 @@ public class FluxShred extends BaseShred {
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NONNULL_XTRACTS
                                       + ", [^)]+\\) replacing .+"
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "WarnUpdateCCtxFromChannelAssessNull",
@@ -712,16 +503,6 @@ public class FluxShred extends BaseShred {
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NULL_XTRACTS
                                       + ", [^)]+\\) retieved null ContrastContext from channel.  Leaving current ContrastContext as is\\."
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "EnterProcessSelectedKeyAssessNonnull",
@@ -730,18 +511,7 @@ public class FluxShred extends BaseShred {
                               DEBUG_PREAMBLE_XTRACT
                                       + "- Entering NioEventLoop.processSelectedKey\\("
                                       + "[^,]+, "
-                                      + CHANNEL_XTRACT + "\\) with "
-                                      + START_CONTRAST_CONTEXT_EXTRACT
-                                      + ASSESS_NONNULL_XTRACTS
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
+                                      + CHANNEL_XTRACT + "\\) using .+"
                                       + "$")),
               new PatternMetadata(
                       "EnterProcessSelectedKeyAssessNull",
@@ -750,19 +520,9 @@ public class FluxShred extends BaseShred {
                               DEBUG_PREAMBLE_XTRACT
                                       + "- Entering NioEventLoop.processSelectedKey\\("
                                       + "[^,]+, "
-                                      + CHANNEL_XTRACT + "\\) with "
-                                      + START_CONTRAST_CONTEXT_EXTRACT
-                                      + ASSESS_NULL_XTRACTS
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
+                                      + CHANNEL_XTRACT + "\\) using .+"
+//                                      + START_CONTRAST_CONTEXT_EXTRACT
+//                                      + ASSESS_NULL_XTRACTS
                                       + "$")),
               new PatternMetadata(
                       "ExitProcessSelectedKeyAssessNonnull",
@@ -774,15 +534,6 @@ public class FluxShred extends BaseShred {
                                       + CHANNEL_XTRACT + "\\) with "
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NONNULL_XTRACTS
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "ExitProcessSelectedKeyAssessNull",
@@ -794,16 +545,6 @@ public class FluxShred extends BaseShred {
                                       + CHANNEL_XTRACT + "\\) with "
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NULL_XTRACTS
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_NETTY_HTTP_MSG_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "responseWrittenUnexpectedMessage",
@@ -812,20 +553,6 @@ public class FluxShred extends BaseShred {
                               DEBUG_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\(\\) found unexpected message "
                                       + NETTY_HTTP_MSG_XTRACT
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_ASSESS_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_URL_XTRACT
-                                      + NO_DECODER_STATE_XTRACT
-                                      + NO_CHANNEL_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_REQ_XTRACT
-                                      + NO_RESP_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
                                       + "$")),
               new PatternMetadata(
                       "invalidDecodedStateNullCCtx",
@@ -840,18 +567,6 @@ public class FluxShred extends BaseShred {
                                       + DECODER_STATE_XTRACT
                                       + " with channel "
                                       + CHANNEL_XTRACT
-                                      + NO_CONCUR_CTX_XTRACT
-                                      + NO_APP_CTX_XTRACT
-                                      + NO_ASSESS_CTX_XTRACT
-                                      + NO_TASK_CLASS_XTRACT
-                                      + NO_WRAP_INIT_XTRACT
-                                      + NO_WRAPPED_RUNNABLE_XTRACT
-                                      + NO_TASK_OBJ_XTRACT
-                                      + NO_URL_XTRACT
-                                      + NO_CHANNEL_HANDLER_CTX_XTRACT
-                                      + NO_REQ_XTRACT
-                                      + NO_RESP_XTRACT
-                                      + NO_TRACE_MAP_XTRACT + NO_TRACE_MAP_SIZE_XTRACT + NO_JUMPED_ASSESS_CTX_XTRACT
                                       + "$"))
       );
 
@@ -907,10 +622,17 @@ public class FluxShred extends BaseShred {
 //          "2024-12-12 15:08:45,760 [reactor-http-nio-2 NettyChannelContext] WARN - NettyChannelContext.updateContextFromChannel(NioSocketChannel@66814be9, ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, INCOMING) retieved null ContrastContext from channel.  Leaving current ContrastContext as is."
 //          "2024-12-13 15:09:54,817 [reactor-http-nio-2 b] DEBUG - Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded(ContrastContext{http=HttpContext{HttpRequest@1d3e95ef, null}, uri='/ping', assessment=AssessmentContext@7d1949c9{traceMap=b@01eee868 (with 0 items in it), jumpedContexts=true}}, HttpServerRequestDecoder@6d16d6a6, DefaultHttpRequest@031b95f5) with channel NioSocketChannel@207ac018 decoderState SKIP_CONTROL_CHARS and null"
 //          "2024-12-13 15:09:55,121 [reactor-http-nio-2 b] DEBUG - Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded(ContrastContext{http=HttpContext{HttpRequest@5159d481, null}, uri='/client/v5_0/entity-headers', assessment=AssessmentContext@047a5fac{traceMap=b@5745553a (with 0 items in it), jumpedContexts=true}}, HttpServerRequestDecoder@42933174, DefaultHttpRequest@59edd928) with channel NioSocketChannel@4610b4e7 decoderState SKIP_CONTROL_CHARS and null"
-          "2024-12-13 15:09:55,205 [reactor-http-nio-2 b] DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten() found unexpected message io.netty.handler.codec.http.DefaultHttpRequest@636032f2"
+//          "2024-12-13 15:09:55,205 [reactor-http-nio-2 b] DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten() found unexpected message io.netty.handler.codec.http.DefaultHttpRequest@636032f2"
+//          "2024-12-14 18:53:10,095 [reactor-http-nio-2 b] DEBUG - Exiting ContrastNettyHttpDispatcherImpl.onRequestDecoded(ContrastContext{http=HttpContext{HttpRequest@1f6d19b1, null}, uri='/ping', assessment=AssessmentContext@39c5d7b0{traceMap=b@24b6895a (with 0 items in it), jumpedContexts=true}}, HttpServerRequestDecoder@0f1499ef, DefaultHttpRequest@7bd30974) with channel NioSocketChannel@61302951 decoderState SKIP_CONTROL_CHARS and channelContext null"
+//          "2024-12-14 19:42:17,111 [reactor-http-nio-1 b] DEBUG - Entering NioEventLoop.processSelectedKey(SelectionKeyImpl@5965630c, NioServerSocketChannel@0b5d377d) using ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}"
+//"2024-12-14 19:42:17,409 [reactor-http-nio-2 b] DEBUG - ContrastNettyHttpDispatcherImpl.onChannelWriteComplete(ContrastContext{http=HttpContext{HttpRequest@54b6dc25, m@50a2d13c}, uri='/ping', assessment=AssessmentContext@52693146{traceMap=b@2e787ce7 (with 26 items in it), jumpedContexts=true}}, NioSocketChannel@1fdf7a71)"
+//          "2024-12-14 19:42:24,816 [reactor-http-nio-3 b] DEBUG - ContrastNettyHttpDispatcherImpl.onFireChannelRead(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, io.netty.channel.DefaultChannelHandlerContext@4f8aaf8e) from handler HttpTrafficHandler@5f449986 with channel NioSocketChannel@26b8164a"
+//          "2024-12-14 19:42:24,815 [reactor-http-nio-3 b] DEBUG - ContrastNettyHttpDispatcherImpl.onChannelWriteComplete(ContrastContext{http=HttpContext{HttpRequest@7d722350, m@2d8f0997}, uri='/routecoverage/annotation/get', assessment=AssessmentContext@6228ada6{traceMap=b@46efde13 (with 34 items in it), jumpedContexts=true}}, NioSocketChannel@26b8164a)"
+//          "2024-12-14 19:42:17,925 [reactor-http-nio-1 b] DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, io.netty.channel.CombinedChannelDuplexHandler$DelegatingChannelHandlerContext@7673ad14, io.netty.handler.codec.http.DefaultHttpRequest@21684b84) with channel NioSocketChannel@1aaf327e"
+  "2024-12-14 19:42:17,925 [reactor-http-nio-1 b] DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten(ContrastContext{http=HttpContext{null, null}, uri='null', assessment=null}, DelegatingChannelHandlerContext@7673ad14, DefaultHttpRequest@21684b84) with channel NioSocketChannel@1aaf327e unexpectedly found null outgoing Channel context, so continuing with ContrastContext from thread."
   );
 
   public static void main(String[] args) {
-    testPatternMatching(exampleLogLines, PATTERN_METADATA.stream().filter(pmd -> pmd.patternId().startsWith("responseWrittenUnexpectedMessage")).toList(), true);
+    testPatternMatching(exampleLogLines, PATTERN_METADATA.stream().filter(pmd -> pmd.patternId().startsWith("")).toList(), true);
   }
 }

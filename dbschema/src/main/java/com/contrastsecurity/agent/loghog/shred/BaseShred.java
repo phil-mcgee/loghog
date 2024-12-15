@@ -10,11 +10,16 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TIMESTAMP_VAR;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.nullCaptureGroupPattern;
 import static com.contrastsecurity.agent.loghog.shred.RowClassifier.MISFIT_PATTERN_ID;
 
 public class BaseShred {
@@ -31,13 +36,13 @@ public class BaseShred {
   private final CreatableSqlTable shredTable;
   private final CreatableSqlTable misfitsTable;
   private final com.contrastsecurity.agent.loghog.shred.ShredSource shredSource;
-  final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> shredMetadata;
-  final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> misfitsMetadata;
+  final List <ShredRowMetaData> shredMetadata;
+  final List <ShredRowMetaData> misfitsMetadata;
 
   public BaseShred(
-          final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> shredMetadata,
+          final List <ShredRowMetaData> shredMetadata,
           final CreatableSqlTable shredTable,
-          final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> misfitsMetadata,
+          final List <ShredRowMetaData> misfitsMetadata,
           final CreatableSqlTable misfitsTable,
           final com.contrastsecurity.agent.loghog.shred.ShredSource shredSource
   ) {
@@ -45,18 +50,28 @@ public class BaseShred {
   }
 
   public BaseShred(
-      final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> shredMetadata,
+      final List<ShredRowMetaData> shredMetadata,
       final CreatableSqlTable shredTable,
-      final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> misfitsMetadata,
+      final List<ShredRowMetaData> misfitsMetadata,
       final CreatableSqlTable misfitsTable,
       final com.contrastsecurity.agent.loghog.shred.ShredSource shredSource,
       final boolean showMisfits) {
     this.shredTable = shredTable;
     this.misfitsTable = misfitsTable;
-    this.shredSource = shredSource;
     this.shredMetadata = shredMetadata;
     this.misfitsMetadata = misfitsMetadata;
     this.showMisfits = showMisfits;
+    if (shredSource.rowValuesExtractor() instanceof PatternRowValuesExtractor) {
+      // automatically appends non-matching groups so all patterns return
+      // all group names
+      this.shredSource =
+            new ShredSource(shredSource,
+              new PatternRowValuesExtractor(
+                      (PatternRowValuesExtractor)shredSource.rowValuesExtractor(),
+                      new PatternGroomer(requiredCaptureGroupNames(shredMetadata))));
+    } else {
+      this.shredSource = shredSource;
+    }
   }
 
   public Object[] shredRowValues(
@@ -188,7 +203,7 @@ public class BaseShred {
       connection.setAutoCommit(false);
 
       for (Object[] row : sourceRows) {
-        final String patternId = rowClassifier.identifyPattern(row);
+        final String patternId = rowClassifier.findPattern(row);
         Map<String, Object> extractedVals =
                 MISFIT_PATTERN_ID != patternId ?
                 valuesExtractor.extractValues(patternId, row, /* FIXME showMisfits*/ false) : null;
@@ -209,6 +224,13 @@ public class BaseShred {
         } else if (showMisfits) {
             System.out.println("\nExtraction/transformation failed in row " + Arrays.asList(row));
             System.out.println("PatternId " + patternId + " returned null extractedVals");
+            if (rowClassifier instanceof TextSignatureRowClassifier) {
+              final String alternatePattern = ((TextSignatureRowClassifier) rowClassifier)
+                      .findPattern(row, Collections.singleton(patternId));
+              if (!MISFIT_PATTERN_ID.equals(alternatePattern)) {
+                System.out.println("Consider alternatePattern " + alternatePattern + "?  Maybe reorder or modify signatures?");
+              }
+            }
         }
         if (extractedVals == null) {
           if (misfitsTable != null) {
@@ -292,6 +314,51 @@ public class BaseShred {
                       + String.valueOf(matcher.group(name) == null));
     }
   }
+
+  public class PatternGroomer implements Function<Pattern,Pattern> {
+
+    final List<String> requiredNamedGroups;
+
+    public PatternGroomer(final List<String> requiredNamedGroups) {
+      this.requiredNamedGroups = requiredNamedGroups;
+    }
+
+    @Override
+    public Pattern apply(Pattern pattern) {
+      return addRequiredCaptureGroups(pattern);
+    }
+
+    private Pattern addRequiredCaptureGroups(final Pattern pattern) {
+      final Set<String> patternGroups = pattern.namedGroups().keySet();
+
+      final String initialPatternStr = pattern.pattern();
+      final boolean endWithDollar = initialPatternStr.endsWith("$");
+      final StringBuilder append = new StringBuilder(
+              endWithDollar ?
+                      initialPatternStr.substring(0, initialPatternStr.length() - 1) :
+                      initialPatternStr);
+      requiredNamedGroups.stream().filter(name -> !patternGroups.contains(name))
+              .forEach(missingName ->append.append(nullCaptureGroupPattern(missingName)));
+      if (endWithDollar) {
+        append.append('$');
+      }
+
+      final Pattern updatedPattern = Pattern.compile(append.toString());
+      if (!updatedPattern.namedGroups().keySet().containsAll(requiredNamedGroups)) {
+        throw new IllegalStateException("updatedPattern contains capture groups: " +
+                updatedPattern.namedGroups().keySet() + " but requires " + requiredNamedGroups);
+      }
+
+      return updatedPattern;
+    }
+  }
+
+  protected static List<String> requiredCaptureGroupNames(final List<ShredRowMetaData> shredMetadata) {
+    return shredMetadata.stream().map(smd -> smd.extractName())
+            .filter(groupName -> groupName != LOG_TABLE_LINE_COL
+                    && groupName != SHRED_TABLE_PATTERN_COL).toList();
+  }
+
 
   record AddRowsResult(int numAddedShredRows, int numMisfitRows, Object lastGoodRowKey) {}
 }

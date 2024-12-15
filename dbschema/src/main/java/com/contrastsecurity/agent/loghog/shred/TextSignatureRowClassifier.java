@@ -1,6 +1,8 @@
 package com.contrastsecurity.agent.loghog.shred;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static com.contrastsecurity.agent.loghog.shred.BaseShred.LOG_TABLE_ENTRY_IDX;
 
@@ -21,21 +23,30 @@ public class TextSignatureRowClassifier implements RowClassifier {
     this.patternsSignatures = List.copyOf(patternsSignatures);
   }
 
-  public String identifyPattern(Object[] sourceRow) {
+  public String findPattern(Object[] sourceRow) {
+    return findPattern(sourceRow, Collections.emptySet());
+  }
+
+  public String findPattern(Object[] sourceRow, Set<String> excludedPatternIds) {
     final String value = (String) sourceRow[LOG_TABLE_ENTRY_IDX];
     for (PatternSignatures patternSignatures : patternsSignatures) {
-      final String patternId = patternSignatures.patternId();
-      boolean isType = true;
-      for (String signature : patternSignatures.signatures()) {
-        if (!value.contains(signature)) {
-          isType = false;
-          break;
-        }
-      }
-      if (isType) {
-        return patternId;
-      }
+      if (!excludedPatternIds.contains(patternSignatures.patternId())
+        && signaturesMatch(patternSignatures, value)) {
+        return patternSignatures.patternId();
+      };
     }
     return MISFIT_PATTERN_ID;
   }
+
+  private static boolean signaturesMatch(PatternSignatures patternSignatures, String value) {
+    boolean isMatch = true;
+    for (String signature : patternSignatures.signatures()) {
+      if (!value.contains(signature)) {
+        isMatch = false;
+        break;
+      }
+    }
+    return isMatch;
+  }
+
 }
