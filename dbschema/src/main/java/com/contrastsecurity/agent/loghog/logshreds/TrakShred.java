@@ -1,15 +1,14 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-import com.contrastsecurity.agent.loghog.shred.AllSameRowClassifier;
-import com.contrastsecurity.agent.loghog.shred.BaseShred;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShredSource;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShred;
 import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
-import com.contrastsecurity.agent.loghog.shred.PatternRowValuesExtractor;
+import com.contrastsecurity.agent.loghog.shred.impl.PatternRowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.RowClassifier;
 import com.contrastsecurity.agent.loghog.shred.RowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
-import com.contrastsecurity.agent.loghog.shred.ShredSource;
-import com.contrastsecurity.agent.loghog.shred.ShredSqlTable;
+import com.contrastsecurity.agent.loghog.shred.impl.ShredSqlTable;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
@@ -107,8 +106,6 @@ public class TrakShred extends BaseShred {
 
   public static final String ENTRY_SIGNATURE = " items in it) keyed by traced object ";
 
-  static final RowClassifier ROW_CLASSIFIER = new AllSameRowClassifier();
-
   // ... DEBUG - Adding trace 35 to map b@2936c20e (with 1 items in it) keyed by traced object
   // String@19c07c00
 
@@ -140,11 +137,11 @@ public class TrakShred extends BaseShred {
               .filter(extractName -> extractName != LOG_TABLE_LINE_COL)
               .toList());
 
-  public static final ShredSource SHRED_SOURCE =
-      new ShredSource(
+  public static final BaseShredSource SHRED_SOURCE =
+      new BaseShredSource(
           LOG_TABLE_NAME,
           VALUE_EXTRACTOR,
-          ROW_CLASSIFIER,
+          RowClassifier.allTheSameRowClassifier(),
           jooq()
               .select(DSL.asterisk())
               .from(LOG_TABLE_NAME)

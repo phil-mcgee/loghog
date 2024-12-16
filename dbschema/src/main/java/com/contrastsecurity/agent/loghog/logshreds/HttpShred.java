@@ -1,23 +1,21 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-import com.contrastsecurity.agent.loghog.shred.BaseShred;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShredSource;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShred;
 import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
-import com.contrastsecurity.agent.loghog.shred.PatternRowValuesExtractor;
+import com.contrastsecurity.agent.loghog.shred.impl.PatternRowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.PatternSignatures;
 import com.contrastsecurity.agent.loghog.shred.RowClassifier;
 import com.contrastsecurity.agent.loghog.shred.RowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
-import com.contrastsecurity.agent.loghog.shred.ShredSource;
-import com.contrastsecurity.agent.loghog.shred.ShredSqlTable;
-import com.contrastsecurity.agent.loghog.shred.TextSignatureRowClassifier;
+import com.contrastsecurity.agent.loghog.shred.impl.ShredSqlTable;
+import com.contrastsecurity.agent.loghog.shred.impl.TextSignatureRowClassifier;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -26,11 +24,6 @@ import static com.contrastsecurity.agent.loghog.db.LogTable.LOG_TABLE_NAME;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.DEBUG_PREAMBLE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NATIVE_RESP_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NATIVE_RESP_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_NATIVE_RESP_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_OUTPUT_MECHANISM_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_REQ_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_RESP_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_URL_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.OUTPUT_MECHANISM_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.OUTPUT_MECHANISM_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.REQ_VAR;
@@ -175,7 +168,6 @@ public class HttpShred extends BaseShred {
                           List.of("- logCrumbData() Unexpected null response for request"),
                           Pattern.compile(HTTP_MANAGER_PREAMBLE_XTRACT + "- logCrumbData\\(\\) Unexpected null response for request.+"
                                   + "$"))
-//                  "2024-12-14 19:42:24,815 [reactor-http-nio-3 HttpManager] DEBUG - HttpContext{HttpRequest@7d722350, null} - logCrumbData() Unexpected null response for request=[HttpRequest{protocol=http, version=HTTP/1.1, method='GET', uri='/routecoverage/annotation/get', queryString='param=paramFromQuery&param2=param2FromQuery&name=%3Cscript%3Ealert%28%27xss%27%29%3C%2Fscript%3E', normalizedUri='/routecoverage/annotation/get', port=8080, parameters={name=[Ljava.lang.String;@7d1fba1b, param=[Ljava.lang.String;@78283f1a, param2=[Ljava.lang.String;@5204212a}, headers={Accept-Encoding=[Ljava.lang.String;@29349f0b, Connection=[Ljava.lang.String;@24f1c64d, contrast-mq-name=[Ljava.lang.String;@786ed221, Host=[Ljava.lang.String;@407cd952, User-Agent=[Ljava.lang.String;@5f509696, x-contrast-1=[Ljava.lang.String;@64b5ee60, x-contrast-2=[Ljava.lang.String;@55f38f7a}, contextPath='/', serverVersionInfo='null', cachedBodyStr='null', contentLength=0, cachedContentType=com.contrastsecurity.agent.http.ContrastContentType@65524393, requestID=2104632144, template='/routecoverage/annotation/get', normalizedTemplate='/routecoverage/annotation/get', path='/routecoverage/annotation/get', secure=false, type=NETTY, active=false, capturingInMemory=false}], CRUMB:"
           );
 
 
@@ -199,8 +191,8 @@ public class HttpShred extends BaseShred {
                           .map(pmd -> new PatternSignatures(pmd.patternId(), pmd.signatures()))
                           .toList());
 
-  public static final ShredSource SHRED_SOURCE =
-          new ShredSource(
+  public static final BaseShredSource SHRED_SOURCE =
+          new BaseShredSource(
                   LOG_TABLE_NAME,
                   VALUE_EXTRACTOR,
                   ROW_CLASSIFIER,

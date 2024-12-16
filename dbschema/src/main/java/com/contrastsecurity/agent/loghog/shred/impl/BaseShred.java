@@ -1,6 +1,10 @@
 /* (C)2024 */
-package com.contrastsecurity.agent.loghog.shred;
+package com.contrastsecurity.agent.loghog.shred.impl;
 
+import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
+import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
+import com.contrastsecurity.agent.loghog.shred.ShredSource;
+import com.contrastsecurity.agent.loghog.shred.pmd.PmdShredSource;
 import com.contrastsecurity.agent.loghog.sql.BatchedSelector;
 import com.contrastsecurity.agent.loghog.sql.CreatableSqlTable;
 
@@ -24,6 +28,7 @@ import static com.contrastsecurity.agent.loghog.shred.RowClassifier.MISFIT_PATTE
 
 public class BaseShred {
   public static final String LOG_TABLE_LINE_COL = "LOG.col(LINE)";
+  public static final String LOG_TABLE_ENTRY_COL = "LOG.col(ENTRY)";
   public static final int LOG_TABLE_LINE_IDX = 0;
   public static final int LOG_TABLE_ENTRY_IDX = 1;
   public static final String LAST_MATCH_KEY = "LAST_MATCH_KEY";
@@ -35,7 +40,7 @@ public class BaseShred {
 
   private final CreatableSqlTable shredTable;
   private final CreatableSqlTable misfitsTable;
-  private final com.contrastsecurity.agent.loghog.shred.ShredSource shredSource;
+  private final ShredSource shredSource;
   final List <ShredRowMetaData> shredMetadata;
   final List <ShredRowMetaData> misfitsMetadata;
 
@@ -44,8 +49,7 @@ public class BaseShred {
           final CreatableSqlTable shredTable,
           final List <ShredRowMetaData> misfitsMetadata,
           final CreatableSqlTable misfitsTable,
-          final com.contrastsecurity.agent.loghog.shred.ShredSource shredSource
-  ) {
+          final ShredSource shredSource) {
     this(shredMetadata,shredTable,misfitsMetadata,misfitsTable,shredSource,false);
   }
 
@@ -54,24 +58,53 @@ public class BaseShred {
       final CreatableSqlTable shredTable,
       final List<ShredRowMetaData> misfitsMetadata,
       final CreatableSqlTable misfitsTable,
-      final com.contrastsecurity.agent.loghog.shred.ShredSource shredSource,
+      final ShredSource shredSource,
       final boolean showMisfits) {
     this.shredTable = shredTable;
     this.misfitsTable = misfitsTable;
     this.shredMetadata = shredMetadata;
     this.misfitsMetadata = misfitsMetadata;
     this.showMisfits = showMisfits;
-    if (shredSource.rowValuesExtractor() instanceof PatternRowValuesExtractor) {
-      // automatically appends non-matching groups so all patterns return
-      // all group names
-      this.shredSource =
-            new ShredSource(shredSource,
-              new PatternRowValuesExtractor(
-                      (PatternRowValuesExtractor)shredSource.rowValuesExtractor(),
-                      new PatternGroomer(requiredCaptureGroupNames(shredMetadata))));
+    this.shredSource = groomedShredSource(shredSource, shredMetadata);
+  }
+
+  public boolean showMisfits() {
+    return showMisfits;
+  }
+
+  public CreatableSqlTable shredTable() {
+    return shredTable;
+  }
+
+  public CreatableSqlTable misfitsTable() {
+    return misfitsTable;
+  }
+
+  public List<ShredRowMetaData> shredMetadata() {
+    return shredMetadata;
+  }
+
+  public List<ShredRowMetaData> misfitsMetadata() {
+    return misfitsMetadata;
+  }
+
+  public static ShredSource groomedShredSource(final ShredSource shredSource, List<ShredRowMetaData> shredMetadata) {
+    if (shredSource instanceof PmdShredSource) {
+      final PmdShredSource pmdShredSource = (PmdShredSource)shredSource;
+      return new PmdShredSource(pmdShredSource, new PatternGroomer(requiredCaptureGroupNames(shredMetadata)));
+    } else if (shredSource.rowValuesExtractor() instanceof PatternRowValuesExtractor) {
+      // automatically appends non-matching groups so all patterns return all group names
+      final PatternRowValuesExtractor prvExtractor = (PatternRowValuesExtractor)shredSource.rowValuesExtractor();
+      return new BaseShredSource((BaseShredSource)shredSource,
+                new PatternRowValuesExtractor(prvExtractor,
+                    new PatternGroomer(requiredCaptureGroupNames(shredMetadata))));
     } else {
-      this.shredSource = shredSource;
+      return shredSource;
     }
+  }
+
+  public ShredSource shredSource() {
+    return shredSource;
   }
 
   public Object[] shredRowValues(
@@ -84,6 +117,8 @@ public class BaseShred {
         val = extractedVals.get(metaData.extractName());
       } else if (LOG_TABLE_LINE_COL.equals(metaData.extractName())) {
         val = sourceRow[LOG_TABLE_LINE_IDX];
+      } else if (LOG_TABLE_ENTRY_COL.equals(metaData.extractName())) {
+        val = sourceRow[LOG_TABLE_ENTRY_IDX];
       } else if (SHRED_TABLE_PATTERN_COL.equals(metaData.extractName())) {
         val = patternId;
       }
@@ -96,11 +131,16 @@ public class BaseShred {
   }
 
   public Object[] misfitsRowValues(Object[] sourceRow, Object lastMatchKey) {
+    if (misfitsMetadata == null){
+      return new Object[0];
+    }
     Object[] misfitsRow = new Object[misfitsMetadata.size()];
     int idx = 0;
-    for (com.contrastsecurity.agent.loghog.shred.ShredRowMetaData metaData : misfitsMetadata) {
+    for (ShredRowMetaData metaData : misfitsMetadata) {
       if (LOG_TABLE_LINE_COL.equals(metaData.extractName())) {
         misfitsRow[idx++] = sourceRow[LOG_TABLE_LINE_IDX];
+      } else if (LOG_TABLE_ENTRY_COL.equals(metaData.extractName())) {
+        misfitsRow[idx++] = sourceRow[LOG_TABLE_ENTRY_IDX];
       } else if (LAST_MATCH_KEY.equals(metaData.extractName())) {
         misfitsRow[idx++] = lastMatchKey;
       }
@@ -315,7 +355,7 @@ public class BaseShred {
     }
   }
 
-  public class PatternGroomer implements Function<Pattern,Pattern> {
+  public static class PatternGroomer implements Function<Pattern,Pattern> {
 
     final List<String> requiredNamedGroups;
 
@@ -358,7 +398,6 @@ public class BaseShred {
             .filter(groupName -> groupName != LOG_TABLE_LINE_COL
                     && groupName != SHRED_TABLE_PATTERN_COL).toList();
   }
-
 
   record AddRowsResult(int numAddedShredRows, int numMisfitRows, Object lastGoodRowKey) {}
 }

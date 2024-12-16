@@ -1,16 +1,16 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-import com.contrastsecurity.agent.loghog.shred.BaseShred;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShredSource;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShred;
 import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
-import com.contrastsecurity.agent.loghog.shred.PatternRowValuesExtractor;
+import com.contrastsecurity.agent.loghog.shred.impl.PatternRowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.PatternSignatures;
 import com.contrastsecurity.agent.loghog.shred.RowClassifier;
 import com.contrastsecurity.agent.loghog.shred.RowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
-import com.contrastsecurity.agent.loghog.shred.ShredSource;
-import com.contrastsecurity.agent.loghog.shred.ShredSqlTable;
-import com.contrastsecurity.agent.loghog.shred.TextSignatureRowClassifier;
+import com.contrastsecurity.agent.loghog.shred.impl.ShredSqlTable;
+import com.contrastsecurity.agent.loghog.shred.impl.TextSignatureRowClassifier;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
@@ -21,68 +21,22 @@ import java.util.stream.Collectors;
 
 import static com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory.jooq;
 import static com.contrastsecurity.agent.loghog.db.LogTable.LOG_TABLE_NAME;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.APP_CTX_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.ASSESS_CTX_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.ASSESS_CTX_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.CHANNEL_HANDLER_CTX_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.CHANNEL_HANDLER_CTX_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.CHANNEL_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.CHANNEL_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.DEBUG_PREAMBLE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.DECODER_STATE_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.DECODER_STATE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.FATE_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.FATE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.INFO_PREAMBLE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.JUMPED_ASSESS_CTX_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.JUMPED_ASSESS_CTX_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NETTY_HTTP_MSG_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NETTY_HTTP_MSG_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_APP_CTX_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_CHANNEL_HANDLER_CTX_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_CHANNEL_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_CONCUR_CTX_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_DECODER_STATE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_FATE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_JUMPED_ASSESS_CTX_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_NETTY_HTTP_MSG_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_RPT_QUEUE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_RULE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_TASK_CLASS_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_TASK_OBJ_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_TRACE_HASH_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_TRACE_MAP_SIZE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_TRACE_MAP_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_TRACE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_URL_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_WRAPPED_RUNNABLE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NO_WRAP_INIT_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.REQ_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.REQ_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RESP_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RESP_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RPT_QUEUE_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RPT_QUEUE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RULE_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.RULE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TASK_CLASS_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TASK_OBJ_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TASK_OBJ_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.THREAD_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TIMESTAMP_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACE_HASH_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACE_HASH_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACE_MAP_SIZE_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACE_MAP_SIZE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACE_MAP_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACE_MAP_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACE_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.URL_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.URL_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.WRAPPED_RUNNABLE_VAR;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.WRAPPED_RUNNABLE_XTRACT;
-import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.WRAP_INIT_VAR;
 
 public class VulnShred extends BaseShred {
 
@@ -261,8 +215,8 @@ public class VulnShred extends BaseShred {
               .map(pmd -> new PatternSignatures(pmd.patternId(), pmd.signatures()))
               .toList());
 
-  public static final ShredSource SHRED_SOURCE =
-      new ShredSource(
+  public static final BaseShredSource SHRED_SOURCE =
+      new BaseShredSource(
           LOG_TABLE_NAME,
           VALUE_EXTRACTOR,
           ROW_CLASSIFIER,

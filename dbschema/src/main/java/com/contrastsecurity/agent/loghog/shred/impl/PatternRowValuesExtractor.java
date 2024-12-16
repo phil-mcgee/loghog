@@ -1,5 +1,8 @@
 /* (C)2024 */
-package com.contrastsecurity.agent.loghog.shred;
+package com.contrastsecurity.agent.loghog.shred.impl;
+
+import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
+import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,6 +10,10 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import static com.contrastsecurity.agent.loghog.shred.impl.BaseShred.LOG_TABLE_LINE_COL;
+import static com.contrastsecurity.agent.loghog.shred.impl.BaseShred.SHRED_TABLE_PATTERN_COL;
 
 public class PatternRowValuesExtractor implements com.contrastsecurity.agent.loghog.shred.RowValuesExtractor {
   private static final int LOG_TABLE_ENTRY_IDX = 1;
@@ -17,8 +24,19 @@ public class PatternRowValuesExtractor implements com.contrastsecurity.agent.log
   final int sourceValueIdx;
   final int sourceKeyIdx;
 
+  public static PatternRowValuesExtractor buildFrom(final List<ShredRowMetaData> shredMetaData, final List<PatternMetadata> patternMetaData) {
+    final  List<String> extractedValNames =
+      shredMetaData.stream()
+              .map(srmd -> srmd.extractName())
+              .filter(extractName -> extractName != LOG_TABLE_LINE_COL && extractName != SHRED_TABLE_PATTERN_COL)
+              .toList();
+    final Map<String, Pattern> patternMap = patternMetaData.stream()
+            .collect(Collectors.toMap(pmd -> pmd.patternId(), pmd -> pmd.pattern()));
+    return new PatternRowValuesExtractor(patternMap, extractedValNames);
+  }
+
   public PatternRowValuesExtractor(
-          final Map<String, Pattern> patternMap, final  List<String> extractedValNames) {
+          final Map<String, Pattern> patternMap, final List<String> extractedValNames) {
     this(patternMap, extractedValNames, LOG_TABLE_ENTRY_IDX, LOG_TABLE_LINE_IDX);
   }
 

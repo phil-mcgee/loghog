@@ -1,19 +1,19 @@
 package com.contrastsecurity.agent.loghog.logshreds;
 
-import com.contrastsecurity.agent.loghog.shred.BaseShred;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShred;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShredSource;
+import com.contrastsecurity.agent.loghog.shred.CandidateRowSelector;
 import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
-import com.contrastsecurity.agent.loghog.shred.PatternRowValuesExtractor;
+import com.contrastsecurity.agent.loghog.shred.impl.PatternRowValuesExtractor;
+import com.contrastsecurity.agent.loghog.shred.RowClassifier;
 import com.contrastsecurity.agent.loghog.shred.RowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
-import com.contrastsecurity.agent.loghog.shred.ShredSource;
-import com.contrastsecurity.agent.loghog.shred.ShredSqlTable;
+import com.contrastsecurity.agent.loghog.shred.impl.ShredSqlTable;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -120,7 +120,10 @@ public class MesgShred extends BaseShred {
 
   // There's no classification required for the mesg shred all rows are parsed identically
   // (or they don't match and become misfits in the continuation table
-  public static final ShredSource SHRED_SOURCE = new ShredSource(LOG_TABLE_NAME, VALUE_EXTRACTOR);
+  public static final BaseShredSource SHRED_SOURCE = new BaseShredSource(LOG_TABLE_NAME, VALUE_EXTRACTOR,
+          RowClassifier.allTheSameRowClassifier(),
+          CandidateRowSelector.allRowsSelector(LOG_TABLE_NAME)
+  );
 
   public MesgShred() {
     super(SHRED_METADATA, SHRED_SQL_TABLE, MISFITS_METADATA, MISFITS_SQL_TABLE, SHRED_SOURCE);

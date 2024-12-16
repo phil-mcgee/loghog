@@ -1,10 +1,13 @@
-package com.contrastsecurity.agent.loghog.shred;
+package com.contrastsecurity.agent.loghog.shred.impl;
+
+import com.contrastsecurity.agent.loghog.shred.PatternSignatures;
+import com.contrastsecurity.agent.loghog.shred.RowClassifier;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static com.contrastsecurity.agent.loghog.shred.BaseShred.LOG_TABLE_ENTRY_IDX;
+import static com.contrastsecurity.agent.loghog.shred.impl.BaseShred.LOG_TABLE_ENTRY_IDX;
 
 /**
  * Searches the "value" field of a "sourceRow" for a pattern's text signatures. The value string

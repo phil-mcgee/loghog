@@ -7,4 +7,16 @@ public interface RowClassifier {
 
   String findPattern(Object[] sourceRow);
 
+  static RowClassifier allTheSameRowClassifier() {
+    return allTheSameRowClassifier(ANY_PATTERN_ID);
+  }
+
+  static RowClassifier allTheSameRowClassifier(String patternId) {
+    return new RowClassifier() {
+      @Override
+      public String findPattern(Object[] sourceRow) {
+        return patternId;
+      }
+    };
+  }
 }

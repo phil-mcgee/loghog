@@ -1,16 +1,16 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-import com.contrastsecurity.agent.loghog.shred.BaseShred;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShredSource;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShred;
 import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
-import com.contrastsecurity.agent.loghog.shred.PatternRowValuesExtractor;
+import com.contrastsecurity.agent.loghog.shred.impl.PatternRowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.PatternSignatures;
 import com.contrastsecurity.agent.loghog.shred.RowClassifier;
 import com.contrastsecurity.agent.loghog.shred.RowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
-import com.contrastsecurity.agent.loghog.shred.ShredSource;
-import com.contrastsecurity.agent.loghog.shred.ShredSqlTable;
-import com.contrastsecurity.agent.loghog.shred.TextSignatureRowClassifier;
+import com.contrastsecurity.agent.loghog.shred.impl.ShredSqlTable;
+import com.contrastsecurity.agent.loghog.shred.impl.TextSignatureRowClassifier;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
@@ -239,8 +239,8 @@ public class CrumbShred extends BaseShred {
               .map(pmd -> new PatternSignatures(pmd.patternId(), pmd.signatures()))
               .toList());
 
-  public static final ShredSource SHRED_SOURCE =
-      new ShredSource(
+  public static final BaseShredSource SHRED_SOURCE =
+      new BaseShredSource(
           LOG_TABLE_NAME,
           VALUE_EXTRACTOR,
           ROW_CLASSIFIER,
