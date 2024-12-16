@@ -36,6 +36,7 @@ import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.CONCUR_C
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.DEBUG_PREAMBLE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.DECODER_STATE_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.DECODER_STATE_XTRACT;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.ERROR_PREAMBLE_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.JUMPED_ASSESS_CTX_VAR;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.JUMPED_ASSESS_CTX_XTRACT;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.NETTY_HTTP_MSG_VAR;
@@ -322,7 +323,7 @@ public class FluxShred extends BaseShred {
                                       + "$")),
               new PatternMetadata(
                       "WarnOnResponseWrittenAssessNull",
-                      List.of("DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten(", "ContrastContext{http=", "found null Channel incoming and outgoing contexts"),
+                      List.of("DEBUG - ContrastNettyHttpDispatcherImpl.onResponseWritten(", "{traceMap=", "found null Channel incoming and outgoing contexts"),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\("
@@ -332,13 +333,26 @@ public class FluxShred extends BaseShred {
                                       + NETTY_HTTP_MSG_XTRACT
                                       + "\\) with channel "
                                       + CHANNEL_XTRACT
-                                      + " found null Channel incoming and outgoing contexts, so continuing with ContrastContext from thread\\."                                      + NO_CONCUR_CTX_XTRACT
+                                      + " found null Channel incoming and outgoing contexts, so continuing with ContrastContext from thread\\."
                                       + "$")),
               new PatternMetadata(
-                      "nullOutgoingChannelCtx",
-                      List.of("- ContrastNettyHttpDispatcherImpl.onResponseWritten(", "unexpectedly found null outgoing Channel context"),
+                      "nullOutgoingChannelCtxAssessNonnull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.onResponseWritten(", "{traceMap=", "unexpectedly found null outgoing Channel context"),
                       Pattern.compile(
-                              DEBUG_PREAMBLE_XTRACT
+                              ERROR_PREAMBLE_XTRACT
+                                      + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\("
+                                      + START_CONTRAST_CONTEXT_EXTRACT
+                                      + ASSESS_NONNULL_XTRACTS
+                                      + ", " + CHANNEL_HANDLER_CTX_XTRACT
+                                      + ", " + NETTY_HTTP_MSG_XTRACT
+                                      + "\\) with channel "+ CHANNEL_XTRACT
+                                      + " unexpectedly found null outgoing Channel context, so continuing with ContrastContext from thread\\."
+                                      + "$")),
+              new PatternMetadata(
+                      "nullOutgoingChannelCtxAssessNull",
+                      List.of("- ContrastNettyHttpDispatcherImpl.onResponseWritten(", "ContrastContext{http=", "unexpectedly found null outgoing Channel context"),
+                      Pattern.compile(
+                              ERROR_PREAMBLE_XTRACT
                                       + "- ContrastNettyHttpDispatcherImpl.onResponseWritten\\("
                                       + START_CONTRAST_CONTEXT_EXTRACT
                                       + ASSESS_NULL_XTRACTS
@@ -439,26 +453,28 @@ public class FluxShred extends BaseShred {
                                       + "\\) replacing null"
                                       + "$")),
               new PatternMetadata(
-                      "updateChannelIncomingAssessNonnull",
-                      List.of("- NettyChannelContext.updateChannelIncomingContrastContext(", "{traceMap="),
+                      "updateChannelContextAssessNonnull",
+                      List.of("- NettyChannelContext.updateChannelContext(", "{traceMap="),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
-                                      + "- NettyChannelContext.updateChannelIncomingContrastContext\\("
+                                      + "- NettyChannelContext.updateChannelContext\\("
                                       + CHANNEL_XTRACT + ", "
                                       + START_CONTRAST_CONTEXT_EXTRACT
-                                      + ASSESS_NONNULL_XTRACTS
-                                      + "\\) saved channel incoming attr, replacing .+"
+                                      + ASSESS_NONNULL_XTRACTS + ", "
+                                      + "(INCOMING|OUTGOING)"
+                                      + "\\) replacing .+"
                                       + "$")),
               new PatternMetadata(
-                      "updateChannelIncomingAssessNull",
+                      "updateChannelContextAssessNull",
                       List.of("- NettyChannelContext.updateChannelIncomingContrastContext(", "ContrastContext{http="),
                       Pattern.compile(
                               DEBUG_PREAMBLE_XTRACT
-                                      + "- NettyChannelContext.updateChannelIncomingContrastContext\\("
+                                      + "- NettyChannelContext.updateChannelContext\\("
                                       + CHANNEL_XTRACT + ", "
                                       + START_CONTRAST_CONTEXT_EXTRACT
-                                      + ASSESS_NULL_XTRACTS
-                                      + "\\) saved channel incoming attr, replacing .+"
+                                      + ASSESS_NULL_XTRACTS + ", "
+                                      + "(INCOMING|OUTGOING)"
+                                      + "\\) replacing .+"
                                       + "$")),
               new PatternMetadata(
                       "updateCurrentCCtxAssessNonnull",
