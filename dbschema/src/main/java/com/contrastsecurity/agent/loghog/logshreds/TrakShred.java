@@ -9,12 +9,14 @@ import com.contrastsecurity.agent.loghog.shred.RowClassifier;
 import com.contrastsecurity.agent.loghog.shred.RowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
 import com.contrastsecurity.agent.loghog.shred.impl.ShredSqlTable;
+import com.contrastsecurity.agent.loghog.shred.pmd.PmdShred;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory.jooq;
@@ -32,7 +34,7 @@ import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACKED_
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TRACKED_OBJ_XTRACT;
 import static com.contrastsecurity.agent.loghog.shred.RowClassifier.ANY_PATTERN_ID;
 
-public class TrakShred extends BaseShred {
+public class TrakShred extends PmdShred {
 
   static final String SHRED_TABLE_NAME = "TRAK";
   static final String SHRED_KEY_COLUMN = "LINE";
@@ -48,13 +50,13 @@ public class TrakShred extends BaseShred {
               TIMESTAMP_VAR),
           new ShredRowMetaData("THREAD", SQLDataType.VARCHAR.notNull(), String.class, THREAD_VAR),
           new ShredRowMetaData(
-              "TRACE_MAP", SQLDataType.VARCHAR.notNull(), String.class, TRACE_MAP_VAR),
+              "TRACE_MAP", SQLDataType.VARCHAR, String.class, TRACE_MAP_VAR),
           new ShredRowMetaData(
-              "TRACKED_OBJ", SQLDataType.VARCHAR.notNull(), String.class, TRACKED_OBJ_VAR),
+              "TRACKED_OBJ", SQLDataType.VARCHAR, String.class, TRACKED_OBJ_VAR),
           new ShredRowMetaData(
-              "TRACE_NUM", SQLDataType.INTEGER.notNull(), Integer.class, TRACE_NUM_VAR),
+              "TRACE_NUM", SQLDataType.INTEGER, Integer.class, TRACE_NUM_VAR),
           new ShredRowMetaData(
-              "TRACE_MAP_SIZE", SQLDataType.INTEGER.notNull(), Integer.class, TRACE_MAP_SIZE_VAR));
+              "TRACE_MAP_SIZE", SQLDataType.INTEGER, Integer.class, TRACE_MAP_SIZE_VAR));
 
   static final String MISFITS_TABLE_NAME = "TRAK_MISFITS";
   static final String MISFITS_KEY_COLUMN = "LINE";
@@ -104,7 +106,7 @@ public class TrakShred extends BaseShred {
                   .getSQL()),
           List.of());
 
-  public static final String ENTRY_SIGNATURE = " items in it) keyed by traced object ";
+  public static final Set<String> ENTRY_SIGNATURES = Set.of(" items in it) keyed by traced object ");
 
   // ... DEBUG - Adding trace 35 to map b@2936c20e (with 1 items in it) keyed by traced object
   // String@19c07c00
@@ -112,7 +114,7 @@ public class TrakShred extends BaseShred {
   static final List<PatternMetadata> PATTERN_METADATA =
           List.of(
                   new PatternMetadata(
-                          ANY_PATTERN_ID,
+                          "track",
                           List.of(""),
                           Pattern.compile(
                                   DEBUG_PREAMBLE_XTRACT
@@ -126,30 +128,13 @@ public class TrakShred extends BaseShred {
                                           + TRACKED_OBJ_XTRACT
                                           + "$")));
 
-  public static final RowValuesExtractor VALUE_EXTRACTOR =
-      new PatternRowValuesExtractor(
-          Map.of(
-              ANY_PATTERN_ID,
-              PATTERN_METADATA.get(0).pattern()
-             ),
-          SHRED_METADATA.stream()
-              .map(srmd -> srmd.extractName())
-              .filter(extractName -> extractName != LOG_TABLE_LINE_COL)
-              .toList());
-
-  public static final BaseShredSource SHRED_SOURCE =
-      new BaseShredSource(
-          LOG_TABLE_NAME,
-          VALUE_EXTRACTOR,
-          RowClassifier.allTheSameRowClassifier(),
-          jooq()
-              .select(DSL.asterisk())
-              .from(LOG_TABLE_NAME)
-              .where("LOG.ENTRY  like '%" + ENTRY_SIGNATURE + "%'")
-              .getSQL());
 
   public TrakShred() {
-    super(SHRED_METADATA, SHRED_SQL_TABLE, MISFITS_METADATA, MISFITS_SQL_TABLE, SHRED_SOURCE);
+    super(
+            SHRED_METADATA, SHRED_SQL_TABLE,
+            MISFITS_METADATA, MISFITS_SQL_TABLE,
+            ENTRY_SIGNATURES, PATTERN_METADATA,
+            true);
   }
 
   static final List<String> exampleLogLines = List.of(

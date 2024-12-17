@@ -17,6 +17,8 @@ public class PatternGroups {
   public static final String UNFOUND_XTRACT_CLOSE = ">~UnFoUnD~)?";
   public static final String DECIMAL_XTRACT_CLOSE =   ">\\d+)";
 
+  public static final String ALLOW_WRAPPPED_TASK_XTRACT_CLOSE = ">[^}\\]\\{\"]+)";
+
   public static final String TIMESTAMP_VAR = "timestamp";
   public static final String TIMESTAMP_XTRACT =
           XTRACT_OPEN + TIMESTAMP_VAR + ">\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2},\\d{3})";
@@ -120,7 +122,7 @@ public class PatternGroups {
   public static final String NO_WRAP_INIT_XTRACT = UNFOUND(WRAP_INIT_VAR);
 
   public static final String WRAPPED_RUNNABLE_VAR = "wrappedRunnable";
-  public static final String WRAPPED_RUNNABLE_XTRACT = XTRACT_OPEN + WRAPPED_RUNNABLE_VAR + NON_WS_XTRACT_CLOSE;
+  public static final String WRAPPED_RUNNABLE_XTRACT = XTRACT_OPEN + WRAPPED_RUNNABLE_VAR + ALLOW_WRAPPPED_TASK_XTRACT_CLOSE;
   public static final String NO_WRAPPED_RUNNABLE_XTRACT = UNFOUND(WRAPPED_RUNNABLE_VAR);
 
   public static final String FROM_THREAD_VAR = "fromThread";
