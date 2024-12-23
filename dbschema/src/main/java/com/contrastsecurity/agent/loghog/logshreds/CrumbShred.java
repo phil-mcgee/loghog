@@ -1,16 +1,16 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-import com.contrastsecurity.agent.loghog.shred.BaseShred;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShredSource;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShred;
 import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
-import com.contrastsecurity.agent.loghog.shred.PatternRowValuesExtractor;
+import com.contrastsecurity.agent.loghog.shred.impl.PatternRowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.PatternSignatures;
 import com.contrastsecurity.agent.loghog.shred.RowClassifier;
 import com.contrastsecurity.agent.loghog.shred.RowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
-import com.contrastsecurity.agent.loghog.shred.ShredSource;
-import com.contrastsecurity.agent.loghog.shred.ShredSqlTable;
-import com.contrastsecurity.agent.loghog.shred.TextSignatureRowClassifier;
+import com.contrastsecurity.agent.loghog.shred.impl.ShredSqlTable;
+import com.contrastsecurity.agent.loghog.shred.impl.TextSignatureRowClassifier;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
@@ -70,7 +70,9 @@ public class CrumbShred extends BaseShred {
   static final List<ShredRowMetaData> MISFITS_METADATA =
       List.of(
           new ShredRowMetaData(
-              "LINE", SQLDataType.INTEGER.notNull(), Integer.class, LOG_TABLE_LINE_COL));
+              "LINE", SQLDataType.INTEGER.notNull(), Integer.class, LOG_TABLE_LINE_COL),
+              new ShredRowMetaData(
+                      "ENTRY", SQLDataType.VARCHAR, String.class, LOG_TABLE_ENTRY_COL));
 
   static final ShredSqlTable SHRED_SQL_TABLE =
       new ShredSqlTable(
@@ -216,17 +218,6 @@ public class CrumbShred extends BaseShred {
                                       + FROM_THREAD_XTRACT
                                       + " ==> \\S+"
                                       + CRUMB_RESP_SUFFIX
-                                      + "$")),
-              // 2024-11-07 18:04:51,703 [reactor-http-nio-2 HttpManager] DEBUG - Request ending for /client/v5_0/internal/mono-body - response is k@5bedc8f2 and output mechanism is null
-              new PatternMetadata(
-                      "reqEndingFor",
-                      List.of("Request ending for "),
-                      Pattern.compile(
-                              DEBUG_PREAMBLE_XTRACT
-                                      + "- Request ending for "
-                                      + URL_XTRACT
-                                      + " - response is "
-                                      + NO_REQ_XTRACT + NO_RESP_XTRACT + NO_STACKFRAME_XTRACT + NO_FROM_THREAD_XTRACT
                                       + "$"))
       );
 
@@ -250,8 +241,8 @@ public class CrumbShred extends BaseShred {
               .map(pmd -> new PatternSignatures(pmd.patternId(), pmd.signatures()))
               .toList());
 
-  public static final ShredSource SHRED_SOURCE =
-      new ShredSource(
+  public static final BaseShredSource SHRED_SOURCE =
+      new BaseShredSource(
           LOG_TABLE_NAME,
           VALUE_EXTRACTOR,
           ROW_CLASSIFIER,
@@ -263,11 +254,11 @@ public class CrumbShred extends BaseShred {
 
   public static void main(String[] args) {
     final String matchThis =
-            "2024-11-07 18:04:51,678 [reactor-http-nio-1 HttpManager] DEBUG - !LM!RequestTime|RequestEnded|uri=/sources/v5_0/serverHttpRequest-uri&elapsed=55";
+            "2024-11-11 20:06:16,284 [reactor-http-nio-2 HttpManager] DEBUG - HttpContext{HttpRequest@40d46f1f, k@52e20455} - Request ending for /ping - response is k@52e20455 and output mechanism is null";
 
     final Pattern toTest =
             PATTERN_METADATA.stream()
-                    .filter(pmd -> "lmReqTime".equals(pmd.patternId()))
+                    .filter(pmd -> "reqEndingFor".equals(pmd.patternId()))
                     .map(PatternMetadata::pattern)
                     .findFirst()
                     .orElseGet(null);

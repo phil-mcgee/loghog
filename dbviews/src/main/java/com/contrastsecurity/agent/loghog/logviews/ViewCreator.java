@@ -59,7 +59,7 @@ ORDER BY thread, thread_line
                   default -> dataType;
                 }
         ).append(", \n");
-      }
+    }
       sb.setLength(sb.length() - ", \n".length());
       sb.append("\n);");
 
@@ -88,59 +88,59 @@ ORDER BY thread, thread_line
     try (Connection connect = EmbeddedDatabaseFactory.create(dbPath)) {
       DSLContext jooq = DSL.using(connect);
       final String selectSql = """
-SELECT
-  REQBEG.REQ,
-  REQBEG.URL,
-  REQBEG.LINE BEGIN_LINE,
-  REQBEG.TIMESTAMP BEGIN_TIME,
-  REQBEG.THREAD BEGIN_THREAD,
-  NEWCTX.LINE CTX_BEG_LINE,
-  NEWCTX.ASSESS_CTX,
-  FIRSTTRK.LINE TRACE_BEG_LINE,
-  FIRSTTRK.TRACE_MAP TRACE_MAP,
-  LASTTRK.LINE LAST_TRAK_LINE,
-  LASTTRK.THREAD LAST_TRAK_THREAD,
-  REQEND.LINE END_LINE,
-  REQEND.TIMESTAMP END_TIME,
-  REQEND.THREAD END_THREAD
-FROM CRUMB REQBEG
-JOIN TRAK FIRSTTRK
-ON
-   REQBEG.PATTERN = 'reqBegin'
-   AND FIRSTTRK.LINE IN (
-      SELECT min(LINE)
-      FROM TRAK
-      WHERE
-        THREAD = REQBEG.THREAD
-        AND LINE > REQBEG.LINE
-   )
-JOIN TRAK LASTTRK
-ON LASTTRK.LINE IN (
-    SELECT max(LINE)
-    FROM TRAK
-    WHERE
-      TRACE_MAP = FIRSTTRK.TRACE_MAP
-  )
+              SELECT
+                REQBEG.REQ,
+                REQBEG.URL,
+                REQBEG.LINE BEGIN_LINE,
+                REQBEG.TIMESTAMP BEGIN_TIME,
+                REQBEG.THREAD BEGIN_THREAD,
+                NEWCTX.LINE CTX_BEG_LINE,
+                NEWCTX.ASSESS_CTX,
+                FIRSTTRK.LINE TRACE_BEG_LINE,
+                FIRSTTRK.TRACE_MAP TRACE_MAP,
+                LASTTRK.LINE LAST_TRAK_LINE,
+                LASTTRK.THREAD LAST_TRAK_THREAD,
+                REQEND.LINE END_LINE,
+                REQEND.TIMESTAMP END_TIME,
+                REQEND.THREAD END_THREAD
+              FROM CRUMB REQBEG
+              JOIN TRAK FIRSTTRK
+              ON
+                 REQBEG.PATTERN = 'reqBegin'
+                 AND FIRSTTRK.LINE IN (
+                    SELECT min(LINE)
+                    FROM TRAK
+                    WHERE
+                      THREAD = REQBEG.THREAD
+                      AND LINE > REQBEG.LINE
+                 )
+              JOIN TRAK LASTTRK
+              ON LASTTRK.LINE IN (
+                  SELECT max(LINE)
+                  FROM TRAK
+                  WHERE
+                    TRACE_MAP = FIRSTTRK.TRACE_MAP
+                )
               LEFT JOIN HTTP REQEND
-ON
-  REQEND.LINE in (
-    SELECT max(LINE)
+              ON
+                REQEND.LINE in (
+                  SELECT max(LINE)
                   FROM HTTP
-    WHERE
+                  WHERE
                     PATTERN = 'reqEnding'
-      AND REQ = REQBEG.REQ
-  )
-LEFT JOIN CTX NEWCTX
-  ON
-    NEWCTX.LINE IN (
-      SELECT min(LINE)
-      FROM CTX
-      WHERE
-        THREAD = REQBEG.THREAD
-        AND PATTERN = 'createdAssessCtx'
-        AND LINE > REQBEG.LINE
-     )
-""";
+                    AND REQ = REQBEG.REQ
+                )
+              LEFT JOIN CTX NEWCTX
+                ON
+                  NEWCTX.LINE IN (
+                    SELECT min(LINE)
+                    FROM CTX
+                    WHERE
+                      THREAD = REQBEG.THREAD
+                      AND PATTERN = 'createdAssessCtx'
+                      AND LINE > REQBEG.LINE
+                   )
+              """;
       if (VERBOSE) {
         System.out.println("selectSql = \n" + selectSql);
       }
@@ -164,14 +164,14 @@ LEFT JOIN CTX NEWCTX
                   default -> dataType;
                 }
         ).append(", \n");
-    }
+      }
       sb.setLength(sb.length() - ", \n".length());
       sb.append("\n);");
 
       final String createRequestTableSql = sb.toString();
       if (VERBOSE) {
         System.out.println("createRequestTableSql = \n" + createRequestTableSql);
-  }
+    }
       stmt.close();
 
       // create the table

@@ -1,19 +1,24 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog;
 
+import static com.contrastsecurity.agent.loghog.shred.pmd.CompoundShred.buildCompoundShred;
+
 import com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory;
 import com.contrastsecurity.agent.loghog.db.LogTable;
 import com.contrastsecurity.agent.loghog.logshreds.CrumbShred;
 import com.contrastsecurity.agent.loghog.logshreds.CtxShred;
+import com.contrastsecurity.agent.loghog.logshreds.FluxShred;
 import com.contrastsecurity.agent.loghog.logshreds.HttpShred;
 import com.contrastsecurity.agent.loghog.logshreds.MesgShred;
 import com.contrastsecurity.agent.loghog.logshreds.TrakShred;
 import com.contrastsecurity.agent.loghog.logshreds.VulnShred;
 import com.contrastsecurity.agent.loghog.logviews.ViewCreator;
+import com.contrastsecurity.agent.loghog.shred.pmd.PmdShred;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public class LogHog {
 
@@ -32,11 +37,22 @@ public class LogHog {
       LogTable.initializeLogTable(connection, logFilepath);
       new MesgShred().createAndPopulateShredTables(connection);
       new CrumbShred().createAndPopulateShredTables(connection);
-      new TrakShred().createAndPopulateShredTables(connection);
-      new CtxShred().createAndPopulateShredTables(connection);
+
+      final PmdShred trakShred = new TrakShred();
+      trakShred.createAndPopulateShredTables(connection);
+
+      final PmdShred ctxShred = new CtxShred();
+      ctxShred.createAndPopulateShredTables(connection);
+
       new HttpShred().createAndPopulateShredTables(connection);
-      // new FluxShred().createAndPopulateShredTables(connection);
+
+      final PmdShred fluxShred = new FluxShred();
+      fluxShred.createAndPopulateShredTables(connection);
+
       new VulnShred().createAndPopulateShredTables(connection);
+
+      PmdShred mfluxShred = buildCompoundShred("MFLUX", List.of(fluxShred, ctxShred, trakShred));
+      mfluxShred.createAndPopulateShredTables(connection);
       //            new WipAmqpShred().createTables(connection);
       //            new WipLmclShred().createTables(connection);
       //            new WipAcelShred().createTables(connection);

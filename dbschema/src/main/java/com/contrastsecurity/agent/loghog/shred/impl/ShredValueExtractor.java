@@ -1,5 +1,5 @@
 /* (C)2024 */
-package com.contrastsecurity.agent.loghog.shred;
+package com.contrastsecurity.agent.loghog.shred.impl;
 
 import java.util.ArrayList;
 import java.util.HashMap;

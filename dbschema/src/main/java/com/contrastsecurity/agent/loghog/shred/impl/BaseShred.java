@@ -1,6 +1,10 @@
 /* (C)2024 */
-package com.contrastsecurity.agent.loghog.shred;
+package com.contrastsecurity.agent.loghog.shred.impl;
 
+import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
+import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
+import com.contrastsecurity.agent.loghog.shred.ShredSource;
+import com.contrastsecurity.agent.loghog.shred.pmd.PmdShredSource;
 import com.contrastsecurity.agent.loghog.sql.BatchedSelector;
 import com.contrastsecurity.agent.loghog.sql.CreatableSqlTable;
 
@@ -10,40 +14,97 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.TIMESTAMP_VAR;
+import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.nullCaptureGroupPattern;
+import static com.contrastsecurity.agent.loghog.shred.RowClassifier.MISFIT_PATTERN_ID;
 
 public class BaseShred {
   public static final String LOG_TABLE_LINE_COL = "LOG.col(LINE)";
+  public static final String LOG_TABLE_ENTRY_COL = "LOG.col(ENTRY)";
   public static final int LOG_TABLE_LINE_IDX = 0;
   public static final int LOG_TABLE_ENTRY_IDX = 1;
   public static final String LAST_MATCH_KEY = "LAST_MATCH_KEY";
   public static final String SHRED_TABLE_PATTERN_COL = "shred.col(PATTERN)";
 
   public static final boolean SHOW_PROGRESS = false;
-  public static final boolean SHOW_MISFITS = false;
+  final boolean showMisfits;
   public static final boolean VERBOSE = true;
 
   private final CreatableSqlTable shredTable;
   private final CreatableSqlTable misfitsTable;
-  private final com.contrastsecurity.agent.loghog.shred.ShredSource shredSource;
-  final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> shredMetadata;
-  final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> misfitsMetadata;
+  private final ShredSource shredSource;
+  final List <ShredRowMetaData> shredMetadata;
+  final List <ShredRowMetaData> misfitsMetadata;
 
   public BaseShred(
-      final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> shredMetadata,
+          final List <ShredRowMetaData> shredMetadata,
+          final CreatableSqlTable shredTable,
+          final List <ShredRowMetaData> misfitsMetadata,
+          final CreatableSqlTable misfitsTable,
+          final ShredSource shredSource) {
+    this(shredMetadata,shredTable,misfitsMetadata,misfitsTable,shredSource,false);
+  }
+
+  public BaseShred(
+      final List<ShredRowMetaData> shredMetadata,
       final CreatableSqlTable shredTable,
-      final List <com.contrastsecurity.agent.loghog.shred.ShredRowMetaData> misfitsMetadata,
+      final List<ShredRowMetaData> misfitsMetadata,
       final CreatableSqlTable misfitsTable,
-      final com.contrastsecurity.agent.loghog.shred.ShredSource shredSource) {
+      final ShredSource shredSource,
+      final boolean showMisfits) {
     this.shredTable = shredTable;
     this.misfitsTable = misfitsTable;
-    this.shredSource = shredSource;
     this.shredMetadata = shredMetadata;
     this.misfitsMetadata = misfitsMetadata;
+    this.showMisfits = showMisfits;
+    this.shredSource = groomedShredSource(shredSource, shredMetadata);
+  }
+
+  public boolean showMisfits() {
+    return showMisfits;
+  }
+
+  public CreatableSqlTable shredTable() {
+    return shredTable;
+  }
+
+  public CreatableSqlTable misfitsTable() {
+    return misfitsTable;
+  }
+
+  public List<ShredRowMetaData> shredMetadata() {
+    return shredMetadata;
+  }
+
+  public List<ShredRowMetaData> misfitsMetadata() {
+    return misfitsMetadata;
+  }
+
+  public static ShredSource groomedShredSource(final ShredSource shredSource, List<ShredRowMetaData> shredMetadata) {
+    if (shredSource instanceof PmdShredSource) {
+      final PmdShredSource pmdShredSource = (PmdShredSource)shredSource;
+      return new PmdShredSource(pmdShredSource, new PatternGroomer(requiredCaptureGroupNames(shredMetadata)));
+    } else if (shredSource.rowValuesExtractor() instanceof PatternRowValuesExtractor) {
+      // automatically appends non-matching groups so all patterns return all group names
+      final PatternRowValuesExtractor prvExtractor = (PatternRowValuesExtractor)shredSource.rowValuesExtractor();
+      return new BaseShredSource((BaseShredSource)shredSource,
+                new PatternRowValuesExtractor(prvExtractor,
+                    new PatternGroomer(requiredCaptureGroupNames(shredMetadata))));
+    } else {
+      return shredSource;
+    }
+  }
+
+  public ShredSource shredSource() {
+    return shredSource;
   }
 
   public Object[] shredRowValues(
@@ -56,6 +117,8 @@ public class BaseShred {
         val = extractedVals.get(metaData.extractName());
       } else if (LOG_TABLE_LINE_COL.equals(metaData.extractName())) {
         val = sourceRow[LOG_TABLE_LINE_IDX];
+      } else if (LOG_TABLE_ENTRY_COL.equals(metaData.extractName())) {
+        val = sourceRow[LOG_TABLE_ENTRY_IDX];
       } else if (SHRED_TABLE_PATTERN_COL.equals(metaData.extractName())) {
         val = patternId;
       }
@@ -68,11 +131,16 @@ public class BaseShred {
   }
 
   public Object[] misfitsRowValues(Object[] sourceRow, Object lastMatchKey) {
+    if (misfitsMetadata == null){
+      return new Object[0];
+    }
     Object[] misfitsRow = new Object[misfitsMetadata.size()];
     int idx = 0;
-    for (com.contrastsecurity.agent.loghog.shred.ShredRowMetaData metaData : misfitsMetadata) {
+    for (ShredRowMetaData metaData : misfitsMetadata) {
       if (LOG_TABLE_LINE_COL.equals(metaData.extractName())) {
         misfitsRow[idx++] = sourceRow[LOG_TABLE_LINE_IDX];
+      } else if (LOG_TABLE_ENTRY_COL.equals(metaData.extractName())) {
+        misfitsRow[idx++] = sourceRow[LOG_TABLE_ENTRY_IDX];
       } else if (LAST_MATCH_KEY.equals(metaData.extractName())) {
         misfitsRow[idx++] = lastMatchKey;
       }
@@ -175,20 +243,36 @@ public class BaseShred {
       connection.setAutoCommit(false);
 
       for (Object[] row : sourceRows) {
-        String patternId = rowClassifier.identifyPattern(row);
-        Map<String, Object> extractedVals = valuesExtractor.extractValues(patternId, row);
-        if (extractedVals != null && extractedVals.size() == valuesExtractor.expectedCount()) {
-          Object[] insertVals = shredRowValues(row, patternId, extractedVals);
-          values.add(insertVals);
-          lastGoodRowKey = valuesExtractor.sourceRowKey(row);
-          nAdded++;
-        } else {
-          if (SHOW_MISFITS) {
-            System.out.println("Extraction/transformation failed in row " + Arrays.asList(row));
-            System.out.println("patternId = " + patternId);
-            System.out.println("Expecting " + valuesExtractor.expectedCount() + " values, but found:\n");
-            System.out.println(extractedVals);
+        final String patternId = rowClassifier.findPattern(row);
+        Map<String, Object> extractedVals =
+                MISFIT_PATTERN_ID != patternId ?
+                valuesExtractor.extractValues(patternId, row, /* FIXME showMisfits*/ false) : null;
+        if (extractedVals != null) {
+          if (extractedVals.size() == valuesExtractor.expectedCount()) {
+            Object[] insertVals = shredRowValues(row, patternId, extractedVals);
+            values.add(insertVals);
+            lastGoodRowKey = valuesExtractor.sourceRowKey(row);
+            nAdded++;
+          } else {
+            if (showMisfits) {
+              System.out.println("\nExtraction/transformation failed in row " + Arrays.asList(row));
+              System.out.println("PatternId " + patternId + " returned extractedVals:\n\t" + extractedVals +
+                      "\n\tbut expected size was " + valuesExtractor.expectedCount());
+            }
+            extractedVals = null;
           }
+        } else if (showMisfits) {
+            System.out.println("\nExtraction/transformation failed in row " + Arrays.asList(row));
+            System.out.println("PatternId " + patternId + " returned null extractedVals");
+            if (rowClassifier instanceof TextSignatureRowClassifier) {
+              final String alternatePattern = ((TextSignatureRowClassifier) rowClassifier)
+                      .findPattern(row, Collections.singleton(patternId));
+              if (!MISFIT_PATTERN_ID.equals(alternatePattern)) {
+                System.out.println("Consider alternatePattern " + alternatePattern + "?  Maybe reorder or modify signatures?");
+              }
+            }
+        }
+        if (extractedVals == null) {
           if (misfitsTable != null) {
             final Object[] misfitVals = misfitsRowValues(row, lastGoodRowKey);
             misfits.add(misfitVals);
@@ -269,6 +353,50 @@ public class BaseShred {
                       + " == null ? "
                       + String.valueOf(matcher.group(name) == null));
     }
+  }
+
+  public static class PatternGroomer implements Function<Pattern,Pattern> {
+
+    final List<String> requiredNamedGroups;
+
+    public PatternGroomer(final List<String> requiredNamedGroups) {
+      this.requiredNamedGroups = requiredNamedGroups;
+    }
+
+    @Override
+    public Pattern apply(Pattern pattern) {
+      return addRequiredCaptureGroups(pattern);
+    }
+
+    private Pattern addRequiredCaptureGroups(final Pattern pattern) {
+      final Set<String> patternGroups = pattern.namedGroups().keySet();
+
+      final String initialPatternStr = pattern.pattern();
+      final boolean endWithDollar = initialPatternStr.endsWith("$");
+      final StringBuilder append = new StringBuilder(
+              endWithDollar ?
+                      initialPatternStr.substring(0, initialPatternStr.length() - 1) :
+                      initialPatternStr);
+      requiredNamedGroups.stream().filter(name -> !patternGroups.contains(name))
+              .forEach(missingName ->append.append(nullCaptureGroupPattern(missingName)));
+      if (endWithDollar) {
+        append.append('$');
+      }
+
+      final Pattern updatedPattern = Pattern.compile(append.toString());
+      if (!updatedPattern.namedGroups().keySet().containsAll(requiredNamedGroups)) {
+        throw new IllegalStateException("updatedPattern contains capture groups: " +
+                updatedPattern.namedGroups().keySet() + " but requires " + requiredNamedGroups);
+      }
+
+      return updatedPattern;
+    }
+  }
+
+  protected static List<String> requiredCaptureGroupNames(final List<ShredRowMetaData> shredMetadata) {
+    return shredMetadata.stream().map(smd -> smd.extractName())
+            .filter(groupName -> groupName != LOG_TABLE_LINE_COL
+                    && groupName != SHRED_TABLE_PATTERN_COL).toList();
   }
 
   record AddRowsResult(int numAddedShredRows, int numMisfitRows, Object lastGoodRowKey) {}

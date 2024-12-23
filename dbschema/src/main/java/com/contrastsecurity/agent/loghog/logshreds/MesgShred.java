@@ -1,19 +1,21 @@
 package com.contrastsecurity.agent.loghog.logshreds;
 
-import com.contrastsecurity.agent.loghog.shred.BaseShred;
-import com.contrastsecurity.agent.loghog.shred.PatternRowValuesExtractor;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShred;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShredSource;
+import com.contrastsecurity.agent.loghog.shred.CandidateRowSelector;
+import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
+import com.contrastsecurity.agent.loghog.shred.impl.PatternRowValuesExtractor;
+import com.contrastsecurity.agent.loghog.shred.RowClassifier;
 import com.contrastsecurity.agent.loghog.shred.RowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
-import com.contrastsecurity.agent.loghog.shred.ShredSource;
-import com.contrastsecurity.agent.loghog.shred.ShredSqlTable;
+import com.contrastsecurity.agent.loghog.shred.impl.ShredSqlTable;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory.jooq;
 import static com.contrastsecurity.agent.loghog.db.LogTable.LOG_TABLE_NAME;
@@ -46,8 +48,9 @@ public class MesgShred extends BaseShred {
       List.of(
           new ShredRowMetaData(
               "LINE", SQLDataType.INTEGER.notNull(), Integer.class, LOG_TABLE_LINE_COL),
-          new ShredRowMetaData("MESG", SQLDataType.INTEGER, Integer.class, LAST_MATCH_KEY));
-
+          new ShredRowMetaData("MESG", SQLDataType.INTEGER, Integer.class, LAST_MATCH_KEY),
+              new ShredRowMetaData(
+                      "ENTRY", SQLDataType.VARCHAR, String.class, LOG_TABLE_ENTRY_COL));
   static final ShredSqlTable SHRED_SQL_TABLE =
       new ShredSqlTable(
           SHRED_TABLE_NAME,
@@ -93,19 +96,44 @@ public class MesgShred extends BaseShred {
                   .getSQL()),
           List.of());
 
-  public static final RowValuesExtractor VALUE_EXTRACTOR =
-      new PatternRowValuesExtractor(
-          Map.of(ANY_PATTERN_ID, Pattern.compile(FULL_PREAMBLE_XTRACT + "-( (?<message>.*))?$")),
+
+  static final List<PatternMetadata> PATTERN_METADATA =
+          List.of(
+            new PatternMetadata(ANY_PATTERN_ID,
+                List.of(""),
+                Pattern.compile(FULL_PREAMBLE_XTRACT + "-( (?<message>.*))?$"))
+          );
+
+
+  static final List<String> EXTRACTED_VAL_NAMES =
           SHRED_METADATA.stream()
-              .map(srmd -> srmd.extractName())
-              .filter(extractName -> extractName != LOG_TABLE_LINE_COL)
-              .toList());
+                  .map(srmd -> srmd.extractName())
+                  .filter(
+                          extractName ->
+                                  extractName != LOG_TABLE_LINE_COL && extractName != SHRED_TABLE_PATTERN_COL)
+                  .toList();
+
+  static final RowValuesExtractor VALUE_EXTRACTOR =
+          new PatternRowValuesExtractor(
+                  PATTERN_METADATA.stream()
+                          .collect(Collectors.toMap(pmd -> pmd.patternId(), pmd -> pmd.pattern())),
+                  EXTRACTED_VAL_NAMES);
 
   // There's no classification required for the mesg shred all rows are parsed identically
   // (or they don't match and become misfits in the continuation table
-  public static final ShredSource SHRED_SOURCE = new ShredSource(LOG_TABLE_NAME, VALUE_EXTRACTOR);
+  public static final BaseShredSource SHRED_SOURCE = new BaseShredSource(LOG_TABLE_NAME, VALUE_EXTRACTOR,
+          RowClassifier.allTheSameRowClassifier(),
+          CandidateRowSelector.allRowsSelector(LOG_TABLE_NAME)
+  );
 
   public MesgShred() {
     super(SHRED_METADATA, SHRED_SQL_TABLE, MISFITS_METADATA, MISFITS_SQL_TABLE, SHRED_SOURCE);
   }
+
+  static final List<String> exampleLogLines = List.of();
+
+  public static void main(String[] args) {
+    testPatternMatching(exampleLogLines, PATTERN_METADATA.stream().filter(pmd -> pmd.patternId().startsWith("channelWriteComplete")).toList(), true);
+  }
+
 }

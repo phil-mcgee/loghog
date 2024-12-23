@@ -1,23 +1,23 @@
 /* (C)2024 */
 package com.contrastsecurity.agent.loghog.logshreds;
 
-import com.contrastsecurity.agent.loghog.shred.BaseShred;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShredSource;
+import com.contrastsecurity.agent.loghog.shred.impl.BaseShred;
 import com.contrastsecurity.agent.loghog.shred.PatternMetadata;
-import com.contrastsecurity.agent.loghog.shred.PatternRowValuesExtractor;
+import com.contrastsecurity.agent.loghog.shred.impl.PatternRowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.PatternSignatures;
 import com.contrastsecurity.agent.loghog.shred.RowClassifier;
 import com.contrastsecurity.agent.loghog.shred.RowValuesExtractor;
 import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
-import com.contrastsecurity.agent.loghog.shred.ShredSource;
-import com.contrastsecurity.agent.loghog.shred.ShredSqlTable;
-import com.contrastsecurity.agent.loghog.shred.TextSignatureRowClassifier;
+import com.contrastsecurity.agent.loghog.shred.impl.ShredSqlTable;
+import com.contrastsecurity.agent.loghog.shred.impl.TextSignatureRowClassifier;
+import com.contrastsecurity.agent.loghog.shred.pmd.PmdShred;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -25,7 +25,7 @@ import static com.contrastsecurity.agent.loghog.db.EmbeddedDatabaseFactory.jooq;
 import static com.contrastsecurity.agent.loghog.db.LogTable.LOG_TABLE_NAME;
 import static com.contrastsecurity.agent.loghog.logshreds.PatternGroups.*;
 
-public class CtxShred extends BaseShred {
+public class CtxShred extends PmdShred {
 
   static final String SHRED_TABLE_NAME = "CTX";
   static final String SHRED_KEY_COLUMN = "LINE";
@@ -54,7 +54,9 @@ public class CtxShred extends BaseShred {
   static final List<ShredRowMetaData> MISFITS_METADATA =
       List.of(
           new ShredRowMetaData(
-              "LINE", SQLDataType.INTEGER.notNull(), Integer.class, LOG_TABLE_LINE_COL));
+              "LINE", SQLDataType.INTEGER.notNull(), Integer.class, LOG_TABLE_LINE_COL),
+              new ShredRowMetaData(
+                      "ENTRY", SQLDataType.VARCHAR, String.class, LOG_TABLE_ENTRY_COL));
 
   static final ShredSqlTable SHRED_SQL_TABLE =
       new ShredSqlTable(
@@ -98,7 +100,7 @@ public class CtxShred extends BaseShred {
                   .getSQL()),
           List.of());
 
-  public static final String[] ENTRY_SIGNATURES = {
+  public static final Set<String> ENTRY_SIGNATURES = Set.of(
     "- Created context: ",
     "- Preparing to jump context: ",
     "Saving app=[",
@@ -106,26 +108,12 @@ public class CtxShred extends BaseShred {
     " onStarted ",
     " wrapped a runnable: ",
     "Removing long-living runnable/callable",
-    "Cleared expired assessment",
+    "Cleared expired assessment"
 //    "AbstractEventExecutor.safeExecute"
-  };
+  );
 
-  static String entryTestSql() {
-    final StringBuilder sb = new StringBuilder();
-    String conjunction = "";
-    for (String signature : ENTRY_SIGNATURES) {
-      sb.append(conjunction).append("LOG.ENTRY like '%");
-      sb.append(signature).append("%'");
-      if (conjunction.isEmpty()) {
-        conjunction = " OR ";
-      }
-    }
-    return sb.toString();
-  }
-
-  //  static String entryTestSql() {
-  //    return "LOG.LINE = 27621";
-  //  }
+  static final String ASSESS_NONNULL_XTRACTS = ASSESS_CTX_XTRACT + "\\{traceMap="
+          + TRACE_MAP_XTRACT + " \\(with " + TRACE_MAP_SIZE_XTRACT + " items in it\\), jumpedContexts=" + JUMPED_ASSESS_CTX_XTRACT + "\\}";
 
   static final List<PatternMetadata> PATTERN_METADATA =
       List.of(
@@ -137,14 +125,7 @@ public class CtxShred extends BaseShred {
               Pattern.compile(
                   DEBUG_PREAMBLE_XTRACT
                       + "- Created context: "
-                      + "AssessmentContext@" + ASSESS_CTX_XTRACT
-                      + NO_CONCUR_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_TASK_CLASS_XTRACT
-                      + NO_TASK_OBJ_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
-                      + NO_TRACE_MAP_XTRACT
+                      + ASSESS_CTX_XTRACT
                       + "$")),
           // 2024-10-28 14:36:25,872 [reactor-http-nio-2 AssessmentContext] DEBUG - Preparing to
           // jump context: AssessmentContext@71d8e43d
@@ -155,13 +136,6 @@ public class CtxShred extends BaseShred {
                   DEBUG_PREAMBLE_XTRACT
                       + "- Preparing to jump context: "
                       + "AssessmentContext@" + ASSESS_CTX_XTRACT
-                      + NO_CONCUR_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_TASK_CLASS_XTRACT
-                      + NO_TASK_OBJ_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
-                      + NO_TRACE_MAP_XTRACT
                       + "$")),
           // Saving app=[com.contrastsecurity.agent.apps.ApplicationContext@19503bf5],
           // HttpContext=[HttpContext{...}], and AssessmentContext=[AssessmentContext@71d8e43d] to
@@ -170,7 +144,8 @@ public class CtxShred extends BaseShred {
               "savingApp",
               List.of("Saving app=["),
               Pattern.compile(
-                  "^\\s+Saving app=\\["
+                      DEBUG_PREAMBLE_XTRACT
+                      + "- Saving app=\\["
                       + APP_CTX_XTRACT
                       + "], HttpContext=\\[.+}], and AssessmentContext=\\["
                       + "(AssessmentContext@)?"
@@ -178,13 +153,6 @@ public class CtxShred extends BaseShred {
                       + "] to ConcurrencyContext=\\["
                       + CONCUR_CTX_XTRACT
                       + "]"
-                      + NO_TIMESTAMP_XTRACT
-                      + NO_THREAD_LOGGER_XTRACT
-                      + NO_TASK_CLASS_XTRACT
-                      + NO_TASK_OBJ_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
-                      + NO_TRACE_MAP_XTRACT
                       + "$")),
           // 2024-10-28 14:36:23,207 [main b] DEBUG - main-1 onSubmitted
           // java.util.zip.ZipFile$CleanableResource$FinalizableResource
@@ -202,10 +170,6 @@ public class CtxShred extends BaseShred {
                       + CONCUR_CTX_XTRACT
                       + " and trace map "
                       + TRACE_MAP_XTRACT
-                      + NO_ASSESS_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
                       + "$")),
           // 2024-10-28 14:36:22,782 [background-preinit b] DEBUG - background-preinit-29 onStarted
           // java.lang.Thread Thread@7dfca9e6 and got context d@113a6636 and trace map null
@@ -222,10 +186,6 @@ public class CtxShred extends BaseShred {
                       + CONCUR_CTX_XTRACT
                       + " and trace map "
                       + TRACE_MAP_XTRACT
-                      + NO_ASSESS_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
                       + "$")),
           // 2024-10-28 14:36:22,782 [background-preinit b] DEBUG - background-preinit-29 onStarted
           // java.lang.Thread Thread@7dfca9e6 and got context d@113a6636 and trace map null
@@ -239,12 +199,6 @@ public class CtxShred extends BaseShred {
                       + " "
                       + TASK_OBJ_XTRACT
                       + " but context was null"
-                      + NO_CONCUR_CTX_XTRACT
-                      + NO_TRACE_MAP_XTRACT
-                      + NO_ASSESS_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
                       + "$")),
           // 2024-10-28 14:36:24,863 [main b] DEBUG - io.netty.channel.nio.NioEventLoop@f8cd5d7
           // wrapped a runnable: io.netty.channel.AbstractChannel$AbstractUnsafe$1@4d1d30dc
@@ -257,13 +211,6 @@ public class CtxShred extends BaseShred {
                       + WRAP_INIT_XTRACT
                       + " wrapped a runnable: "
                       + WRAPPED_RUNNABLE_XTRACT
-                      + " "
-                      + NO_CONCUR_CTX_XTRACT
-                      + NO_ASSESS_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_TASK_CLASS_XTRACT
-                      + NO_TASK_OBJ_XTRACT
-                      + NO_TRACE_MAP_XTRACT
                       + "$")),
           new PatternMetadata(
               "clearedAssessment",
@@ -273,12 +220,6 @@ public class CtxShred extends BaseShred {
                       + "- Cleared expired assessment context AssessmentContext@"
                               + ASSESS_CTX_XTRACT
                       + " with traceMap " + TRACE_MAP_XTRACT + " in .+"
-                      + NO_CONCUR_CTX_XTRACT
-                      + NO_APP_CTX_XTRACT
-                      + NO_TASK_CLASS_XTRACT
-                      + NO_TASK_OBJ_XTRACT
-                      + NO_WRAP_INIT_XTRACT
-                      + NO_WRAPPED_RUNNABLE_XTRACT
                       + "$"))
 //              ,
 //
@@ -304,50 +245,27 @@ public class CtxShred extends BaseShred {
 //              ))
       );
 
-  static final List<String> EXTRACTED_VAL_NAMES =
-      SHRED_METADATA.stream()
-          .map(srmd -> srmd.extractName())
-          .filter(
-              extractName ->
-                  extractName != LOG_TABLE_LINE_COL && extractName != SHRED_TABLE_PATTERN_COL)
-          .toList();
-
-  static final RowValuesExtractor VALUE_EXTRACTOR =
-      new PatternRowValuesExtractor(
-          PATTERN_METADATA.stream()
-              .collect(Collectors.toMap(pmd -> pmd.patternId(), pmd -> pmd.pattern())),
-          EXTRACTED_VAL_NAMES);
-
-  static final RowClassifier ROW_CLASSIFIER =
-      new TextSignatureRowClassifier(
-          PATTERN_METADATA.stream()
-              .map(pmd -> new PatternSignatures(pmd.patternId(), pmd.signatures()))
-              .toList());
-
-  public static final ShredSource SHRED_SOURCE =
-      new ShredSource(
-          LOG_TABLE_NAME,
-          VALUE_EXTRACTOR,
-          ROW_CLASSIFIER,
-          jooq().select(DSL.asterisk()).from(LOG_TABLE_NAME).where(entryTestSql()).getSQL());
-
   public CtxShred() {
-    super(SHRED_METADATA, SHRED_SQL_TABLE, MISFITS_METADATA, MISFITS_SQL_TABLE, SHRED_SOURCE);
+    super(SHRED_METADATA, SHRED_SQL_TABLE,
+            MISFITS_METADATA, MISFITS_SQL_TABLE,
+            ENTRY_SIGNATURES, PATTERN_METADATA,
+            true);
   }
 
   static final List<String> exampleLogLines = List.of(
-    "2024-11-12 16:26:33,392 [reactor-http-nio-2 AssessmentContext] DEBUG - Created context: AssessmentContext@7ecb67d4",
-    "2024-11-12 16:27:03,429 [elastic-2 b] DEBUG - elastic-2-40 onStarted java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask ScheduledFutureTask@02b2bc79 and got context a@6532cf85 and trace map null",
-    "2024-11-12 16:26:53,461 [pool-2-thread-2 b] DEBUG - pool-2-thread-2-15 onStarted java.util.concurrent.Executors$RunnableAdapter RunnableAdapter@7780bf12 but context was null",
-    "2024-11-12 16:27:03,428 [Thread-10 b] DEBUG - Thread-10-33 onSubmitted java.lang.Thread Thread@60e40443 into map under context a@53eb78bf and trace map null",
-    "2024-11-12 16:27:03,425 [reactor-http-nio-2 AssessmentContext] DEBUG - Preparing to jump context: AssessmentContext@7ecb67d4",
-    "\tSaving app=[com.contrastsecurity.agent.apps.ApplicationContext@1a9e4f22], HttpContext=[HttpContext{request=null, response=null}], and AssessmentContext=[AssessmentContext@7ecb67d4] to ConcurrencyContext=[a@00a90db9]",
-    "2024-11-12 16:27:03,425 [reactor-http-nio-1 b] DEBUG - io.netty.channel.nio.NioEventLoop@1564c848 wrapped a runnable: io.netty.channel.AbstractChannel$AbstractUnsafe$8@3aac0178 ",
-    "2024-11-12 16:27:03,424 [reactor-http-nio-3 AssessmentContext] DEBUG - Cleared expired assessment context AssessmentContext@393a609a with traceMap b@2e819ac3 in (29999ms)",
-    "2024-11-14 21:10:53,104 [reactor-http-nio-1 b] DEBUG - AbstractEventExecutor.safeExecute(java.lang.ContrastRunnableWrapper$ContrastClearStateRunnableWrapper@5bb04013) wrapping task io.netty.channel.AbstractChannel$AbstractUnsafe$1@6c6e0f32 with ContrastContext ContrastContext{application=com.contrastsecurity.agent.apps.ApplicationContext@353a9f6a, http=HttpContext{request=null, response=null}, scopeProvider=com.contrastsecurity.agent.scope.ScopeProviderImpl@25ac4989, scopeArchitecture=ScopeArchitecture{scope=0, sampling=0}, additionalScopes=[ASSESS=0, ASSESS_PROPAGATION=0, ASSESS_SAMPLING=0, ASSESS_SOURCE=0, ASSESS_VALIDATOR=0, CONCURRENCY_IGNORE_SUBMIT=0, GENERAL=0, JSP_INCLUDE=0, LOG_ENHANCER=0, OBSERVE_DEADZONE=0, SERVLET=0, SERVLET_MULTIPART=0, SERVLET_PARAMETER_RESOLUTION=0, SERVLET_RESPONSE_HEADER=0, THROWABLE=0, WEBSPHERE_JAR_PREVENTION=0], assessment=null, protect=com.contrastsecurity.agent.plugins.protect.ProtectContext@517692a6, observe=null}"
+//    "2024-11-12 16:26:33,392 [reactor-http-nio-2 AssessmentContext] DEBUG - Created context: AssessmentContext@7ecb67d4",
+//      "2024-12-16 04:36:12,028 [reactor-http-nio-4 AssessmentContext] DEBUG - Created context: AssessmentContext@23d27530{traceMap=b@593397d4 (with 0 items in it), jumpedContexts=false}"
+//    "2024-11-12 16:27:03,429 [elastic-2 b] DEBUG - elastic-2-40 onStarted java.util.concurrent.ScheduledThreadPoolExecutor$ScheduledFutureTask ScheduledFutureTask@02b2bc79 and got context a@6532cf85 and trace map null",
+//    "2024-11-12 16:26:53,461 [pool-2-thread-2 b] DEBUG - pool-2-thread-2-15 onStarted java.util.concurrent.Executors$RunnableAdapter RunnableAdapter@7780bf12 but context was null",
+//    "2024-11-12 16:27:03,428 [Thread-10 b] DEBUG - Thread-10-33 onSubmitted java.lang.Thread Thread@60e40443 into map under context a@53eb78bf and trace map null",
+//    "2024-11-12 16:27:03,425 [reactor-http-nio-2 AssessmentContext] DEBUG - Preparing to jump context: AssessmentContext@7ecb67d4",
+//    "2024-11-14 21:10:53,104 [reactor-http-nio-1 b] DEBUG - Saving app=[com.contrastsecurity.agent.apps.ApplicationContext@1a9e4f22], HttpContext=[HttpContext{request=null, response=null}], and AssessmentContext=[AssessmentContext@7ecb67d4] to ConcurrencyContext=[a@00a90db9]"
+    "2024-12-16 04:36:11,133 [reactor-http-nio-1 b] DEBUG - io.netty.channel.nio.NioEventLoop@6830983 wrapped a runnable: PromiseTask@79510e96(incomplete, task: reactor.netty.resources.ColocatedEventLoopGroup$$Lambda$964/0x00000008408b1c40@65029fa8)"
+//    "2024-11-12 16:27:03,424 [reactor-http-nio-3 AssessmentContext] DEBUG - Cleared expired assessment context AssessmentContext@393a609a with traceMap b@2e819ac3 in (29999ms)",
+//    "2024-11-14 21:10:53,104 [reactor-http-nio-1 b] DEBUG - AbstractEventExecutor.safeExecute(java.lang.ContrastRunnableWrapper$ContrastClearStateRunnableWrapper@5bb04013) wrapping task io.netty.channel.AbstractChannel$AbstractUnsafe$1@6c6e0f32 with ContrastContext ContrastContext{application=com.contrastsecurity.agent.apps.ApplicationContext@353a9f6a, http=HttpContext{request=null, response=null}, scopeProvider=com.contrastsecurity.agent.scope.ScopeProviderImpl@25ac4989, scopeArchitecture=ScopeArchitecture{scope=0, sampling=0}, additionalScopes=[ASSESS=0, ASSESS_PROPAGATION=0, ASSESS_SAMPLING=0, ASSESS_SOURCE=0, ASSESS_VALIDATOR=0, CONCURRENCY_IGNORE_SUBMIT=0, GENERAL=0, JSP_INCLUDE=0, LOG_ENHANCER=0, OBSERVE_DEADZONE=0, SERVLET=0, SERVLET_MULTIPART=0, SERVLET_PARAMETER_RESOLUTION=0, SERVLET_RESPONSE_HEADER=0, THROWABLE=0, WEBSPHERE_JAR_PREVENTION=0], assessment=null, protect=com.contrastsecurity.agent.plugins.protect.ProtectContext@517692a6, observe=null}"
   );
-
+  
   public static void main(String[] args) {
-    testPatternMatching(exampleLogLines, PATTERN_METADATA, true);
+    testPatternMatching(exampleLogLines, PATTERN_METADATA.stream().filter(pmd -> pmd.patternId().startsWith("wrapped")).toList(), true);
   }
 }

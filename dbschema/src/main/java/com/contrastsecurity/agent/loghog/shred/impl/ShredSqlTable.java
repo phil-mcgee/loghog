@@ -1,6 +1,7 @@
 /* (C)2024 */
-package com.contrastsecurity.agent.loghog.shred;
+package com.contrastsecurity.agent.loghog.shred.impl;
 
+import com.contrastsecurity.agent.loghog.shred.ShredRowMetaData;
 import com.contrastsecurity.agent.loghog.sql.BaseCreatableSqlTable;
 import org.jooq.CreateTableElementListStep;
 
